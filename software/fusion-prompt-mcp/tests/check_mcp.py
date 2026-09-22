@@ -1,0 +1,44 @@
+"""Real MCP protocol test. Uses an isolated job directory; does not execute Fusion APIs."""
+import asyncio
+import os
+from pathlib import Path
+import sys
+import tempfile
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+def value(result):
+    import json
+    if result.structuredContent:
+        return result.structuredContent
+    return json.loads(result.content[0].text)
+
+async def main():
+    server=str(Path(__file__).resolve().parents[1]/'server.py')
+    with tempfile.TemporaryDirectory() as home:
+        params=StdioServerParameters(command=sys.executable,args=[server],env={'HOME':home,'USERPROFILE':home,'PYTHONPATH':os.pathsep.join(sys.path)})
+        async with stdio_client(params) as (read,write):
+            async with ClientSession(read,write) as session:
+                await session.initialize()
+                result=await session.list_tools()
+                expected={'inspect_design','new_design','rectangle_sketch','circle_sketch','extrude',
+                          'set_parameter','export_model','fusion_capabilities','inspect_assembly','inspect_body',
+                          'read_selection','fillet_edges','create_joint','run_model_script','job_status','job_result',
+                          'list_jobs','cancel_job','inspect_full_assembly','select_geometry',
+                          'measure_minimum_distance','check_interference','validate_model'}
+                assert {t.name for t in result.tools}==expected
+                assert (await session.call_tool('extrude',{'design_id':'test'})).isError
+                assert (await session.call_tool('create_joint',{'design_id':'test','geometry_one':'a',
+                            'geometry_two':'b','kind':'invalid'})).isError
+                request={'operation_id':'mcp-test','document_id':'test','component_token':'root','units':'mm',
+                         'script':'def run(ctx): return {"ok":True}'}
+                first=await session.call_tool('run_model_script',request); assert not first.isError
+                job=value(first); ident=job['job_id']; assert job['status']=='queued'
+                duplicate=value(await session.call_tool('run_model_script',request)); assert duplicate['job_id']==ident
+                conflict=await session.call_tool('run_model_script',dict(request,script='def run(ctx): return 2'))
+                assert conflict.isError
+                status=value(await session.call_tool('job_status',{'job_id':ident})); assert status['status']=='queued'
+                cancelled=value(await session.call_tool('cancel_job',{'job_id':ident})); assert cancelled['status']=='cancelled'
+                print('PASS: MCP initialize; 23 tools; validation; persistent enqueue/status; duplicate protection; cancellation')
+
+asyncio.run(main())
