@@ -57,7 +57,7 @@ def assembly(d):
             'token': o.entityToken, 'component': ref(o.component),
             'grounded': o.isGrounded, 'linked': o.isReferencedComponent,
             'bodies': [ref(b) for b in each(o.component.bRepBodies)]})
-    return {'version': '0.3.0', 'root_bodies': [ref(b) for b in each(root.bRepBodies)],
+    return {'version': '0.4.0', 'root_bodies': [ref(b) for b in each(root.bRepBodies)],
             'occurrences': occurrences,
             'joints': [health(j) for j in each(root.joints)],
             'as_built_joints': [health(j) for j in each(root.asBuiltJoints)]}
@@ -91,11 +91,16 @@ def geometry(d, token, occurrence_token, keypoint):
 
 def execute(op, a, d, app):
     if op == 'capabilities':
-        return {'version': '0.3.0', 'fillets': ['constant_radius'],
+        return {'version': '0.4.0', 'fillets': ['constant_radius'],
                 'joints': ['rigid', 'revolute', 'slider', 'cylindrical'],
                 'joint_mode': 'standard joints (can reposition components)',
                 'batch_scripts': True, 'persistent_jobs': True, 'full_adsk_access': True,
-                'full_assembly_inspection': True, 'geometry_selection': True, 'live_fusion_tested': False}
+                'full_assembly_inspection': True, 'geometry_selection': True, 'live_fusion_tested': False,
+                'read_only_batches': True, 'explicit_root_target': '@root',
+                'verified_motion_requires_expected_world': True, 'disposable_experiments': True,
+                'tolerance_budgets': True, 'semantic_selectors': True,
+                'surface_review_candidates': True, 'full_print_audit': False,
+                'release_hash_revision_checks': True}
     if op == 'inspect_assembly':
         return assembly(d)
     if op == 'read_selection':

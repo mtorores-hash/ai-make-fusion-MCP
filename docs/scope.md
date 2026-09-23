@@ -20,3 +20,7 @@ security isolation. Scripts must identify stage checkpoints and cooperative canc
 Remaining gates are live Fusion validation and project license selection. A future public
 release must follow AI Make's reviewed-engineering and publication rules. No GitHub release,
 tag, repo visibility change or challenge-story material is part of this import.
+
+## v0.4 update
+
+See [BRANCA verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.

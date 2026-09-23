@@ -1,3 +1,14 @@
+# v0.4.0 — 2026-09-23 (development)
+
+BRANCA execution/verification slice: restricted read-only batches, explicit @root targeting,
+bounded synchronization, independently verified motion poses/restoration, bounded adaptive
+sampling, conservative root-body broad phase, disposable F3D experiments, dimensional tolerance
+budgets, semantic selectors, surface review candidates, release hash/revision validation and
+inclusive timing breakdown. Default modeling idempotency remains compatible with v0.3.
+
+Breaking helper change: sample_motion now requires expected_world(position). No live Fusion
+validation for v0.4. Full layer/slicer audit, primitive library and media timeline remain pending.
+
 # v0.3.0
 
 - Added persistent full-adsk Python batch jobs with explicit document/component/units.

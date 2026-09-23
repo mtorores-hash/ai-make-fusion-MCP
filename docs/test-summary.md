@@ -1,3 +1,31 @@
+# Test summary — v0.4.0
+
+2026-09-23: **63 tests pass**, plus the real STDIO MCP protocol check (23 tools).
+New coverage: repeated read-only batches perform no regeneration; modeling still regenerates;
+read-only mutation/escape attempts are rejected; default v0.3 idempotency preserved; explicit root;
+stale world transform rejected despite matching joint value; pose restored on measurement error;
+destructive volume/envelope/protected-interface changes rejected; candidate lifecycle closes unsaved;
+semantic re-resolution rejects ambiguity; small functional edges remain review candidates;
+nominal-clear/tolerance-failing fixture; bounded narrow-contact refinement with unresolved intervals;
+stale revision/calculation/hash rejected.
+
+Commands from `software/fusion-prompt-mcp`:
+
+```sh
+python -m unittest discover -s tests
+python tests/check_mcp.py
+```
+
+These are numerical, filesystem, real transport and Fusion API-double tests. **No v0.4 live
+Windows/Fusion kernel, archive, joint solver or physical print validation was performed.**
+The attached BRANCA report describes prior native/custom-script results; its JSON files were
+not available here, and those results are not evidence for the new wrappers. See
+[lessons provenance](branca-lessons.md) and [remaining work](upgrade-v0.4.md).
+
+---
+
+## Historical v0.3 evidence (unchanged below)
+
 # Test summary — v0.3.0
 
 ## Objective

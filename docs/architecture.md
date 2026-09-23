@@ -48,3 +48,7 @@ geometry changes and before the success record is committed. That job becomes in
 and requires inspection. Use list_jobs after a lost response; never treat a stale progress
 timestamp as proof a running job can be safely replayed.
 
+
+## v0.4 update
+
+See [BRANCA verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.

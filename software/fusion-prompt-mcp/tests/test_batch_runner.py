@@ -74,8 +74,47 @@ class BatchTests(unittest.TestCase):
         self.design.unitsManager=Node(convert=lambda x,a,b:x)
         with patch.object(ctx,'minimum_distance',side_effect=RuntimeError('measurement failed')):
             with self.assertRaisesRegex(RuntimeError,'measurement failed'):
-                ctx.sample_motion(joint,[0.5,1.0],[('a','b')])
+                matrix=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+                occ=Node(transform2=Node(asArray=lambda:matrix))
+                self.design.rootComponent.allOccurrences=Collection([occ])
+                with patch.object(runner.model_tools,'ref',return_value={}):
+                    ctx.sample_motion(joint,[0.5,1.0],[('a','b')],expected_world=lambda p:[(occ,matrix)])
         self.assertEqual(joint.jointMotion.rotationValue,0.25)
+    def test_default_mode_keeps_v03_operation_id_digest(self):
+        old=self.store.submit(self.req)
+        new=self.store.submit(dict(self.req,mode='modeling'))
+        self.assertEqual(old['job_id'],new['job_id'])
+    def test_read_only_performs_no_regeneration(self):
+        from unittest.mock import Mock
+        self.design.computeAll=Mock(side_effect=AssertionError('read-only regenerated'))
+        for i in range(3):
+            r=self.run_job(dict(self.req,operation_id='read'+str(i),mode='read_only',
+                                script='def run(ctx): return ctx.validate()'))
+            self.assertEqual(r['status'],'succeeded')
+        self.design.computeAll.assert_not_called()
+    def test_modeling_still_regenerates(self):
+        from unittest.mock import Mock
+        self.design.computeAll=Mock(return_value=True)
+        self.assertEqual(self.run_job()['status'],'succeeded')
+        self.design.computeAll.assert_called_once()
+    def test_explicit_root_target(self):
+        r=self.run_job(dict(self.req,component_token='@root'))
+        self.assertEqual(r['status'],'succeeded')
+    def test_motion_rejects_stale_transform_even_if_joint_value_changes(self):
+        ctx=self.context(); joint=Node(jointMotion=Node('RevoluteJointMotion',rotationValue=0.25))
+        self.design.unitsManager=Node(convert=lambda x,a,b:x)
+        matrix=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+        expected=list(matrix); expected[3]=1
+        occ=Node(transform2=Node(asArray=lambda:matrix))
+        self.design.rootComponent.allOccurrences=Collection([occ])
+        from unittest.mock import Mock
+        with patch.object(runner.adsk,'doEvents',Mock(),create=True), \
+             patch.object(ctx,'minimum_distance') as measure:
+            with self.assertRaisesRegex(RuntimeError,'unverified'):
+                ctx.sample_motion(joint,[1],[('a','b')],expected_world=lambda p:[(occ,expected)])
+            measure.assert_not_called()
+        self.assertEqual(joint.jointMotion.rotationValue,0.25)
+        self.assertTrue(ctx.result['pose_restored'])
     def test_explicit_mm_point_conversion(self):
         ctx=self.context(); p=ctx.point(10,20,30)
         self.assertEqual((p.x,p.y,p.z),(1,2,3))

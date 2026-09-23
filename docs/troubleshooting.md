@@ -19,3 +19,7 @@
 Use job_result for the complete error traceback. Model changes can be partial after a failure;
 open the last usable F3D checkpoint separately and inspect it. Automatic rollback is not supplied.
 See architecture.md for state and restart behavior, and script-api.md for execution boundaries.
+
+## v0.4 update
+
+See [BRANCA verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.

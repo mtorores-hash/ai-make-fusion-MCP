@@ -8,6 +8,7 @@ import re
 import sqlite3
 import time
 import uuid
+from .execution_policy import validate_read_only
 
 ROOT = Path.home() / '.fusion-prompt-mcp'
 TERMINAL = {'succeeded', 'failed', 'cancelled', 'interrupted'}
@@ -40,6 +41,14 @@ class Store:
             c.close()
 
     def submit(self, request):
+        if not isinstance(request, dict): raise ValueError('request must be an object')
+        for key in ('operation_id','document_id','component_token','units','script'):
+            if not isinstance(request.get(key),str) or not request[key]:
+                raise ValueError(key+' must be a nonempty string')
+        for key in ('checkpoint_before','validate_after'):
+            if type(request.get(key)) is not bool: raise ValueError(key+' must be boolean')
+        mode=request.get('mode','modeling')
+        if mode not in ('modeling','read_only'): raise ValueError('mode must be modeling or read_only')
         operation_id = request['operation_id']
         if not re.fullmatch(r'[A-Za-z0-9_.:-]{1,128}', operation_id):
             raise ValueError('operation_id must be 1–128 letters, digits, _, ., :, or -')
@@ -53,6 +62,13 @@ class Store:
         tree = ast.parse(source, filename='<fusion-job>')
         if not any(isinstance(n, ast.FunctionDef) and n.name == 'run' for n in tree.body):
             raise ValueError('Script must define synchronous run(ctx).')
+        if mode=='read_only':
+            validate_read_only(tree)
+            if request['checkpoint_before']:
+                raise ValueError('read_only does not create checkpoints; set checkpoint_before=False')
+        # Preserve v0.3 idempotency digests for the unchanged default modeling behavior.
+        request=dict(request)
+        if request.get('mode')=='modeling': request.pop('mode')
         encoded = canonical(request)
         digest = hashlib.sha256(encoded.encode()).hexdigest()
         with self.connect() as c:

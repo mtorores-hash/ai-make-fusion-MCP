@@ -1,32 +1,33 @@
 # Current state
 
-Updated: 2026-09-22. Branch: `workbench`. Version: v0.3.0 development snapshot.
+Updated: 2026-09-23. Branch: workbench. Version: v0.4.0 development.
 
 ## Now
 
-The tool documentation and matching software source are imported into the user-designated
-private repository. No code behavior changes were part of this documentation import.
-This is a supporting CAD automation tool; no new challenge budget, clock or episode is locked.
+Implemented the first BRANCA execution/verification slice. See docs/upgrade-v0.4.md for exact
+coverage and the outstanding P1/P2 work. Canonical requirements preserved in docs/branca-lessons.md.
+The Windows installation is not changed by this hosted repository update.
 
 ## Last experiment / evidence
 
-Prior build in this conversation: 40 automated tests and real MCP protocol checks passed.
-Tests cover SQLite/job behavior, geometry-selection predicates, dispatcher reentry and API
-contracts using Fusion doubles. Real Fusion geometry and Windows add-in execution remain
-unverified. See docs/test-summary.md for the evidence boundary and reproducible commands.
+63 automated tests pass (numerical/filesystem tests and Fusion API doubles); real STDIO MCP
+protocol checks pass with 23 tools. No live Fusion/kernel or physical printing test ran here.
+Reported BRANCA run: 1,233 native interference checks across 56 verified poses, archive reopening
+with four printed solids and 11 joints, and four parts sliced. These are user-reported v0.3/custom-script
+workflow results; underlying JSON evidence was not attached, and they do not validate v0.4 wrappers.
 
 ## Next question
 
-Can the installed v0.3 bridge complete the parametric spring-cup example in a COPY of a local
-Fusion design, produce a usable F3D checkpoint, and return the same job for an identical
-operation ID? Run this live acceptance before using it for a full BRANCA extruder batch.
+Does v0.4 complete disposable F3D import/close and joint/world-transform verification on a copy
+in Windows Fusion? Run docs/validation.md acceptance gates before relying on these native paths.
+Then implement remaining print/surface audits, path/contact policies and authoring/release/media layer.
 
 ## Files touched
 
-Repository README, AGENTS, .gitignore, CHANGELOG, docs/, source snapshot under software/,
-CURRENT.md and ledger/LEDGER.md. Shared AI_MAKE receives the repo-library pointer and handoff.
+Batch runner, queue validation, geometry checking, new policy/experiment/intent modules,
+regression tests, motion example, documentation and this working ledger.
 
 ## Open gates
 
-Live Fusion acceptance; project license selection before any public release; episode/public
-release authorization where applicable. No public release or repo visibility change performed.
+Live Windows/Fusion acceptance; remaining roadmap; license/public-release decision.
+No public release, challenge clock, budget or physical outcome inferred.

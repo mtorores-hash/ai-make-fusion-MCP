@@ -16,7 +16,10 @@ def value(result):
 async def main():
     server=str(Path(__file__).resolve().parents[1]/'server.py')
     with tempfile.TemporaryDirectory() as home:
-        params=StdioServerParameters(command=sys.executable,args=[server],env={'HOME':home,'USERPROFILE':home,'PYTHONPATH':os.pathsep.join(sys.path)})
+        bootstrap=('import sys; sys.path.insert(0,sys.argv[1]); import server; '
+                   'from FusionPromptBridge.job_store import Store; '
+                   'server.job_store=lambda:Store(sys.argv[2]); server.mcp.run(transport="stdio")')
+        params=StdioServerParameters(command=sys.executable,args=['-c',bootstrap,str(Path(server).parent),home])
         async with stdio_client(params) as (read,write):
             async with ClientSession(read,write) as session:
                 await session.initialize()
@@ -39,6 +42,11 @@ async def main():
                 assert conflict.isError
                 status=value(await session.call_tool('job_status',{'job_id':ident})); assert status['status']=='queued'
                 cancelled=value(await session.call_tool('cancel_job',{'job_id':ident})); assert cancelled['status']=='cancelled'
+                readonly=dict(request,operation_id='read-test',mode='read_only',checkpoint_before=False,
+                              script='def run(ctx): return ctx.inspect(False)')
+                assert not (await session.call_tool('run_model_script',readonly)).isError
+                assert (await session.call_tool('run_model_script',dict(readonly,operation_id='bad-read',
+                        script='def run(ctx): return ctx.design.computeAll()'))).isError
                 print('PASS: MCP initialize; 23 tools; validation; persistent enqueue/status; duplicate protection; cancellation')
 
 asyncio.run(main())

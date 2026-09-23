@@ -10,6 +10,7 @@ def run(ctx):
     component = ctx.target
     # Use the full adsk API here: sketches, constraints, planes, features, assemblies.
     ctx.record('design_intent', {'insert_diameter_mm': 12})
+    ctx.synchronize()  # Solve geometry before measuring/exporting intermediate results.
     ctx.progress(0.80, 'Checking geometry')
     ctx.record('health', ctx.validate())
     ctx.export('mechanism.f3d', ctx.design.rootComponent)
@@ -60,7 +61,7 @@ Avoid `adsk.doEvents()` loops and never call Fusion APIs from script-created thr
 | `section_sketch(body,plane,offset,name)` | Body/plane intersection curves in an editable sketch |
 | `import_step(absolute_path)` | Import real hardware into target component |
 | `set_joint_limits(joint,min,max,motion,unit)` | Rotation or slide limits with explicit unit conversion |
-| `sample_motion(joint,positions,pairs,motion,unit,capture)` | Pose samples, pair checks and optional PNG frames; restore starting pose |
+| `sample_motion(..., expected_world=kinematics, near_contact_mm=None)` | Verify requested joint and independent world transforms, check pairs, restore pose; optionally refine |
 | `export(filename,entity=None)` | Editable F3D, STEP/STP or STL; defaults to target component |
 | `export_print_copy(body,Matrix3D,stem)` | Orient a temporary copy, export STL/STEP, remove copy |
 | `camera(eye,target,up,fit)` | Set view; eye/target use declared units in world coordinates |
@@ -83,3 +84,22 @@ Linked/external-reference designs may reject F3D checkpoints: the batch then fai
 executing the script. Use an appropriate editable local source design; do not silently
 skip a failed checkpoint. Cloud project save/version management is not automated here.
 
+
+## v0.4 verification helpers
+
+See [full contracts and examples](upgrade-v0.4.md) before using these helpers.
+
+| Helper | Behavior |
+| --- | --- |
+| `synchronize(predicate=None,max_events=20,timeout_seconds=2,recompute=True)` | Bounded event synchronization, with optional one full regeneration |
+| `try_feature(name,build,select_bodies,rules,protected_metrics=None,capture=True)` | Disposable F3D candidate with measured guards and separate accepted archive |
+| `geometry_snapshot(bodies,protected=None)` | Measured body/volume/envelope/health snapshot |
+| `clearance_budget(name,nominal_mm,terms,kind='axial',allowance_mm=0)` | Independent signed dimensional bounds and provenance |
+| `tag_geometry(body,name,kind,filters,feature=None,role='functional',requirement='')` | Store unique semantic selector on native body |
+| `resolve_tag(name)` | Re-evaluate selector; reject ambiguous or missing geometry |
+| `surface_audit(body,short_edge_mm,small_face_mm2,slender_width_mm,protected_entities=())` | Located review candidates, not full continuity or print audit |
+| `release_manifest(model_revision,entries,checks,filename='release_manifest.json')` | Validate generation revisions/hashes and emit manifest |
+
+`from FusionPromptBridge import verification` provides numerical policies to external scripts
+when the software folder is on Python's import path; inside Fusion use the ctx methods or a
+relative add-in import appropriate to Fusion's module namespace. No new Python dependencies.

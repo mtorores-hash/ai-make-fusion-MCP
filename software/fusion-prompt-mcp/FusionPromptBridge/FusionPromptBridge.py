@@ -58,7 +58,7 @@ def inspect():
         bodies.append(dict(ref(body), size_mm=[10 * (getattr(box.maxPoint, a) -
                            getattr(box.minPoint, a)) for a in ('x','y','z')]))
     return {'design_id': design_id(), 'document': _app.activeDocument.name,
-            'version': '0.3.0', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
+            'version': '0.4.0', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
             'sketches': [dict(ref(s), profiles=s.profiles.count) for s in items(root.sketches)],
             'parameters': [{'name': p.name, 'expression': p.expression, 'unit': p.unit}
                            for p in items(d.allParameters)],

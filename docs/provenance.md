@@ -40,3 +40,11 @@ Files were fetched from main; file blob hashes below identify the exact contents
 - Preserve the existing active-challenge lock; this upload registers a supporting tool, not a new season.
 
 The central standards remain authoritative. This record does not duplicate or replace them.
+
+## v0.4 change provenance — 2026-09-23
+
+Base workbench commit: f47c5bd191f889a033e2648636e1048d6ce31392 (v0.3 import).
+New code is derived from that source and the supplied Pasted text.txt BRANCA lessons.
+The package SHA above identifies the original v0.3 baseline, not the modified v0.4 source.
+The requirements text is preserved in branca-lessons.md, with reported evidence distinguished
+from this update's automated results. Current shared instructions were re-read before editing.

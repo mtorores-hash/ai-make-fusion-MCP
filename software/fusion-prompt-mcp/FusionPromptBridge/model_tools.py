@@ -4,7 +4,7 @@ from pathlib import Path
 import struct
 import adsk.core
 import adsk.fusion
-from . import advanced
+from . import advanced, verification
 
 def each(c): return [c.item(i) for i in range(c.count)]
 def xyz(p): return [p.x*10, p.y*10, p.z*10]
@@ -152,8 +152,14 @@ def measure(app,d,one,two):
 
 def interference(d,references):
     if len(references)<2: raise ValueError('At least two body or occurrence references required.')
+    resolved=[resolve_ref(d,r,True) for r in references]
+    if len(resolved)==2 and all(adsk.fusion.BRepBody.cast(e) and
+            not getattr(e,'assemblyContext',None) and e.parentComponent==d.rootComponent for e in resolved):
+        if verification.separated_boxes(bbox(resolved[0]),bbox(resolved[1])):
+            return {'interferences':[],'count':0,'checked':True,'method':'root_body_AABB_separation',
+                    'note':'Strictly disjoint body bounds at this pose; no tolerance or path guarantee.'}
     entities=adsk.core.ObjectCollection.create()
-    for r in references: entities.add(resolve_ref(d,r,True))
+    for e in resolved: entities.add(e)
     inp=d.createInterferenceInput(entities)
     inp.areCoincidentFacesIncluded=False
     results=d.analyzeInterference(inp)

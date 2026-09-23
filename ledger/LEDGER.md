@@ -20,3 +20,16 @@ Idempotency key: fusion-mcp-docs-import-20260922. usageEventId: none; no usage P
 Next: run documented live Fusion acceptance on a copy of a local native design.
 
 This ledger stays on unpublished workbench; it is not a public release artifact.
+
+## 2026-09-23 — BRANCA execution and verification update
+
+Request: update the MCP using the attached lessons. Advanced: v0.4 execution/verification slice;
+full requirements and remaining work preserved in docs/branca-lessons.md and docs/upgrade-v0.4.md.
+Observed: 63 automated tests and real MCP protocol checks pass. These include Fusion doubles,
+not native kernel tests. Reported BRANCA workflow numbers are attributed and not reused as v0.4 evidence.
+Next: Windows/Fusion disposable-copy and verified-pose acceptance, then remaining roadmap items.
+Reused from: this repository v0.3; user-supplied BRANCA lessons. No private CAD/hardware models copied.
+BOM: no physical parts consumed. Challenge-accounted cost and active time: not measured; no totals inferred.
+Video candidate: rejected destructive experiment beside preserved source, and stale-pose detection;
+proposed only, no footage. Shelf: pending; no consumption event. usageEventId: none.
+Idempotency key: fusion-mcp-branca-update-20260923. Public main and active challenge lock unchanged.

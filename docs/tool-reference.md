@@ -1,6 +1,6 @@
-# MCP tool reference — v0.3.0
+# MCP tool reference — v0.4.0
 
-Generated from the bundled server signatures and docstrings; 23 tools.
+Signatures generated from server.py. Local STDIO; see [installation](installation.md).
 
 ## `inspect_design`
 
@@ -124,12 +124,15 @@ Preserve existing placements unless the user requested alignment. Inspect return
 ## `run_model_script`
 
 ```python
-run_model_script(operation_id: str, document_id: str, component_token: str, units: Literal['mm', 'cm', 'm', 'in'], script: str, checkpoint_before: bool=True, validate_after: bool=True)
+run_model_script(operation_id: str, document_id: str, component_token: str, units: Literal['mm', 'cm', 'm', 'in'], script: str, checkpoint_before: bool=True, validate_after: bool=True, mode: Literal['modeling', 'read_only']='modeling')
 ```
 
 Enqueue a complete trusted Fusion Python script defining run(ctx); returns immediately.
 Arbitrary Python executes with the user's permissions INSIDE Fusion, on its main thread.
-document_id is inspect_design.design_id; component_token is an explicit Component token.
+document_id is inspect_design.design_id; component_token is an explicit Component token or @root.
+mode=read_only accepts ONLY def run(ctx): return queries with literal arguments to
+ctx.inspect/validate/minimum_distance/interference/capture. Set checkpoint_before=False.
+Read-only queries do not regenerate. Full Python modeling always regenerates at completion.
 Use ctx.target, ctx.point/value, ctx.progress, ctx.stage, ctx.record, ctx.export and return JSON.
 The same operation_id + exact request returns the same job; changed content is rejected.
 Poll job_status/job_result; NEVER auto-retry an interrupted job with a fresh ID.

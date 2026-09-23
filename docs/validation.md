@@ -46,3 +46,28 @@ python -m compileall -q .
 MCP SDK is bounded to major version 1, not completely dependency-locked. No OpenAI API key
 is required by this server: your connected Codex client supplies the model interaction.
 
+
+## v0.4 live acceptance gates (not executed here)
+
+Record Windows/Fusion/bridge versions, request scripts, output JSON, measurements/tolerances,
+archive hashes and limitations. Use a disposable synthetic design, not redistributable purchased CAD.
+
+1. Submit repeated restricted read-only inspection/capture batches. Confirm no full regeneration,
+   unchanged model and exact 1920×1080 PNG headers. Confirm arbitrary modeling code is rejected.
+2. Create a simple known-axis mechanism. Supply independently calculated world transforms at each
+   sample. Confirm both joint and transform verification; deliberately supply a wrong transform and
+   force a measurement exception. Verify source pose restores in each failure case.
+3. Run the narrow-contact synthetic numerical fixture, then a matching native geometric fixture.
+   Preserve all unresolved intervals. Do not generalize the finite sample pass to continuous clearance.
+4. Run a destructive heal/volume-changing candidate via try_feature. Confirm rejection reason,
+   before/after views, no accepted candidate export, and source/checkpoint remains available. Repeat
+   with an acceptable small edit and verify the separately exported accepted F3D reopens.
+5. Tag a washer-seat selector, edit topology, and confirm re-resolution or an explicit ambiguity error.
+   Confirm an intentional small shoulder is flagged for review rather than modified.
+6. Reproduce the nominally clear/tolerance-failing fixture; retain provenance and provisional status.
+7. Build a manifest, substitute an older STL/calculation and then alter file bytes. Each must fail.
+   Separately reopen F3D, check expected bodies/joints, export/source bounds, units, volume and mesh
+   integrity: these native checks are not performed by the manifest helper.
+
+Full surface continuity, layer-island/bridge/cantilever/support-removal audit, slicer-adapter and
+access-path acceptance fixtures remain future work; no pass is recorded for them.

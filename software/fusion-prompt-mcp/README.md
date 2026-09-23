@@ -1,3 +1,8 @@
+> v0.4 development update: read `../../docs/upgrade-v0.4.md` and
+> `../../docs/installation.md` in the repository for current behavior and migration.
+> `sample_motion` now requires independent expected_world(position) transforms.
+> The v0.3 instructions below describe the baseline; the v0.4 update supersedes conflicts.
+
 # Fusion Prompt MCP v0.3 — persistent batch modeling
 
 Give Codex a design task. Codex can now submit one complete Fusion Python script to build,
