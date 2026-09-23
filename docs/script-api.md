@@ -103,3 +103,16 @@ See [full contracts and examples](upgrade-v0.4.md) before using these helpers.
 `from FusionPromptBridge import verification` provides numerical policies to external scripts
 when the software folder is on Python's import path; inside Fusion use the ctx methods or a
 relative add-in import appropriate to Fusion's module namespace. No new Python dependencies.
+
+## v0.4.1 modeling hygiene
+
+Read [modeling rules](modeling-rules.md) before authoring. Contracts: [hygiene](modeling-hygiene.md).
+
+| Helper | Behavior |
+| --- | --- |
+| `audit_hygiene()` | Read-only whole-design automated subset; no regeneration/repair |
+| `require_hygiene(strict_reviews=False)` | Record audit; raise on errors/incomplete inspection, optionally reviews |
+| `export_checked(filename,entity=None,manual_review_note='',strict_reviews=False)` | Synchronize, require audit/manual note, then export and record report/hash |
+
+`audit_hygiene` is also allowed in restricted read-only batches. Plain exports/checkpoints remain
+available for recovery/work in progress and never imply full-standard compliance.

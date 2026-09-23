@@ -1,3 +1,24 @@
+# Test summary — v0.4.1
+
+**80 automated tests pass** (63 retained + 17 hygiene tests). Real STDIO MCP checks pass:
+25 tools, modeling-rules tool and resource with identical text, schema validation, persistent jobs,
+operation-ID deduplication and cancellation. Protocol verification used Python 3.12 and MCP 1.30.0
+within the existing declared dependency range. No dependency range was changed.
+
+New fixtures check under-constrained sketches, yellow/red feature states, empty/default names,
+root-body exceptions, sketch-size advisories, fixed-origin exclusion, fixed-entity review,
+parameter metadata/dependency limitations, missing/null API data, direct-model preservation,
+read-only grammar, checked-export refusal before file creation, required manual note and target-document
+validation. Runtime and repository rule copies are compared in the repository test run.
+
+These are numerical/API-double and real protocol tests, **not live Fusion kernel tests**.
+Mauricio reported v0.4 running in Fusion; v0.4.1 is not installed or live-validated by this session.
+Run [live hygiene acceptance](modeling-hygiene.md#installation-and-live-acceptance) after updating.
+
+---
+
+## Historical v0.4 evidence
+
 # Test summary — v0.4.0
 
 2026-09-23: **63 tests pass**, plus the real STDIO MCP protocol check (23 tools).

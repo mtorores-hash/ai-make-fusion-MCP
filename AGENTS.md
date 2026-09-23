@@ -17,3 +17,13 @@ supersede this routing summary. See docs/provenance.md for the source revisions 
 - Keep source and tool documentation aligned. Use the same operation ID after an uncertain
   batch submission; inspect interrupted jobs instead of silently replaying them.
 - No new license, financial totals, challenge clock, physical test or release claim without evidence.
+
+## Parametric modeling hygiene
+
+Read docs/modeling-rules.md before modeling, and preserve the supplied reference in
+docs/Fusion-Parametric-Modeling-Best-Practices.md. Runtime tools/resources expose the same
+rules to installed clients. Component ownership, real driving parameters, named geometry,
+constrained sketches and healthy features are required for new native parametric work.
+Use the structured hygiene audit and explicitly review what it cannot prove. See
+docs/modeling-hygiene.md for gate scope, legitimate exceptions and live acceptance.
+Do not rename, convert or repair existing/imported hardware merely to obtain a clean report.

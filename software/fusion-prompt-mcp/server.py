@@ -7,7 +7,31 @@ mcp = FastMCP('Fusion Prompt MCP', instructions='Inspect the active document and
     'identical request after a connection timeout. Interrupted jobs are NEVER automatically replayed. '
     'Scripts are trusted full Python, not sandboxed. Use ctx.stage checkpoints before major changes. '
     'All API calls run on the Fusion main thread. Native length units are cm; use ctx.point/value. '
+    'Before modeling, call get_modeling_rules and follow the returned authoring standard. '
+    'Use named components and parameters, fully constrain native sketches, and audit_modeling_hygiene '
+    'before declaring completion. Use ctx.export_checked for checked deliverables; checkpoints stay available. '
     'Inspect/validate results. Do not equate sampled motion clearance with continuous collision freedom.')
+
+@mcp.tool()
+def get_modeling_rules() -> dict:
+    """Read the installed authoring rules, version and SHA-256 before any design task.
+    No Fusion connection required. Rules include required behavior, preferences, exceptions,
+    manual-review items and the limits of automated hygiene enforcement."""
+    from FusionPromptBridge.modeling_rules import get_rules
+    return get_rules()
+
+@mcp.resource('fusion://modeling-rules')
+def modeling_rules_resource() -> str:
+    """Installed Fusion authoring standard; also available via get_modeling_rules."""
+    return get_modeling_rules()['text']
+
+@mcp.tool()
+def audit_modeling_hygiene(design_id: str) -> dict:
+    """Read-only whole-design audit: naming, sketch constraints/size/Fix, timeline health,
+    parameter metadata/dependencies and root-body review. Does not regenerate or repair.
+    Unknown API data fails completeness; zero errors is NOT proof of the full standard.
+    Imported/linked definitions are included; preserve ownership before proposing repairs."""
+    return call('audit_hygiene', locals())
 
 @mcp.tool()
 def inspect_design() -> dict:
@@ -117,7 +141,7 @@ def run_model_script(operation_id: str, document_id: str, component_token: str,
     Arbitrary Python executes with the user's permissions INSIDE Fusion, on its main thread.
     document_id is inspect_design.design_id; component_token is an explicit Component token or @root.
     mode=read_only accepts ONLY def run(ctx): return queries with literal arguments to
-    ctx.inspect/validate/minimum_distance/interference/capture. Set checkpoint_before=False.
+    ctx.inspect/validate/minimum_distance/interference/capture/audit_hygiene. Set checkpoint_before=False.
     Read-only queries do not regenerate. Full Python modeling always regenerates at completion.
     Use ctx.target, ctx.point/value, ctx.progress, ctx.stage, ctx.record, ctx.export and return JSON.
     The same operation_id + exact request returns the same job; changed content is rejected.

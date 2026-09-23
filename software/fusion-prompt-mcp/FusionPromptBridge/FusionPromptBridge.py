@@ -19,7 +19,7 @@ _owner = uuid.uuid4().hex
 _app = _event = _handler = _thread = None
 _stop = threading.Event()
 _documents = []
-ALLOWED = {'inspect', 'new_design', 'rectangle', 'circle', 'extrude', 'parameter', 'export'} | advanced.OPS | {'inspect_full', 'select_geometry', 'measure_distance', 'check_interference', 'validate_model'}
+ALLOWED = {'inspect', 'new_design', 'rectangle', 'circle', 'extrude', 'parameter', 'export'} | advanced.OPS | {'inspect_full', 'select_geometry', 'measure_distance', 'check_interference', 'validate_model', 'audit_hygiene'}
 
 def atomic_json(path, value):
     temp = path.with_suffix('.tmp')
@@ -58,7 +58,7 @@ def inspect():
         bodies.append(dict(ref(body), size_mm=[10 * (getattr(box.maxPoint, a) -
                            getattr(box.minPoint, a)) for a in ('x','y','z')]))
     return {'design_id': design_id(), 'document': _app.activeDocument.name,
-            'version': '0.4.0', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
+            'version': '0.4.1', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
             'sketches': [dict(ref(s), profiles=s.profiles.count) for s in items(root.sketches)],
             'parameters': [{'name': p.name, 'expression': p.expression, 'unit': p.unit}
                            for p in items(d.allParameters)],
@@ -109,6 +109,9 @@ def execute(op, a):
         return model_tools.interference(d, a['references'])
     if op == 'validate_model':
         return model_tools.validate(d)
+    if op == 'audit_hygiene':
+        from .hygiene import audit
+        return audit(d)
     if op in advanced.OPS:
         return advanced.execute(op, a, d, _app)
     root = d.rootComponent

@@ -1,33 +1,34 @@
 # Current state
 
-Updated: 2026-09-23. Branch: workbench. Version: v0.4.0 development.
+Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.0.
 
 ## Now
 
-Implemented the first BRANCA execution/verification slice. See docs/upgrade-v0.4.md for exact
-coverage and the outstanding P1/P2 work. Canonical requirements preserved in docs/branca-lessons.md.
-The Windows installation is not changed by this hosted repository update.
+Mauricio supplied a parametric modeling standard. Original preserved in
+docs/Fusion-Parametric-Modeling-Best-Practices.md; operational rules shipped with the software,
+linked from AGENTS, and exposed by MCP tool/resource. Added read-only whole-design hygiene audit
+and explicit checked-export gate. Existing checkpoints/working exports are not blocked.
+Prior BRANCA roadmap coverage remains in docs/upgrade-v0.4.md; this update does not complete it.
 
 ## Last experiment / evidence
 
-63 automated tests pass (numerical/filesystem tests and Fusion API doubles); real STDIO MCP
-protocol checks pass with 23 tools. No live Fusion/kernel or physical printing test ran here.
-Reported BRANCA run: 1,233 native interference checks across 56 verified poses, archive reopening
-with four printed solids and 11 joints, and four parts sliced. These are user-reported v0.3/custom-script
-workflow results; underlying JSON evidence was not attached, and they do not validate v0.4 wrappers.
+80 automated tests pass (including 17 hygiene regressions); real STDIO MCP checks pass with
+25 tools and the modeling-rules resource. These include API doubles, not native Fusion execution.
+Reported by Mauricio: v0.4 is running in local Fusion. No result of the requested read-only smoke
+test was supplied. No v0.4.1 live geometry, audit or export validation occurred here.
 
 ## Next question
 
-Does v0.4 complete disposable F3D import/close and joint/world-transform verification on a copy
-in Windows Fusion? Run docs/validation.md acceptance gates before relying on these native paths.
-Then implement remaining print/surface audits, path/contact policies and authoring/release/media layer.
+After updating both installed processes to v0.4.1, can the client retrieve the rules and audit a
+copy without changing it? Confirm under-constrained fixture blocks checked export and recovery
+checkpoint remains available; follow docs/modeling-hygiene.md live acceptance.
 
 ## Files touched
 
-Batch runner, queue validation, geometry checking, new policy/experiment/intent modules,
-regression tests, motion example, documentation and this working ledger.
+Rules/source docs, AGENTS and installed guidance, MCP server/dispatcher/resource, hygiene inspector,
+batch helpers, capability/version metadata, regression/protocol tests and working-state records.
 
 ## Open gates
 
-Live Windows/Fusion acceptance; remaining roadmap; license/public-release decision.
-No public release, challenge clock, budget or physical outcome inferred.
+Live Fusion acceptance; manual review of non-automatable rules; remaining BRANCA roadmap;
+license/public release. No challenge clock, budget or physical outcome inferred.

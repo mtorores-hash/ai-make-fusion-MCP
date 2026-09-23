@@ -93,6 +93,26 @@ class Context:
         if p: p.expression=expression
         else: p=self.design.userParameters.add(name,adsk.core.ValueInput.createByString(expression),unit or self.units,'Batch MCP')
         return p
+    def audit_hygiene(self):
+        from .hygiene import audit
+        self.check_cancel()
+        return audit(self.design)
+    def require_hygiene(self,strict_reviews=False):
+        from .hygiene import require
+        report=self.audit_hygiene()
+        self.record('modeling_hygiene',report)
+        return require(report,strict_reviews)
+    def export_checked(self,filename,entity=None,manual_review_note='',strict_reviews=False):
+        if not isinstance(manual_review_note,str) or not manual_review_note.strip():
+            raise ValueError('Record a manual_review_note covering non-automated rules before a checked export')
+        self.synchronize()
+        report=self.require_hygiene(strict_reviews)
+        self.record('modeling_hygiene_manual_review',manual_review_note)
+        artifact=self.export(filename,entity)
+        result={'artifact':artifact,'hygiene':report,'manual_review_note':manual_review_note,
+                'scope':'Automated-subset gate plus caller-reported manual review; not a full design certification.'}
+        self.record('checked_export_'+filename,result)
+        return result
     def tag_geometry(self,body,name,kind,filters,feature=None,role='functional',requirement=''):
         from .design_intent import tag_geometry
         return tag_geometry(self.design,body,name,kind,filters,feature,role,requirement)

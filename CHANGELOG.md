@@ -1,3 +1,11 @@
+# v0.4.1 — Modeling hygiene (development)
+
+Preserve Mauricio's supplied parametric modeling standard; ship operational rules with the
+installation and expose them through a tool and MCP resource. Add a read-only whole-design
+hygiene audit and explicit checked-export gate, with unknown-data and manual-review boundaries.
+25 MCP tools. No forced changes to geometry, existing exports or recovery checkpoints.
+Live Fusion acceptance pending; v0.4 installation reported running by Mauricio.
+
 # v0.4.0 — 2026-09-23 (development)
 
 BRANCA execution/verification slice: restricted read-only batches, explicit @root targeting,

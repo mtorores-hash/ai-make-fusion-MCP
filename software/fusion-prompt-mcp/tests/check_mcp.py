@@ -19,7 +19,8 @@ async def main():
         bootstrap=('import sys; sys.path.insert(0,sys.argv[1]); import server; '
                    'from FusionPromptBridge.job_store import Store; '
                    'server.job_store=lambda:Store(sys.argv[2]); server.mcp.run(transport="stdio")')
-        params=StdioServerParameters(command=sys.executable,args=['-c',bootstrap,str(Path(server).parent),home])
+        params=StdioServerParameters(command=sys.executable,args=['-c',bootstrap,str(Path(server).parent),home],
+                                     env={'PYTHONPATH':os.pathsep.join(sys.path)})
         async with stdio_client(params) as (read,write):
             async with ClientSession(read,write) as session:
                 await session.initialize()
@@ -28,8 +29,14 @@ async def main():
                           'set_parameter','export_model','fusion_capabilities','inspect_assembly','inspect_body',
                           'read_selection','fillet_edges','create_joint','run_model_script','job_status','job_result',
                           'list_jobs','cancel_job','inspect_full_assembly','select_geometry',
-                          'measure_minimum_distance','check_interference','validate_model'}
+                          'measure_minimum_distance','check_interference','validate_model',
+                          'get_modeling_rules','audit_modeling_hygiene'}
                 assert {t.name for t in result.tools}==expected
+                rules=value(await session.call_tool('get_modeling_rules',{}))
+                assert rules['rules_version']=='1.0.0' and 'Component first' in rules['text']
+                resource=await session.read_resource('fusion://modeling-rules')
+                assert resource.contents[0].text==rules['text']
+                assert (await session.call_tool('audit_modeling_hygiene',{})).isError
                 assert (await session.call_tool('extrude',{'design_id':'test'})).isError
                 assert (await session.call_tool('create_joint',{'design_id':'test','geometry_one':'a',
                             'geometry_two':'b','kind':'invalid'})).isError
@@ -47,6 +54,6 @@ async def main():
                 assert not (await session.call_tool('run_model_script',readonly)).isError
                 assert (await session.call_tool('run_model_script',dict(readonly,operation_id='bad-read',
                         script='def run(ctx): return ctx.design.computeAll()'))).isError
-                print('PASS: MCP initialize; 23 tools; validation; persistent enqueue/status; duplicate protection; cancellation')
+                print('PASS: MCP initialize; 25 tools; modeling rules tool/resource; validation; persistent enqueue/status; duplicate protection; cancellation')
 
 asyncio.run(main())

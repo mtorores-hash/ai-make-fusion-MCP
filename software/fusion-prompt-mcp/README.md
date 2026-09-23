@@ -1,3 +1,7 @@
+> v0.4.1 adds installed modeling rules, `get_modeling_rules`, `audit_modeling_hygiene`,
+> the `fusion://modeling-rules` resource and explicit `ctx.export_checked`. Copy the entire
+> folder, including `modeling-rules.md`. See `../../docs/modeling-hygiene.md`.
+
 > v0.4 development update: read `../../docs/upgrade-v0.4.md` and
 > `../../docs/installation.md` in the repository for current behavior and migration.
 > `sample_motion` now requires independent expected_world(position) transforms.

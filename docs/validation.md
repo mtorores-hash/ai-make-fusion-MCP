@@ -71,3 +71,7 @@ archive hashes and limitations. Use a disposable synthetic design, not redistrib
 
 Full surface continuity, layer-island/bridge/cantilever/support-removal audit, slicer-adapter and
 access-path acceptance fixtures remain future work; no pass is recorded for them.
+
+## v0.4.1 hygiene
+
+See [hygiene live acceptance](modeling-hygiene.md#installation-and-live-acceptance).

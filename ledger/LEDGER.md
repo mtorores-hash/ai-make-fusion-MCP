@@ -33,3 +33,17 @@ BOM: no physical parts consumed. Challenge-accounted cost and active time: not m
 Video candidate: rejected destructive experiment beside preserved source, and stale-pose detection;
 proposed only, no footage. Shelf: pending; no consumption event. usageEventId: none.
 Idempotency key: fusion-mcp-branca-update-20260923. Public main and active challenge lock unchanged.
+
+## v0.4.1 — supplied parametric modeling standard
+
+Request: incorporate Mauricio's compilation of design hygiene rules following the agreed
+instruction-plus-checks approach. Advanced: original source preserved, operational rules exposed
+through MCP tool/resource and AGENTS, whole-design read-only audit, explicit checked-export gate.
+Observed: 80 automated tests and real MCP protocol/resource checks pass. No live Fusion evidence
+for the new code. Reported: Mauricio has v0.4 running locally; his PC was not changed here.
+Reused from: v0.4 code and Mauricio's attached Fusion-Parametric-Modeling-Best-Practices.md.
+BOM: no physical parts consumed. Challenge-accounted cost/active engineering time: not measured.
+Video candidate: demonstrate failed hygiene gate preserving checkpoint, then corrected sketch;
+proposed only, no footage. Shelf: pending; no consumption event; usageEventId: none.
+Idempotency key: fusion-mcp-hygiene-v041. Next: retrieve installed rules and run live audit on a copy.
+No active-challenge lock change, license decision, public release or visibility change.

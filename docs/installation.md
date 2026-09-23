@@ -2,7 +2,7 @@
 
 Repository source is in [`software/fusion-prompt-mcp`](../software/fusion-prompt-mcp/). Copy that folder to your chosen permanent installation directory; the examples below assume `C:\AI-Make\fusion-prompt-mcp`. Do not point the MCP at the repository root.
 
-## Upgrade from v0.1, v0.2 or v0.3
+## Upgrade from v0.1, v0.2, v0.3 or v0.4
 
 1. Save your Fusion document and stop FusionPromptBridge in Scripts and Add-Ins.
 2. Back up the existing installation folder outside itself.
@@ -15,7 +15,7 @@ Repository source is in [`software/fusion-prompt-mcp`](../software/fusion-prompt
 4. Restart Fusion to clear imported Python modules, then run FusionPromptBridge.
 5. Restart the Fusion MCP connection in your desktop client.
 6. Ask Codex to inspect the active design and call fusion_capabilities. It should report
-   **0.4.0**, `batch_scripts: true`, and expose `run_model_script` plus `job_status`.
+   **0.4.1**, `batch_scripts: true`, and expose `run_model_script` plus `job_status`.
 
 These steps update your PC; the hosted development session has not modified that PC.
 
@@ -50,3 +50,7 @@ WSL/container environments do not share this local connection automatically.
 
 
 See [v0.4 migration and coverage](upgrade-v0.4.md), particularly the new required motion-transform expectations.
+
+For v0.4.1, copy `modeling-rules.md` beside server.py and all add-in modules, including
+`hygiene.py` and `modeling_rules.py`. Restart both processes. Ask the client to call
+`get_modeling_rules` and `audit_modeling_hygiene` before continuing native modeling.

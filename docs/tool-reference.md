@@ -1,6 +1,27 @@
-# MCP tool reference — v0.4.0
+# MCP tool reference — v0.4.1
 
-Signatures generated from server.py. Local STDIO; see [installation](installation.md).
+25 tools. Installed rules also available as resource `fusion://modeling-rules`.
+
+## `get_modeling_rules`
+
+```python
+get_modeling_rules()
+```
+
+Read the installed authoring rules, version and SHA-256 before any design task.
+No Fusion connection required. Rules include required behavior, preferences, exceptions,
+manual-review items and the limits of automated hygiene enforcement.
+
+## `audit_modeling_hygiene`
+
+```python
+audit_modeling_hygiene(design_id: str)
+```
+
+Read-only whole-design audit: naming, sketch constraints/size/Fix, timeline health,
+parameter metadata/dependencies and root-body review. Does not regenerate or repair.
+Unknown API data fails completeness; zero errors is NOT proof of the full standard.
+Imported/linked definitions are included; preserve ownership before proposing repairs.
 
 ## `inspect_design`
 
@@ -131,7 +152,7 @@ Enqueue a complete trusted Fusion Python script defining run(ctx); returns immed
 Arbitrary Python executes with the user's permissions INSIDE Fusion, on its main thread.
 document_id is inspect_design.design_id; component_token is an explicit Component token or @root.
 mode=read_only accepts ONLY def run(ctx): return queries with literal arguments to
-ctx.inspect/validate/minimum_distance/interference/capture. Set checkpoint_before=False.
+ctx.inspect/validate/minimum_distance/interference/capture/audit_hygiene. Set checkpoint_before=False.
 Read-only queries do not regenerate. Full Python modeling always regenerates at completion.
 Use ctx.target, ctx.point/value, ctx.progress, ctx.stage, ctx.record, ctx.export and return JSON.
 The same operation_id + exact request returns the same job; changed content is rejected.

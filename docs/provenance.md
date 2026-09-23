@@ -48,3 +48,13 @@ New code is derived from that source and the supplied Pasted text.txt BRANCA les
 The package SHA above identifies the original v0.3 baseline, not the modified v0.4 source.
 The requirements text is preserved in branca-lessons.md, with reported evidence distinguished
 from this update's automated results. Current shared instructions were re-read before editing.
+
+## v0.4.1 modeling-rule provenance
+
+Base: 04da0ad5be0157538cb3bceb9afbabbf743d0e1d. The uploaded
+Fusion-Parametric-Modeling-Best-Practices.md is preserved byte-for-byte under docs/.
+Attachment SHA-256: `6a8a855d135d49ffd04706cbee141994fdac12173fceeac84d1973fabeeb8dd1`.
+Operational interpretation is docs/modeling-rules.md, mirrored in the installable software and
+verified by a regression test. The attachment's cited sources are the user's compilation;
+this change does not represent an independent validation of every historical/community claim.
+Primary API contracts used for inspection were checked; details in docs/modeling-hygiene.md.
