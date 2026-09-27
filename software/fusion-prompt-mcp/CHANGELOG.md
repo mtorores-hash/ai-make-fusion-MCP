@@ -1,5 +1,10 @@
 # v0.4.1 — Modeling hygiene (development)
 
+## Unreleased — hardware sourcing rules (2026-09-27)
+
+Rules 1.0.1 require online commercial CAD search, then asking the user, then specification-based
+reconstruction before placeholders. Added sourcing/fidelity to manual audit review; runtime stays v0.4.1.
+
 ## Unreleased — documentation cleanup (2026-09-27)
 
 Generalize project references and spring-cup parameter names; shorten modeling lessons to

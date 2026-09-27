@@ -57,3 +57,16 @@ Reused from: existing v0.4.1 documentation and example. Runtime behavior/version
 Evidence: static Python syntax, parameter-reference and local Markdown link checks; no live Fusion test.
 BOM: no parts consumed. Cost/time: not measured. Video: none. Shelf: no consumption event; usageEventId: none.
 Idempotency key: fusion-mcp-generic-docs-20260927. Next: existing live Fusion acceptance gates.
+
+## 2026-09-27 — commercial hardware sourcing rule
+
+Request: use quality commercial CAD before placeholders: search online, ask user, reconstruct
+from online specifications, then placeholder only as last resort.
+Advanced: rules 1.0.1 in served/repo copies, capability metadata and manual audit checklist;
+source identity, dimensional checks and reconstruction/placeholder limits explicitly required.
+Reused from: existing v0.4.1 rules and audit; original uploaded compilation unchanged.
+Evidence: 80 automated tests pass; rules loader/version and identical documentation copies verified.
+No live Fusion or hardware sourcing performed. Tests use API doubles, not native kernel validation.
+BOM: no parts consumed. Cost/time: not measured. Video: none. Shelf: no consumption event.
+Idempotency key: fusion-mcp-hardware-rules-20260927. usageEventId: none.
+Next: refresh local software and retrieve rules 1.0.1; existing live acceptance remains pending.

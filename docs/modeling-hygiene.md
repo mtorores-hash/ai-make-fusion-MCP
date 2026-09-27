@@ -8,7 +8,7 @@ No geometry was modified while introducing these rules.
 ## How connected AI clients receive the rules
 
 - MCP initialization instructions tell the client to call `get_modeling_rules` before modeling.
-- `get_modeling_rules()` returns the full installed rules text, version `1.0.0`, and SHA-256.
+- `get_modeling_rules()` returns the full installed rules text, version `1.0.1`, and SHA-256.
   It works without opening Fusion.
 - Resource `fusion://modeling-rules` exposes the same text for clients that use MCP resources.
 - Repository `AGENTS.md` references the same rules for coding/modeling work.
@@ -93,7 +93,7 @@ be saved for further work. There are no silent auto-waivers for known failures.
 Update the complete `software/fusion-prompt-mcp` folder, including `modeling-rules.md` and the
 new `FusionPromptBridge/modeling_rules.py` and `hygiene.py`. Restart Fusion and the MCP process.
 `fusion_capabilities` should report `0.4.1`, `modeling_hygiene_audit: true` and
-`modeling_rules_version: '1.0.0'`. The MCP exposes 25 tools. See [installation](installation.md).
+`modeling_rules_version: '1.0.1'`. The MCP exposes 25 tools. See [installation](installation.md).
 
 On a COPY of a local design:
 
@@ -118,3 +118,11 @@ not validate v0.4.1 inspection or export paths.
 - [UserParameter.comment](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_UserParameter_comment.htm)
 - [UserParameter.isFavorite](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_UserParameter_isFavorite.htm)
 - [Parameter.dependentParameters](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_Parameter_dependentParameters.htm)
+
+## Commercial hardware sourcing (rules 1.0.1)
+
+The served rules require online CAD search, then asking the user, then reconstruction from
+published specifications before using a labeled placeholder. Verify part/variant and critical
+dimensions; record source and model status. The audit includes this in manual_review_required;
+no automatic web search or supplier-model fidelity check is implemented. A checked export's
+manual review must address this requirement when purchased components are present.

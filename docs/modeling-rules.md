@@ -1,6 +1,6 @@
 # Fusion modeling rules — AI Make
 
-Rules version: 1.0.0. Supplied by Mauricio; applied to native parametric authoring.
+Rules version: 1.0.1. Supplied by Mauricio; applied to native parametric authoring.
 Read these rules before modeling. Project-specific instructions and explicit user decisions
 control dimensions, materials, fits and documented exceptions. Report a conflict rather
 than quietly dropping a rule. Preserve existing models and imported hardware.
@@ -35,6 +35,30 @@ than quietly dropping a rule. Preserve existing models and imported hardware.
    `ctx.audit_hygiene()`, resolve violations, and explicitly review the items automation cannot prove.
    Exercise a driving parameter, restore it, verify health and dimensions, and record the evidence.
    Save/version descriptions should explain intent. Local F3D checkpoints are not cloud versions.
+
+## Commercial hardware models
+
+For every purchased component, use an accurate CAD model when available. Follow this order:
+
+1. **Search online first.** Identify the manufacturer, exact part number and variant. Prefer
+   manufacturer/supplier CAD, then reputable CAD libraries. Prefer usable native/STEP solids;
+   visual detail alone is not quality. Check units, envelope, mounting pattern and critical
+   interfaces against the product drawing. Do not substitute a similar-looking variant.
+2. **Ask the user.** If no suitable model is found or accessible, summarize the search and
+   ask whether the user has the CAD file. Allow their answer before proceeding for that
+   component; continue independent design work while waiting.
+3. **Reconstruct from specifications.** If the user has no model, find manufacturer drawings
+   or spec sheets online and model the documented geometry. Preserve critical interfaces;
+   identify missing dimensions and assumptions. Label it as reconstructed, not supplier CAD.
+4. **Placeholder last.** Only after those routes are exhausted, use a clearly named
+   placeholder for layout, state its assumptions and limits, and flag it for replacement.
+   Do not claim verified fit, clearance or motion from guessed geometry.
+
+Record source URL/file, part/variant, model status (supplier, third-party, reconstructed or
+placeholder), and checked dimensions in the project record. Keep source identifiers intact.
+Use the model's applicable sharing terms; obtaining CAD does not imply redistribution rights.
+Search, sourcing quality and dimensional fidelity require AI/user review; the hygiene audit
+does not automatically verify them.
 
 ## Preferred modeling strategy — review, not universal numeric gates
 
@@ -82,4 +106,4 @@ including native definitions of linked components; report source ownership befor
 
 Before calling the model finished, confirm component ownership/names, constraints and anchoring,
 parameter usage and perturbation, reference stability, feature ordering/health, joint intent,
-restored timeline and save description. Automatic checks cannot infer all of these.
+restored timeline, commercial-hardware sourcing/fidelity and save description. Automatic checks cannot infer all of these.

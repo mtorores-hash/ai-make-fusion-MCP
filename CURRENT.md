@@ -1,8 +1,11 @@
 # Current state
 
-Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.0.
+Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.1.
 
 ## Now
+
+2026-09-27: rules 1.0.1 require commercial-hardware CAD sourcing before reconstruction or
+placeholders. Served rules and audit manual-review checklist updated; runtime stays v0.4.1.
 
 2026-09-27: working documentation and spring-cup example generalized; project anecdotes removed
 from the lessons summary. Runtime behavior and version remain v0.4.1. Original source is in Git history.

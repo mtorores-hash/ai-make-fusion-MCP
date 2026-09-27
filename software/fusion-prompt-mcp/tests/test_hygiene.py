@@ -127,7 +127,7 @@ class HygieneTests(unittest.TestCase):
         if repo_copy.is_file():
             self.assertEqual((software/'modeling-rules.md').read_bytes(),repo_copy.read_bytes())
         rules=get_rules()
-        self.assertEqual(rules['rules_version'],'1.0.0')
+        self.assertEqual(rules['rules_version'],'1.0.1')
         self.assertEqual(len(rules['sha256']),64)
         self.assertIn('Component first',rules['text'])
     def test_bridge_dispatch_checks_target_document(self):

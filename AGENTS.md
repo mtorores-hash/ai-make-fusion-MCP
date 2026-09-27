@@ -27,3 +27,7 @@ constrained sketches and healthy features are required for new native parametric
 Use the structured hygiene audit and explicitly review what it cannot prove. See
 docs/modeling-hygiene.md for gate scope, legitimate exceptions and live acceptance.
 Do not rename, convert or repair existing/imported hardware merely to obtain a clean report.
+
+For commercial hardware, follow the sourcing order in docs/modeling-rules.md: online CAD,
+ask the user, reconstruct from published specifications, then a labeled placeholder as last resort.
+Verify exact variant and critical dimensions; record sources and uncertainty in the design project.

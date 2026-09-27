@@ -6,6 +6,7 @@ from .modeling_rules import get_rules
 
 DEFAULT_NAME=re.compile(r'^(Sketch|Body|Component|Plane|Axis|Point|Extrude|Fillet|Chamfer|Hole|Revolve|Sweep|Loft|Mirror|Pattern|Move|Joint)\s*\d+(?::\d+)?$',re.I)
 MANUAL_REVIEW=[
+    'Commercial hardware sourcing order, exact variant, CAD provenance and critical dimensions; reconstructed/placeholder limits',
     'Correct component activation/ownership and documented root-body exceptions',
     'Origin anchoring and constraint intent (fully constrained does not prove this)',
     'Driving parameter use, intentional constants, duplicate values and circularity',
