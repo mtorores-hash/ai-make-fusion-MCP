@@ -24,7 +24,7 @@ This ledger stays on unpublished workbench; it is not a public release artifact.
 ## 2026-09-23 — BRANCA execution and verification update
 
 Request: update the MCP using the attached lessons. Advanced: v0.4 execution/verification slice;
-full requirements and remaining work preserved in docs/branca-lessons.md and docs/upgrade-v0.4.md.
+full requirements and remaining work preserved in docs/modeling-lessons.md and docs/upgrade-v0.4.md.
 Observed: 63 automated tests and real MCP protocol checks pass. These include Fusion doubles,
 not native kernel tests. Reported BRANCA workflow numbers are attributed and not reused as v0.4 evidence.
 Next: Windows/Fusion disposable-copy and verified-pose acceptance, then remaining roadmap items.
@@ -47,3 +47,13 @@ Video candidate: demonstrate failed hygiene gate preserving checkpoint, then cor
 proposed only, no footage. Shelf: pending; no consumption event; usageEventId: none.
 Idempotency key: fusion-mcp-hygiene-v041. Next: retrieve installed rules and run live audit on a copy.
 No active-challenge lock change, license decision, public release or visibility change.
+
+## 2026-09-27 — generic documentation and example
+
+Request: remove project-specific references from working documentation and use generic example names.
+Advanced: condensed reusable modeling lessons, updated links/provenance and renamed sample parameters.
+Historical entries above retain original attribution and operation IDs; source context remains in Git history.
+Reused from: existing v0.4.1 documentation and example. Runtime behavior/version unchanged.
+Evidence: static Python syntax, parameter-reference and local Markdown link checks; no live Fusion test.
+BOM: no parts consumed. Cost/time: not measured. Video: none. Shelf: no consumption event; usageEventId: none.
+Idempotency key: fusion-mcp-generic-docs-20260927. Next: existing live Fusion acceptance gates.

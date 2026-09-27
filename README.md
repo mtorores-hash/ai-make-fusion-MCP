@@ -6,7 +6,7 @@ Fusion models through typed tools or one complete Python modeling script.
 ## Current version and release status
 
 **v0.4.1 development snapshot, on `workbench`.** This is an unpublished supporting tool,
-not a released or physically validated BRANCA extruder. The repository remains private.
+not a released or physically validated mechanical design. The repository remains private.
 `main` is a landing page; no public release or episode milestone is asserted.
 
 ## Capabilities
@@ -72,6 +72,6 @@ No MCP-specific published episode is recorded. General channel: [AI Make](https:
 See [CURRENT.md](CURRENT.md). The working [ledger](ledger/LEDGER.md) belongs on `workbench` only.
 Shared operating context is [AI_MAKE](https://github.com/mtorores-hash/AI_MAKE).
 
-Latest: [BRANCA verification update and remaining work](docs/upgrade-v0.4.md).
+Latest: [Execution and verification update and remaining work](docs/upgrade-v0.4.md).
 
 Modeling standard: [rules](docs/modeling-rules.md) and [audit / checked-export behavior](docs/modeling-hygiene.md).

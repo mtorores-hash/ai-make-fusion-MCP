@@ -2,7 +2,7 @@
 
 Example files are in [`software/fusion-prompt-mcp/examples`](../software/fusion-prompt-mcp/examples/). Run development commands from `software/fusion-prompt-mcp`. Live acceptance is **pending**, not a reported pass.
 
-## BRANCA examples and live acceptance
+## Modeling examples and live acceptance
 
 - `examples/parametric_spring_cup.py`: constrained annular sketch, named diameter/wall/height,
   change-and-restore diameter check, geometric selection, exports and exact-size screenshot.

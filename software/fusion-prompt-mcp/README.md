@@ -18,7 +18,7 @@ test doubles. Real MCP initialization, all 23 tool schemas, enqueue/status, dupl
 rejection and queued cancellation pass. Python syntax checks pass. No Autodesk Fusion
 installation is available in the build environment. CAD geometry, Windows add-in loading,
 checkpoint/export behavior, nested transforms and joint solving still need live acceptance.
-This package is not a validated BRANCA extruder design.
+This package is not a validated mechanical design.
 
 ## Upgrade from v0.1 or v0.2
 
@@ -223,7 +223,7 @@ geometry changes and before the success record is committed. That job becomes in
 and requires inspection. Use list_jobs after a lost response; never treat a stale progress
 timestamp as proof a running job can be safely replayed.
 
-## BRANCA examples and live acceptance
+## Modeling examples and live acceptance
 
 - `examples/parametric_spring_cup.py`: constrained annular sketch, named diameter/wall/height,
   change-and-restore diameter check, geometric selection, exports and exact-size screenshot.

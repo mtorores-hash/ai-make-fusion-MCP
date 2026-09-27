@@ -22,4 +22,4 @@ See architecture.md for state and restart behavior, and script-api.md for execut
 
 ## v0.4 update
 
-See [BRANCA verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.
+See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.

@@ -1,6 +1,6 @@
 # Scope and capability map
 
-This is a supporting tool for prompt-driven CAD. No BRANCA mechanism geometry, motor model,
+This is a supporting tool for prompt-driven CAD. No Project-specific mechanism geometry, motor model,
 challenge budget, validated physical fit or production readiness is included.
 
 | Requested capability | v0.3 implementation | Evidence / boundary |
@@ -23,4 +23,4 @@ tag, repo visibility change or challenge-story material is part of this import.
 
 ## v0.4 update
 
-See [BRANCA verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.
+See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.

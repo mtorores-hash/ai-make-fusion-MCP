@@ -1,5 +1,10 @@
 # v0.4.1 — Modeling hygiene (development)
 
+## Unreleased — documentation cleanup (2026-09-27)
+
+Generalize project references and spring-cup parameter names; shorten modeling lessons to
+reusable requirements. Runtime behavior and version unchanged. Original context remains in Git history.
+
 Preserve Mauricio's supplied parametric modeling standard; ship operational rules with the
 installation and expose them through a tool and MCP resource. Add a read-only whole-design
 hygiene audit and explicit checked-export gate, with unknown-data and manual-review boundaries.
@@ -8,7 +13,7 @@ Live Fusion acceptance pending; v0.4 installation reported running by Mauricio.
 
 # v0.4.0 — 2026-09-23 (development)
 
-BRANCA execution/verification slice: restricted read-only batches, explicit @root targeting,
+Execution/verification slice: restricted read-only batches, explicit @root targeting,
 bounded synchronization, independently verified motion poses/restoration, bounded adaptive
 sampling, conservative root-body broad phase, disposable F3D experiments, dimensional tolerance
 budgets, semantic selectors, surface review candidates, release hash/revision validation and

@@ -4,11 +4,14 @@ Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.0.
 
 ## Now
 
+2026-09-27: working documentation and spring-cup example generalized; project anecdotes removed
+from the lessons summary. Runtime behavior and version remain v0.4.1. Original source is in Git history.
+
 Mauricio supplied a parametric modeling standard. Original preserved in
 docs/Fusion-Parametric-Modeling-Best-Practices.md; operational rules shipped with the software,
 linked from AGENTS, and exposed by MCP tool/resource. Added read-only whole-design hygiene audit
 and explicit checked-export gate. Existing checkpoints/working exports are not blocked.
-Prior BRANCA roadmap coverage remains in docs/upgrade-v0.4.md; this update does not complete it.
+Prior verification roadmap coverage remains in docs/upgrade-v0.4.md; this update does not complete it.
 
 ## Last experiment / evidence
 
@@ -30,5 +33,5 @@ batch helpers, capability/version metadata, regression/protocol tests and workin
 
 ## Open gates
 
-Live Fusion acceptance; manual review of non-automatable rules; remaining BRANCA roadmap;
+Live Fusion acceptance; manual review of non-automatable rules; remaining verification roadmap;
 license/public release. No challenge clock, budget or physical outcome inferred.

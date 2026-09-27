@@ -1,7 +1,7 @@
-# v0.4 — BRANCA verification update
+# v0.4 — Execution and verification update
 
 Development update, 2026-09-23. Implements the first execution and verification slice of
-[the supplied BRANCA lessons](branca-lessons.md). This is not a claim that the entire
+[the supplied modeling lessons](modeling-lessons.md). This is not a claim that the entire
 roadmap is implemented. No live Windows/Fusion session was available to this change.
 
 ## Implemented

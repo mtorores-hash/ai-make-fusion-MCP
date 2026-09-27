@@ -31,4 +31,4 @@ cases. Repeated instances require occurrence context for assembly checks.
 
 ## v0.4 update
 
-See [BRANCA verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.
+See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.

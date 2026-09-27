@@ -44,10 +44,11 @@ The central standards remain authoritative. This record does not duplicate or re
 ## v0.4 change provenance — 2026-09-23
 
 Base workbench commit: f47c5bd191f889a033e2648636e1048d6ce31392 (v0.3 import).
-New code is derived from that source and the supplied Pasted text.txt BRANCA lessons.
+New code is derived from that source and the supplied Pasted text.txt modeling lessons.
 The package SHA above identifies the original v0.3 baseline, not the modified v0.4 source.
-The requirements text is preserved in branca-lessons.md, with reported evidence distinguished
-from this update's automated results. Current shared instructions were re-read before editing.
+The original supplied text is retained in Git history at commit b193554700bf5da56ba9e05df562dc5426dd9fc0.
+modeling-lessons.md now summarizes reusable requirements; prior reported project results are not
+evidence for these wrappers. Current shared instructions were re-read before editing.
 
 ## v0.4.1 modeling-rule provenance
 

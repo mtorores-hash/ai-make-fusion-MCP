@@ -39,9 +39,9 @@ python tests/check_mcp.py
 
 These are numerical, filesystem, real transport and Fusion API-double tests. **No v0.4 live
 Windows/Fusion kernel, archive, joint solver or physical print validation was performed.**
-The attached BRANCA report describes prior native/custom-script results; its JSON files were
+The attached source report describes prior native/custom-script results; its JSON files were
 not available here, and those results are not evidence for the new wrappers. See
-[lessons provenance](branca-lessons.md) and [remaining work](upgrade-v0.4.md).
+[lessons provenance](modeling-lessons.md) and [remaining work](upgrade-v0.4.md).
 
 ---
 
@@ -79,7 +79,7 @@ the server over STDIO for protocol, schema and job lifecycle checks.
 | Real MCP protocol check | Passed; 23 tool schemas | Initialization, schema validation, queue/status/cancel and duplicate behavior |
 | Python syntax | Passed | Packaged Python files compile |
 | Fusion kernel / Windows add-in | Not run | No live CAD validity or installation claim |
-| Physical build / BRANCA extruder | Not run | No manufacturing or mechanism result |
+| Physical build / mechanical design | Not run | No manufacturing or mechanism result |
 
 ## Reproduce
 
