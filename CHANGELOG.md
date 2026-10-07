@@ -1,5 +1,11 @@
 # v0.4.1 — Modeling hygiene (development)
 
+## Unreleased — PCB detail policy (2026-10-07)
+
+Rules 1.0.2 default to PCB connector/pin clearance volumes and correctly oriented cable
+routes to board regions; detailed contacts/pins require an explicit request. Added manual
+review item and clarified the supplier-CAD simplification exception. Runtime stays v0.4.1.
+
 ## Unreleased — hardware sourcing rules (2026-09-27)
 
 Rules 1.0.1 require online commercial CAD search, then asking the user, then specification-based

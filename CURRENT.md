@@ -1,8 +1,12 @@
 # Current state
 
-Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.1.
+Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.2.
 
 ## Now
+
+2026-10-07: rules 1.0.2 default to simple PCB connector/pin clearance volumes and cable
+routes to the correct board area/orientation. Detail is opt-in; supplier CAD originals preserved.
+Rules copy/version/loader and Python syntax checks pass; no new live Fusion validation.
 
 2026-09-27: rules 1.0.1 require commercial-hardware CAD sourcing before reconstruction or
 placeholders. Served rules and audit manual-review checklist updated; runtime stays v0.4.1.

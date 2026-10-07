@@ -31,3 +31,7 @@ Do not rename, convert or repair existing/imported hardware merely to obtain a c
 For commercial hardware, follow the sourcing order in docs/modeling-rules.md: online CAD,
 ask the user, reconstruct from published specifications, then a labeled placeholder as last resort.
 Verify exact variant and critical dimensions; record sources and uncertainty in the design project.
+
+For PCB layout, default to connector/pin clearance volumes and cable routes to the correct
+board area/orientation. Detailed connector/pin modeling requires an explicit user request;
+use accurate sourced envelopes and preserve original supplier CAD. See modeling-rules.md.

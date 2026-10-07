@@ -8,7 +8,7 @@ No geometry was modified while introducing these rules.
 ## How connected AI clients receive the rules
 
 - MCP initialization instructions tell the client to call `get_modeling_rules` before modeling.
-- `get_modeling_rules()` returns the full installed rules text, version `1.0.1`, and SHA-256.
+- `get_modeling_rules()` returns the full installed rules text, version `1.0.2`, and SHA-256.
   It works without opening Fusion.
 - Resource `fusion://modeling-rules` exposes the same text for clients that use MCP resources.
 - Repository `AGENTS.md` references the same rules for coding/modeling work.
@@ -93,7 +93,7 @@ be saved for further work. There are no silent auto-waivers for known failures.
 Update the complete `software/fusion-prompt-mcp` folder, including `modeling-rules.md` and the
 new `FusionPromptBridge/modeling_rules.py` and `hygiene.py`. Restart Fusion and the MCP process.
 `fusion_capabilities` should report `0.4.1`, `modeling_hygiene_audit: true` and
-`modeling_rules_version: '1.0.1'`. The MCP exposes 25 tools. See [installation](installation.md).
+`modeling_rules_version: '1.0.2'`. The MCP exposes 25 tools. See [installation](installation.md).
 
 On a COPY of a local design:
 
@@ -126,3 +126,11 @@ published specifications before using a labeled placeholder. Verify part/variant
 dimensions; record source and model status. The audit includes this in manual_review_required;
 no automatic web search or supplier-model fidelity check is implemented. A checked export's
 manual review must address this requirement when purchased components are present.
+
+## PCB representation (rules 1.0.2)
+
+Use simplified connector/pin clearance volumes and cable paths to the correct board region
+and orientation unless detail is explicitly requested. Source-backed simplification is an
+exception to detailed commercial-hardware representation; preserve original supplier CAD.
+The audit lists envelope accuracy and cable routing/orientation for manual review, not as
+an automatically verified geometry check. See modeling-rules.md for the full requirement.

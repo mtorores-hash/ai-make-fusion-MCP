@@ -1,6 +1,6 @@
 # Fusion modeling rules — AI Make
 
-Rules version: 1.0.1. Supplied by Mauricio; applied to native parametric authoring.
+Rules version: 1.0.2. Supplied by Mauricio; applied to native parametric authoring.
 Read these rules before modeling. Project-specific instructions and explicit user decisions
 control dimensions, materials, fits and documented exceptions. Report a conflict rather
 than quietly dropping a rule. Preserve existing models and imported hardware.
@@ -59,6 +59,25 @@ placeholder), and checked dimensions in the project record. Keep source identifi
 Use the model's applicable sharing terms; obtaining CAD does not imply redistribution rights.
 Search, sourcing quality and dimensional fidelity require AI/user review; the hygiene audit
 does not automatically verify them.
+
+## PCB connectors, pins and cables
+
+Unless the user explicitly requests detailed connector or pin geometry, model PCB connectors
+and pin groups as simple clearance volumes. Preserve their location, board side, orientation,
+outer envelope and protrusion; include mating-plug/insertion space where relevant. Omit
+individual contacts, pin-by-pin geometry and cosmetic connector detail.
+
+Route cables as simple paths or swept envelopes toward the appropriate connection area on the
+board, with the correct mating direction and cable exit orientation. Do not route to individual
+pins or imply pin-level electrical connectivity. Account for cable thickness and required bend/
+access space; label unknown dimensions or routing assumptions.
+
+This is an intentional detail-level exception to the commercial-hardware CAD rule: use sourced
+CAD or drawings to establish accurate envelopes, but do not rebuild detailed connectors or pins.
+Preserve original supplier models; use simplified representations for layout/clearance work.
+A source-backed envelope is a simplification, not a guessed placeholder. Apply the sourcing
+fallback order when dimensions are unavailable. Review clearances and routing manually;
+the hygiene audit cannot automatically verify envelope fidelity or cable orientation.
 
 ## Preferred modeling strategy — review, not universal numeric gates
 

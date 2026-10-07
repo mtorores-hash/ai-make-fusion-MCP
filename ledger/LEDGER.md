@@ -70,3 +70,14 @@ No live Fusion or hardware sourcing performed. Tests use API doubles, not native
 BOM: no parts consumed. Cost/time: not measured. Video: none. Shelf: no consumption event.
 Idempotency key: fusion-mcp-hardware-rules-20260927. usageEventId: none.
 Next: refresh local software and retrieve rules 1.0.1; existing live acceptance remains pending.
+
+## 2026-10-07 — PCB detail policy
+
+Request: avoid detailed PCB connectors/pins unless specified; model clearance volumes and
+route cables to the correct board area/orientation. Advanced: rules 1.0.2, manual audit item,
+metadata and installation guidance; sourced envelopes explicitly distinguished from placeholders.
+Reused from: existing rules and manual-review mechanism. Original supplier CAD remains preserved.
+Evidence: rules copy/version/loader and Python syntax checks; no live Fusion geometry validation.
+BOM: no parts consumed. Cost/time: not measured. Video: none. Shelf: no consumption event.
+Idempotency key: fusion-mcp-pcb-detail-20261007. usageEventId: none.
+Next: refresh local software and retrieve rules 1.0.2.

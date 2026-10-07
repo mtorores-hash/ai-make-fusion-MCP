@@ -101,7 +101,7 @@ def execute(op, a, d, app):
                 'tolerance_budgets': True, 'semantic_selectors': True,
                 'surface_review_candidates': True, 'full_print_audit': False,
                 'release_hash_revision_checks': True, 'modeling_hygiene_audit': True,
-                'checked_export_gate': True, 'modeling_rules_version': '1.0.1'}
+                'checked_export_gate': True, 'modeling_rules_version': '1.0.2'}
     if op == 'inspect_assembly':
         return assembly(d)
     if op == 'read_selection':
