@@ -55,5 +55,5 @@ For v0.4.1, copy `modeling-rules.md` beside server.py and all add-in modules, in
 `hygiene.py` and `modeling_rules.py`. Restart both processes. Ask the client to call
 `get_modeling_rules` and `audit_modeling_hygiene` before continuing native modeling.
 
-For rules 1.0.3, refresh the complete software folder and restart both processes. The bridge
-still reports runtime 0.4.1; get_modeling_rules and fusion_capabilities should report rules 1.0.3.
+For rules 1.0.4, refresh the complete software folder and restart both processes. The bridge
+still reports runtime 0.4.1; get_modeling_rules and fusion_capabilities should report rules 1.0.4.

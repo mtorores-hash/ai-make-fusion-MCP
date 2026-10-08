@@ -93,3 +93,15 @@ Fusion validation or automated junction-geometry detection. Screenshot is not di
 BOM: no consumption. Cost/time: not measured. Video: none. Shelf: no consumption event.
 Idempotency key: fusion-mcp-junction-rules-20261008. usageEventId: none.
 Next: refresh local installation and retrieve rules 1.0.3; live geometry checks remain pending.
+
+## 2026-10-08 — connection selection
+
+Request: add the agreed connection-selection and fastener-review guidance.
+Advanced: rules 1.0.4 cover consolidation, motion/load paths, service, locating/retention roles,
+candidate connections and a short per-connection rationale; added manual audit reminder.
+Reused from: served rules/manual-review mechanism and user-approved design guidance.
+Evidence: rules loader/version/copy, manual checklist and changed Python syntax checks.
+No automatic connection optimizer, load certification or live Fusion validation.
+BOM: no consumption. Cost/time: not measured. Video: none. Shelf: no consumption event.
+Idempotency key: fusion-mcp-connection-rules-20261008. usageEventId: none.
+Next: refresh local installation and retrieve rules 1.0.4.

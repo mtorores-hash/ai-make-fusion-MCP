@@ -1,6 +1,6 @@
 # Fusion modeling rules — AI Make
 
-Rules version: 1.0.3. Supplied by Mauricio; applied to native parametric authoring.
+Rules version: 1.0.4. Supplied by Mauricio; applied to native parametric authoring.
 Read these rules before modeling. Project-specific instructions and explicit user decisions
 control dimensions, materials, fits and documented exceptions. Report a conflict rather
 than quietly dropping a rule. Preserve existing models and imported hardware.
@@ -79,6 +79,45 @@ A source-backed envelope is a simplification, not a guessed placeholder. Apply t
 fallback order when dimensions are unavailable. Review clearances and routing manually;
 the hygiene audit cannot automatically verify envelope fidelity or cable orientation.
 
+## Connection selection and fastener review
+
+Choose the physical connection before modeling hardware. Prefer the simplest connection that
+satisfies loads, motion, assembly, manufacturing and service needs. Do not add screws or nuts
+without identifying their purpose. A Fusion kinematic joint alone does not define a physical
+attachment.
+
+1. Consider one-piece construction when material, manufacturing/print orientation and service
+   access permit. Do not merge parts that need motion, replacement or separate manufacture.
+2. Define required motion and load path. Distinguish permanent assembly, occasional servicing
+   and frequent access; account for vibration, wear, creep and material limitations where relevant.
+3. Separate locating, load-bearing, retention and clamping functions. Consider shoulders,
+   locating pins, tongues/grooves and interlocking geometry; do not assume screws must do every job.
+4. Compare feasible options using hardware count/types, assembly steps, tool access, print
+   difficulty and failure modes. Reuse suitable standard hardware; avoid arbitrary fastener-count
+   limits or elaborate printed mechanisms that are worse than a simple screwed connection.
+5. Record unknown loads/service needs as assumptions; ask when they materially change selection.
+   Do not present an unverified choice as an ideal or validated joint.
+
+Candidate guide (evaluate suitability, not automatic prescriptions):
+- Permanent same-material structure: one-piece construction.
+- Removable alignment: locating features plus minimal retention.
+- Frequent-access cover: captive screws, latch or suitable snap-fit.
+- Occasionally serviced printed assembly: screws with suitable inserts or captive nuts.
+- Sliding/interchangeable module: guide or dovetail with a stop/lock.
+- Rotation: axle/pivot, appropriate bearing surfaces and axial retention.
+- Permanent dissimilar materials: suitable adhesive or mechanical retention.
+
+For each distinct connection, keep a short project record:
+purpose → loads/motion → service frequency → selected connection → reason a simpler alternative
+was rejected (or why none is needed) → assembly/access check. Repeated identical connections may
+share one rationale.
+
+Before completion, review redundant screws, inaccessible nuts, unnecessary hardware sizes,
+assembly order and opportunities to consolidate parts. Retain necessary clamp/load capacity
+and inspect insertion, tightening and removal access. Do not substitute snap-fits, adhesives
+or press fits without checking their material, tolerance and service requirements.
+This is design guidance plus manual review, not an automatic joint optimizer or strength proof.
+
 ## Junction completeness
 
 A successful join, healthy feature or single solid body does not prove that a junction is
@@ -152,4 +191,4 @@ including native definitions of linked components; report source ownership befor
 
 Before calling the model finished, confirm component ownership/names, constraints and anchoring,
 parameter usage and perturbation, reference stability, feature ordering/health, joint intent,
-restored timeline, commercial-hardware sourcing/fidelity, junction evidence and save description. Automatic checks cannot infer all of these.
+restored timeline, commercial-hardware sourcing/fidelity, junction evidence, connection selection/fastener review and save description. Automatic checks cannot infer all of these.

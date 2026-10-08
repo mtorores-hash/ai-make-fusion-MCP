@@ -1,5 +1,11 @@
 # v0.4.1 — Modeling hygiene (development)
 
+## Unreleased — connection selection (2026-10-08)
+
+Rules 1.0.4 require connection selection before hardware, brief design rationale and final
+fastener/access review. Added manual checklist reminder; no automatic joint optimizer.
+Runtime remains v0.4.1.
+
 ## Unreleased — junction completeness (2026-10-08)
 
 Rules 1.0.3 require intended attachment, local width/thickness and smooth-transition review,

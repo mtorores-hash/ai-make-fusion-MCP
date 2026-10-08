@@ -8,7 +8,7 @@ No geometry was modified while introducing these rules.
 ## How connected AI clients receive the rules
 
 - MCP initialization instructions tell the client to call `get_modeling_rules` before modeling.
-- `get_modeling_rules()` returns the full installed rules text, version `1.0.3`, and SHA-256.
+- `get_modeling_rules()` returns the full installed rules text, version `1.0.4`, and SHA-256.
   It works without opening Fusion.
 - Resource `fusion://modeling-rules` exposes the same text for clients that use MCP resources.
 - Repository `AGENTS.md` references the same rules for coding/modeling work.
@@ -93,7 +93,7 @@ be saved for further work. There are no silent auto-waivers for known failures.
 Update the complete `software/fusion-prompt-mcp` folder, including `modeling-rules.md` and the
 new `FusionPromptBridge/modeling_rules.py` and `hygiene.py`. Restart Fusion and the MCP process.
 `fusion_capabilities` should report `0.4.1`, `modeling_hygiene_audit: true` and
-`modeling_rules_version: '1.0.3'`. The MCP exposes 25 tools. See [installation](installation.md).
+`modeling_rules_version: '1.0.4'`. The MCP exposes 25 tools. See [installation](installation.md).
 
 On a COPY of a local design:
 
@@ -144,3 +144,11 @@ before completion. Preserve intentional gaps, moving interfaces and functional s
 The manual_review_required checklist includes this requirement. The audit does not automatically
 validate attachment area, local thickness, tangency or evidence files; checked-export notes must
 reference that review for critical junctions. A healthy feature or one solid is insufficient.
+
+## Connection selection (rules 1.0.4)
+
+Select the physical assembly method before adding hardware. Consider consolidation, motion,
+load path, service frequency and manufacturing; record a short rationale per distinct connection.
+Review unnecessary screws/nuts, hardware variety, assembly order and insertion/tool/removal access.
+The manual checklist includes this review. The audit cannot select an ideal connection, infer
+loads or prove strength; checked-export review notes should reference the design rationale.

@@ -33,7 +33,7 @@ async def main():
                           'get_modeling_rules','audit_modeling_hygiene'}
                 assert {t.name for t in result.tools}==expected
                 rules=value(await session.call_tool('get_modeling_rules',{}))
-                assert rules['rules_version']=='1.0.3' and 'Component first' in rules['text']
+                assert rules['rules_version']=='1.0.4' and 'Component first' in rules['text']
                 resource=await session.read_resource('fusion://modeling-rules')
                 assert resource.contents[0].text==rules['text']
                 assert (await session.call_tool('audit_modeling_hygiene',{})).isError

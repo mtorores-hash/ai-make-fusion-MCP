@@ -39,3 +39,7 @@ use accurate sourced envelopes and preserve original supplier CAD. See modeling-
 For critical junctions, follow the junction-completeness rule: classify intent, verify local
 attachment and thickness, and retain close-up/section evidence before completion. Healthy
 features and a single solid are insufficient. This remains explicit manual review.
+
+Choose physical connections before adding hardware. Consider consolidation, motion, loads,
+service and assembly access; record a brief rationale per distinct connection and review
+redundant/inaccessible fasteners. Follow the connection-selection rule in docs/modeling-rules.md.

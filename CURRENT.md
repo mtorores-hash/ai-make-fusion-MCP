@@ -1,8 +1,11 @@
 # Current state
 
-Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.3.
+Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.4.
 
 ## Now
+
+2026-10-08: rules 1.0.4 require connection selection before hardware, a short rationale per
+distinct connection and final fastener/access review. Manual guidance, not automatic optimization.
 
 2026-10-08: rules 1.0.3 require complete intended junctions, local width/thickness checks,
 intentional surface continuity and revision-specific close-up/section evidence before completion.
