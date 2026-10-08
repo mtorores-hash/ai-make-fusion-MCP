@@ -1,5 +1,11 @@
 # v0.4.1 — Modeling hygiene (development)
 
+## Unreleased — junction completeness (2026-10-08)
+
+Rules 1.0.3 require intended attachment, local width/thickness and smooth-transition review,
+with current close-up/section evidence before completion. Added manual audit reminder;
+no automatic junction validation implemented. Runtime remains v0.4.1.
+
 ## Unreleased — PCB detail policy (2026-10-07)
 
 Rules 1.0.2 default to PCB connector/pin clearance volumes and correctly oriented cable

@@ -6,6 +6,7 @@ from .modeling_rules import get_rules
 
 DEFAULT_NAME=re.compile(r'^(Sketch|Body|Component|Plane|Axis|Point|Extrude|Fillet|Chamfer|Hole|Revolve|Sweep|Loft|Mirror|Pattern|Move|Joint)\s*\d+(?::\d+)?$',re.I)
 MANUAL_REVIEW=[
+    'Junction intent, complete attachment, measured width/thickness and intended tangency; current close-up and section evidence',
     'PCB connector/pin clearance envelopes and cable destination, mating direction and exit orientation; detail only when requested',
     'Commercial hardware sourcing order, exact variant, CAD provenance and critical dimensions; reconstructed/placeholder limits',
     'Correct component activation/ownership and documented root-body exceptions',

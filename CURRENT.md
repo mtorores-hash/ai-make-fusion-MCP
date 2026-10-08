@@ -1,8 +1,12 @@
 # Current state
 
-Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.2.
+Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.3.
 
 ## Now
+
+2026-10-08: rules 1.0.3 require complete intended junctions, local width/thickness checks,
+intentional surface continuity and revision-specific close-up/section evidence before completion.
+Added manual audit reminder; no automatic junction-geometry validator is claimed.
 
 2026-10-07: rules 1.0.2 default to simple PCB connector/pin clearance volumes and cable
 routes to the correct board area/orientation. Detail is opt-in; supplier CAD originals preserved.

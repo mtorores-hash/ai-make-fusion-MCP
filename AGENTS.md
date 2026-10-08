@@ -35,3 +35,7 @@ Verify exact variant and critical dimensions; record sources and uncertainty in 
 For PCB layout, default to connector/pin clearance volumes and cable routes to the correct
 board area/orientation. Detailed connector/pin modeling requires an explicit user request;
 use accurate sourced envelopes and preserve original supplier CAD. See modeling-rules.md.
+
+For critical junctions, follow the junction-completeness rule: classify intent, verify local
+attachment and thickness, and retain close-up/section evidence before completion. Healthy
+features and a single solid are insufficient. This remains explicit manual review.

@@ -81,3 +81,15 @@ Evidence: rules copy/version/loader and Python syntax checks; no live Fusion geo
 BOM: no parts consumed. Cost/time: not measured. Video: none. Shelf: no consumption event.
 Idempotency key: fusion-mcp-pcb-detail-20261007. usageEventId: none.
 Next: refresh local software and retrieve rules 1.0.2.
+
+## 2026-10-08 — junction completeness
+
+Request: add the agreed rule against unintended incomplete/discontinuous junctions.
+Advanced: rules 1.0.3 and manual audit reminder require intent, complete attachment, local
+width/thickness measurements and current close-up/section evidence; preserve intentional interfaces.
+Reused from: existing served rules/manual-review mechanism and user-approved junction guidance.
+Evidence: rules loader/version/copy, manual checklist and changed Python syntax checks; no live
+Fusion validation or automated junction-geometry detection. Screenshot is not dimensional proof.
+BOM: no consumption. Cost/time: not measured. Video: none. Shelf: no consumption event.
+Idempotency key: fusion-mcp-junction-rules-20261008. usageEventId: none.
+Next: refresh local installation and retrieve rules 1.0.3; live geometry checks remain pending.

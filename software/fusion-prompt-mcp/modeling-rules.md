@@ -1,6 +1,6 @@
 # Fusion modeling rules — AI Make
 
-Rules version: 1.0.2. Supplied by Mauricio; applied to native parametric authoring.
+Rules version: 1.0.3. Supplied by Mauricio; applied to native parametric authoring.
 Read these rules before modeling. Project-specific instructions and explicit user decisions
 control dimensions, materials, fits and documented exceptions. Report a conflict rather
 than quietly dropping a rule. Preserve existing models and imported hardware.
@@ -79,6 +79,33 @@ A source-backed envelope is a simplification, not a guessed placeholder. Apply t
 fallback order when dimensions are unavailable. Review clearances and routing manually;
 the hygiene audit cannot automatically verify envelope fidelity or cable orientation.
 
+## Junction completeness
+
+A successful join, healthy feature or single solid body does not prove that a junction is
+complete, sufficiently thick or smoothly transitioned. Verify the intended local geometry.
+
+- Classify each critical junction as continuous material, an intentional seam or a moving
+  interface. Preserve designed gaps, reliefs and sharp functional edges.
+- For continuous parts, connect ribs, bosses and walls across the intended attachment area.
+  Reject accidental gaps, point/edge-only contact, thin slivers and unintended partial-width
+  attachments. Define minimum attachment width/thickness from design and manufacturing needs;
+  do not invent one universal threshold or treat body count as proof of adequate connection.
+- Prefer shared profiles, correctly terminated ribs and controlled lofts/transitions. Correct
+  the source geometry rather than accumulating patch features or hiding defects with fillets.
+- After relevant edits and regeneration, inspect sections through AND beside each critical
+  junction. Measure the attachment width and local thickness against the stated requirements.
+- Where a smooth blend is intended, require tangent continuity and inspect the transition;
+  use zebra/surface analysis where available. Deliberate sharp boundaries need no forced blend.
+  Surface smoothness alone does not establish solid connectivity or structural adequacy.
+- Before completion, retain a close-up, section evidence and measured values for each critical
+  junction in the design project. Identify the junction and model revision; refresh evidence
+  after edits affecting it. Resolve unintended discontinuities before declaring completion;
+  report unresolved findings and keep any interim export clearly marked as work in progress.
+
+These are authoring and manual-review requirements. The current hygiene audit does not
+automatically measure junction thickness, prove attachment completeness or verify tangency.
+Its passing result cannot substitute for this evidence.
+
 ## Preferred modeling strategy — review, not universal numeric gates
 
 - Keep sketches small: roughly 20 curves and 5–10 dimensions. At 100 curves review splitting;
@@ -125,4 +152,4 @@ including native definitions of linked components; report source ownership befor
 
 Before calling the model finished, confirm component ownership/names, constraints and anchoring,
 parameter usage and perturbation, reference stability, feature ordering/health, joint intent,
-restored timeline, commercial-hardware sourcing/fidelity and save description. Automatic checks cannot infer all of these.
+restored timeline, commercial-hardware sourcing/fidelity, junction evidence and save description. Automatic checks cannot infer all of these.
