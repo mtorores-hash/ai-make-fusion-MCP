@@ -43,3 +43,7 @@ features and a single solid are insufficient. This remains explicit manual revie
 Choose physical connections before adding hardware. Consider consolidation, motion, loads,
 service and assembly access; record a brief rationale per distinct connection and review
 redundant/inaccessible fasteners. Follow the connection-selection rule in docs/modeling-rules.md.
+
+Use Fusion cloud projects and named native part files for shared editing. Read
+`docs/cloud-workflow.md`; preserve user edits, file IDs and links, use edit tokens before
+mutations, and confirm completed cloud saves before handoff. Never silently migrate assemblies.

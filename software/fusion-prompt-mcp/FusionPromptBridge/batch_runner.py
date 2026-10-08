@@ -10,7 +10,7 @@ import time
 import traceback
 import adsk.core
 import adsk.fusion
-from . import advanced, model_tools, verification
+from . import advanced, model_tools, verification, cloud
 from .execution_policy import validate_read_only
 import ast
 
@@ -174,6 +174,12 @@ class Context:
         return self.artifact(path)
     def checkpoint(self,label):
         self.check_cancel()
+        if self.document.allDocumentReferences.count:
+            record=cloud.cloud_checkpoint(self.app,self.design,self.request['document_id'])
+            path=self.path('checkpoint_%03d_cloud.json'%len(self.result['checkpoints']))
+            path.write_text(json.dumps(record,indent=2),encoding='utf-8')
+            artifact=dict(self.artifact(path),kind='cloud_version',recovery=record)
+            self.result['checkpoints'].append(dict(artifact,label=label)); self.flush(); return artifact
         clean=re.sub(r'[^A-Za-z0-9_-]+','_',label)[:70] or 'checkpoint'
         filename='checkpoint_%03d_%s.f3d'%(len(self.result['checkpoints']),clean)
         with self.timed('checkpoint'):
@@ -368,6 +374,8 @@ def execute_job(store,job,app,design_getter,document_id_getter):
         def guard():
             if document_id_getter()!=request['document_id']: raise ValueError('Active document ID changed; job target rejected.')
         guard(); d=design_getter()
+        if request.get('mode','modeling')!='read_only':
+            cloud.require_edit(app,d,request['document_id'],request.get('edit_token',''))
         target=d.rootComponent if request['component_token']=='@root' else advanced.resolve(d,request['component_token'],adsk.fusion.Component)
         if request.get('mode','modeling')!='read_only': advanced.editable(d,target)
         ctx=Context(store,job,app,d,target,guard); result=ctx.result

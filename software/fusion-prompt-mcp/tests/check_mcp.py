@@ -30,10 +30,10 @@ async def main():
                           'read_selection','fillet_edges','create_joint','run_model_script','job_status','job_result',
                           'list_jobs','cancel_job','inspect_full_assembly','select_geometry',
                           'measure_minimum_distance','check_interference','validate_model',
-                          'get_modeling_rules','audit_modeling_hygiene'}
+                          'get_modeling_rules','audit_modeling_hygiene','browse_cloud','inspect_document_state','cloud_operation'}
                 assert {t.name for t in result.tools}==expected
                 rules=value(await session.call_tool('get_modeling_rules',{}))
-                assert rules['rules_version']=='1.0.4' and 'Component first' in rules['text']
+                assert rules['rules_version']=='1.0.5' and 'Component first' in rules['text']
                 resource=await session.read_resource('fusion://modeling-rules')
                 assert resource.contents[0].text==rules['text']
                 assert (await session.call_tool('audit_modeling_hygiene',{})).isError
@@ -54,6 +54,11 @@ async def main():
                 assert not (await session.call_tool('run_model_script',readonly)).isError
                 assert (await session.call_tool('run_model_script',dict(readonly,operation_id='bad-read',
                         script='def run(ctx): return ctx.design.computeAll()'))).isError
-                print('PASS: MCP initialize; 25 tools; modeling rules tool/resource; validation; persistent enqueue/status; duplicate protection; cancellation')
+                cloud_request=dict(operation_id='cloud-test',action='ensure_project',arguments={'hub_id':'h','name':'Test'})
+                cloud=value(await session.call_tool('cloud_operation',cloud_request))
+                assert cloud['status']=='queued'
+                assert value(await session.call_tool('cloud_operation',cloud_request))['job_id']==cloud['job_id']
+                assert (await session.call_tool('cloud_operation',dict(cloud_request,action='delete'))).isError
+                print('PASS: MCP initialize; 28 tools; modeling rules tool/resource; validation; persistent enqueue/status; duplicate protection; cancellation')
 
 asyncio.run(main())

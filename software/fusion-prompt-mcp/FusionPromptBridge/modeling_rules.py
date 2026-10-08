@@ -2,7 +2,7 @@
 import hashlib
 from pathlib import Path
 
-RULES_VERSION = '1.0.4'
+RULES_VERSION = '1.0.5'
 
 
 def get_rules():

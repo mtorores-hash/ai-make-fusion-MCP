@@ -11,7 +11,7 @@ challenge budget, validated physical fit or production readiness is included.
 | Broader modeling | Full adsk available for revolve, sweep, loft, patterns, split and other features | Not separate tested wrappers for every operation |
 | Components and joints | Typed basic joints; script helpers for STEP import, joint limits and position sampling | Existing native design context required; solving pending |
 | Geometry checks | Distance, interference, section-curve sketch and discrete motion samples | No automatic access-envelope or continuous-collision proof |
-| Save/export/presentation | F3D/STEP/STL, temporary print-copy orientation, appearances, camera and PNG capture | Native Fusion output validation pending; no encoded video or cloud save management |
+| Save/export/presentation | F3D/STEP/STL, temporary print-copy orientation, appearances, camera and PNG capture | Native Fusion output validation pending; no encoded video; cloud management added in v0.5.0 below |
 
 The script runner was explicitly requested after the earlier typed-tool-only versions. It
 executes unrestricted local Python with user permissions. Target checks are guardrails, not
@@ -24,3 +24,8 @@ tag, repo visibility change or challenge-story material is part of this import.
 ## v0.4 update
 
 See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.
+
+## v0.5.0 update
+
+[Cloud workflow](cloud-workflow.md) adds named project/part files, external links, selected reference
+updates and optimistic shared-edit checks. Cloud/kernel acceptance is pending.

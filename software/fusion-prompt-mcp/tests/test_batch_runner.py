@@ -22,13 +22,17 @@ class BatchTests(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup); self.store=Store(self.tmp.name)
         self.target=Node('Component',entityToken='root',name='Root')
         self.design=Node(findEntityByToken=lambda t:[self.target] if t=='root' else [],
-                         rootComponent=Node(allOccurrences=Collection()),computeAll=lambda:True)
-        self.app=Node(activeDocument=Node(name='Test'))
+                         rootComponent=Node(allOccurrences=Collection()),computeAll=lambda:True,
+                         allComponents=Collection([Node(name='Root',revisionId='r1')]),allParameters=Collection())
+        self.app=Node(activeDocument=Node(name='Test',isModified=False,isSaved=False,allDocumentReferences=Collection()))
         self.req=dict(operation_id='batch',document_id='doc',component_token='root',units='mm',
                       script='def run(ctx):\n    ctx.progress(0.5,"half")\n    print("hello")\n    ctx.record("diameter_mm",12)\n    return {"ok":True}',
                       checkpoint_before=False,validate_after=True)
     def run_job(self,request=None,doc='doc'):
-        j=self.store.submit(request or self.req); claimed=self.store.claim('owner')
+        request=dict(request or self.req)
+        if 'edit_token' not in request:
+            request['edit_token']=runner.cloud.inspect_state(self.app,self.design,'doc')['edit_token']
+        j=self.store.submit(request); claimed=self.store.claim('owner')
         with patch.object(runner,'inventory',return_value=[]), patch.object(runner.Context,'validate',return_value={'feature_errors':[]}):
             runner.execute_job(self.store,claimed,self.app,lambda:self.design,lambda:doc)
         return self.store.result(j['job_id'])
@@ -37,6 +41,17 @@ class BatchTests(unittest.TestCase):
         self.assertEqual(r['result']['measurements']['diameter_mm'],12)
         self.assertIn('hello',r['result']['stdout'])
         self.assertEqual(r['result']['return_value'],{'ok':True})
+    def test_missing_edit_token_blocks_module_execution(self):
+        r=self.run_job(dict(self.req,edit_token=''))
+        self.assertEqual(r['status'],'failed')
+        self.assertIn('edit_token',r['result']['message'])
+        self.assertEqual(r['result']['measurements'],{})
+    def test_user_edit_between_inspection_and_execution_blocks_batch(self):
+        token=runner.cloud.inspect_state(self.app,self.design,'doc')['edit_token']
+        self.design.allComponents.item(0).revisionId='manual-change'
+        r=self.run_job(dict(self.req,edit_token=token))
+        self.assertEqual(r['status'],'failed')
+        self.assertIn('changed since inspection',r['result']['message'])
     def test_wrong_document_rejected_before_script(self):
         r=self.run_job(doc='other'); self.assertEqual(r['status'],'failed')
         self.assertIn('Active document ID changed',r['result']['traceback'])
@@ -143,7 +158,7 @@ class EventDispatchTests(unittest.TestCase):
         from FusionPromptBridge import FusionPromptBridge as bridge
         from unittest.mock import Mock
         with tempfile.TemporaryDirectory() as directory:
-            store=Mock(); store.claim.return_value={'job_id':'job'}
+            store=Mock(); store.claim.return_value={'job_id':'job','request':{}}
             ids=[]
             def execute(*args):
                 ids.append(threading.get_ident())

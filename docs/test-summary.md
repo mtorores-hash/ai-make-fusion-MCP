@@ -1,4 +1,20 @@
-# Test summary — v0.4.1
+# Test summary — v0.5.0 development
+
+**106 automated tests pass**. Coverage adds cloud API doubles for edit-token consumption,
+dirty-to-dirty manual edits, stale/read-only/processing/other-editor rejection, reference
+state, cloud checkpoints, first/in-place saves, upload futures/failures, duplicate operations,
+restart interruption, dirty-document preservation and selected version updates.
+
+Real STDIO MCP checks pass with **28 tools**, rules 1.0.5 tool/resource, schema validation,
+persistent batch and cloud-job submission, deduplication and cancellation. Environment:
+Python 3.12, MCP 1.30.0, declared dependency range unchanged. Syntax and identical rules
+copies checked. No live Fusion cloud/kernel, Windows install or native geometry test here.
+
+The decisive next check is [local Fusion acceptance](cloud-workflow.md#local-fusion-acceptance):
+manual edit/save of a named part, selected assembly-reference update, inspection and AI resumption.
+
+## Historical v0.4.1 evidence
+
 
 **80 automated tests pass** (63 retained + 17 hygiene tests). Real STDIO MCP checks pass:
 25 tools, modeling-rules tool and resource with identical text, schema validation, persistent jobs,

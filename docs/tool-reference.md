@@ -1,6 +1,6 @@
-# MCP tool reference — v0.4.1
+# MCP tool reference — v0.5.0
 
-25 tools. Installed rules also available as resource `fusion://modeling-rules`.
+28 tools. Rules resource: `fusion://modeling-rules`.
 
 ## `get_modeling_rules`
 
@@ -42,7 +42,7 @@ Open a new unsaved parametric design without closing existing documents.
 ## `rectangle_sketch`
 
 ```python
-rectangle_sketch(design_id: str, name: str, width_mm: float, height_mm: float, x_mm: float=0, y_mm: float=0, plane: Literal['XY', 'XZ', 'YZ']='XY')
+rectangle_sketch(design_id: str, name: str, width_mm: float, height_mm: float, x_mm: float=0, y_mm: float=0, plane: Literal['XY', 'XZ', 'YZ']='XY', edit_token: str='')
 ```
 
 Create a rectangle in a new root sketch from a lower-left corner. Size is initial geometry,
@@ -51,7 +51,7 @@ not driven by named parameters. Returns a sketch token for extrude.
 ## `circle_sketch`
 
 ```python
-circle_sketch(design_id: str, name: str, diameter_mm: float, x_mm: float=0, y_mm: float=0, plane: Literal['XY', 'XZ', 'YZ']='XY')
+circle_sketch(design_id: str, name: str, diameter_mm: float, x_mm: float=0, y_mm: float=0, plane: Literal['XY', 'XZ', 'YZ']='XY', edit_token: str='')
 ```
 
 Create a circle in a new root sketch. Coordinates are sketch-local mm.
@@ -59,7 +59,7 @@ Create a circle in a new root sketch. Coordinates are sketch-local mm.
 ## `extrude`
 
 ```python
-extrude(design_id: str, sketch_token: str, distance: str, name: str, operation: Literal['new_body', 'new_component', 'join', 'cut']='new_body', profile_index: int=0, target_body_token: str='')
+extrude(design_id: str, sketch_token: str, distance: str, name: str, operation: Literal['new_body', 'new_component', 'join', 'cut']='new_body', profile_index: int=0, target_body_token: str='', edit_token: str='')
 ```
 
 Extrude a profile; distance is positive, e.g. '4 mm' or 'plate_thickness'.
@@ -69,7 +69,7 @@ Join may affect touching root bodies. Inspect before and after.
 ## `set_parameter`
 
 ```python
-set_parameter(design_id: str, name: str, expression: str, unit: str='mm')
+set_parameter(design_id: str, name: str, expression: str, unit: str='mm', edit_token: str='')
 ```
 
 Create/update a user parameter. Existing model parameters can also be updated by name.
@@ -122,7 +122,7 @@ Useful when verbal edge/face descriptions are ambiguous. Finish active commands 
 ## `fillet_edges`
 
 ```python
-fillet_edges(design_id: str, edge_tokens: list[str], radius: str, name: str='MCP Fillet', tangent_chain: bool=False, rolling_ball: bool=True)
+fillet_edges(design_id: str, edge_tokens: list[str], radius: str, name: str='MCP Fillet', tangent_chain: bool=False, rolling_ball: bool=True, edit_token: str='')
 ```
 
 Create a native constant-radius fillet on explicitly inspected/selected edges of one body.
@@ -133,7 +133,7 @@ Kernel failures can occur for oversized radii. Inspect health and topology after
 ## `create_joint`
 
 ```python
-create_joint(design_id: str, geometry_one: str, geometry_two: str, occurrence_one: str='', occurrence_two: str='', kind: Literal['rigid', 'revolute', 'slider', 'cylindrical']='rigid', name: str='MCP Joint', axis: Literal['X', 'Y', 'Z']='Z', keypoint_one: Literal['center', 'start', 'end', 'middle']='center', keypoint_two: Literal['center', 'start', 'end', 'middle']='center', offset: str='0 mm', angle: str='0 deg', flipped: bool=False)
+create_joint(design_id: str, geometry_one: str, geometry_two: str, occurrence_one: str='', occurrence_two: str='', kind: Literal['rigid', 'revolute', 'slider', 'cylindrical']='rigid', name: str='MCP Joint', axis: Literal['X', 'Y', 'Z']='Z', keypoint_one: Literal['center', 'start', 'end', 'middle']='center', keypoint_two: Literal['center', 'start', 'end', 'middle']='center', offset: str='0 mm', angle: str='0 deg', flipped: bool=False, edit_token: str='')
 ```
 
 Create a STANDARD joint: Fusion may reposition components to align the references.
@@ -145,7 +145,7 @@ Preserve existing placements unless the user requested alignment. Inspect return
 ## `run_model_script`
 
 ```python
-run_model_script(operation_id: str, document_id: str, component_token: str, units: Literal['mm', 'cm', 'm', 'in'], script: str, checkpoint_before: bool=True, validate_after: bool=True, mode: Literal['modeling', 'read_only']='modeling')
+run_model_script(operation_id: str, document_id: str, component_token: str, units: Literal['mm', 'cm', 'm', 'in'], script: str, checkpoint_before: bool=True, validate_after: bool=True, mode: Literal['modeling', 'read_only']='modeling', edit_token: str='')
 ```
 
 Enqueue a complete trusted Fusion Python script defining run(ctx); returns immediately.
@@ -157,7 +157,8 @@ Read-only queries do not regenerate. Full Python modeling always regenerates at 
 Use ctx.target, ctx.point/value, ctx.progress, ctx.stage, ctx.record, ctx.export and return JSON.
 The same operation_id + exact request returns the same job; changed content is rejected.
 Poll job_status/job_result; NEVER auto-retry an interrupted job with a fresh ID.
-Checkpoints export the full design before code runs. Failure aborts before modeling.
+Modeling requires a fresh inspect_document_state edit_token. Checkpoints use local F3D or
+a completed clean cloud version manifest for linked assemblies. Failure aborts before modeling.
 Cancellation is cooperative; a kernel call or tight Python loop cannot be forcibly interrupted.
 Units declare helper inputs; raw adsk floats STILL use Fusion native cm/radians.
 
@@ -242,3 +243,43 @@ validate_model(design_id: str)
 ```
 
 Report feature/joint errors and warnings across component definitions. Not a printability guarantee.
+
+## `browse_cloud`
+
+```python
+browse_cloud(hub_id: str='', project_id: str='', folder_id: str='')
+```
+
+Browse Fusion hubs, projects, or one folder's files/subfolders. IDs are authoritative.
+Omit all IDs for hubs; supply hub for projects; hub+project for its root folder.
+File records contain stable id, version_id for opening, version, processing/read-only state.
+
+## `inspect_document_state`
+
+```python
+inspect_document_state(document_id: str)
+```
+
+Read active document's cloud identity/versions, dirty state and nested reference versions.
+Returns a single-use edit_token required before every modeling mutation or cloud save.
+If a user edits after inspection, the mutation is rejected. Inspect geometry too before adapting.
+The token acknowledges the inspected unsaved state; it never discards, reloads or saves it.
+
+## `cloud_operation`
+
+```python
+cloud_operation(operation_id: str, action: Literal['ensure_project', 'ensure_folder', 'save', 'save_component', 'open', 'insert', 'update_reference'], arguments: dict)
+```
+
+Durable main-thread cloud job. Poll job_status/job_result; retry SAME ID+arguments.
+ensure_project: hub_id,name; creates/reuses project and Assembly/Parts/Purchased Components folders.
+ensure_folder: hub_id,project_id,folder_id (parent),name.
+open: version_id,expected_version; preserves all open documents, refuses stale/dirty target.
+save: document_id,edit_token,description; FIRST save also hub_id,project_id,folder_id,name.
+save_component: same first-save arguments + component_token; independent native copy, NOT link replacement.
+insert: document_id,edit_token,version_id,expected_version,transform_cm (16 matrix values).
+update_reference: document_id,edit_token,file_id,expected_latest_version; one direct reference.
+Insert/update require a clean completed cloud save as recovery checkpoint. Insert links same-project files.
+Save succeeds only after isComplete. Cancellation stops monitoring, not the actual cloud upload.
+Results preserve file id/version_id and source mapping. Interrupted jobs are never replayed.
+No deletes, share links, contributor changes or automatic replacement of existing components.

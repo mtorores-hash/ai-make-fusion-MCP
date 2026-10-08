@@ -5,19 +5,20 @@ Fusion models through typed tools or one complete Python modeling script.
 
 ## Current version and release status
 
-**v0.4.1 development snapshot, on `workbench`.** This is an unpublished supporting tool,
+**v0.5.0 development snapshot, on `workbench`.** This is an unpublished supporting tool,
 not a released or physically validated mechanical design. The repository remains private.
 `main` is a landing page; no public release or episode milestone is asserted.
 
 ## Capabilities
 
+- Fusion cloud projects, named native part files, version guards and linked references.
 - Full `adsk` batch scripts with explicit document/component targets and units.
 - Durable jobs, operation-ID duplicate protection, progress, results, traceback and checkpoints.
 - Sketch/extrude/fillet/joint tools plus nested assembly and geometry inspection.
 - Geometry-based selection, interference and clearance checks, motion sampling.
 - F3D/STEP/STL export, print-copy orientation and exact-size PNG capture helpers.
 
-The package exposes **25 MCP tools**. Full API access enables broader operations through
+The package exposes **28 MCP tools**. Full API access enables broader operations through
 batch scripts; those operations are not all independently validated convenience tools.
 
 ## Hardware and software
@@ -40,7 +41,7 @@ Its original package README, dependency file, Windows setup helper, examples and
 | --- | --- |
 | Architecture, persistent jobs and recovery | [architecture](docs/architecture.md) |
 | Script contract and helper API | [script API](docs/script-api.md) |
-| All 25 tools and argument signatures | [tool reference](docs/tool-reference.md) |
+| All 28 tools and argument signatures | [tool reference](docs/tool-reference.md) |
 | Geometry and feature-boundary selection | [geometry selection](docs/geometry-selection.md) |
 | Validation method and live acceptance | [validation](docs/validation.md) |
 | Evidence and test limits | [test summary](docs/test-summary.md) |
@@ -53,8 +54,8 @@ Its original package README, dependency file, Windows setup helper, examples and
 
 Live Fusion/Windows loading, CAD-kernel behavior, exports, transforms and joint solving have
 not been verified here. Scripts run as trusted unrestricted Python; component targeting is
-not a sandbox. Cancellation is cooperative; failures can leave partial changes. F3D checkpoint
-export can fail for linked designs, stopping the batch before script execution. Motion checks
+not a sandbox. Cancellation is cooperative; failures can leave partial changes. Linked-design checkpoints require a clean completed cloud save and produce a version manifest,
+not a self-contained F3D archive. Cloud/version checks are optimistic, not distributed locking. Motion checks
 are discrete samples. Section helpers produce curves, not clipped-solid Section Analysis.
 
 ## License
@@ -75,3 +76,5 @@ Shared operating context is [AI_MAKE](https://github.com/mtorores-hash/AI_MAKE).
 Latest: [Execution and verification update and remaining work](docs/upgrade-v0.4.md).
 
 Modeling standard: [rules](docs/modeling-rules.md) and [audit / checked-export behavior](docs/modeling-hygiene.md).
+
+Shared editing: [cloud workflow and live acceptance](docs/cloud-workflow.md).

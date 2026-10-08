@@ -59,3 +59,12 @@ Operational interpretation is docs/modeling-rules.md, mirrored in the installabl
 verified by a regression test. The attachment's cited sources are the user's compilation;
 this change does not represent an independent validation of every historical/community claim.
 Primary API contracts used for inspection were checked; details in docs/modeling-hygiene.md.
+
+
+## v0.5.0 cloud/shared-edit provenance
+
+Base workbench: 82b782eba07d376e2406b57e7f07a4db32f72b70. User requested Fusion project/part
+file management and manual/AI handoff. Reused existing custom events and durable jobs.
+Shared AI_MAKE README, house ritual, lock, handoff, decisions, library and engineering/ledger
+standards were reviewed. Existing unrelated project locks remain unchanged.
+Official API contracts and acceptance boundaries: docs/cloud-workflow.md. No live API claim.

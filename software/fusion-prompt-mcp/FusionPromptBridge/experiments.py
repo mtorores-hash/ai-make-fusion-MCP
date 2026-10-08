@@ -37,6 +37,8 @@ def try_feature(ctx, name, build, select_bodies, rules, protected_metrics=None, 
     # Validate acceptance policy before invoking a candidate callback.
     verification.geometry_delta(before,before,rules)
     checkpoint=ctx.checkpoint('experiment_'+name)
+    if checkpoint.get('kind')=='cloud_version':
+        raise ValueError('Disposable feature experiments require a local F3D checkpoint; linked assemblies are not supported')
     candidate=None; report={'accepted':False,'reasons':[],'checkpoint':checkpoint}
     try:
         manager=ctx.app.importManager

@@ -69,6 +69,22 @@ class Store:
         # Preserve v0.3 idempotency digests for the unchanged default modeling behavior.
         request=dict(request)
         if request.get('mode')=='modeling': request.pop('mode')
+        if not request.get('edit_token'): request.pop('edit_token',None)
+        return self._enqueue(request)
+
+    def submit_cloud(self, request):
+        if not isinstance(request, dict): raise ValueError('request must be an object')
+        op = request.get('operation_id', '')
+        if not isinstance(op,str) or not re.fullmatch(r'[A-Za-z0-9_.:-]{1,128}',op):
+            raise ValueError('Invalid operation_id')
+        if request.get('action') not in ('ensure_project','ensure_folder','save','save_component','open','insert','update_reference'):
+            raise ValueError('Unsupported cloud action')
+        if not isinstance(request.get('arguments'),dict): raise ValueError('arguments must be an object')
+        if len(canonical(request))>100_000: raise ValueError('Cloud request too large')
+        return self._enqueue(dict(request,kind='cloud'))
+
+    def _enqueue(self, request):
+        operation_id=request['operation_id']
         encoded = canonical(request)
         digest = hashlib.sha256(encoded.encode()).hexdigest()
         with self.connect() as c:
@@ -110,7 +126,7 @@ class Store:
 
     def pending(self):
         with self.connect() as c:
-            return c.execute("SELECT 1 FROM jobs WHERE status IN ('queued','waiting') LIMIT 1").fetchone() is not None
+            return c.execute("SELECT 1 FROM jobs WHERE status IN ('queued','waiting','running') LIMIT 1").fetchone() is not None
 
     def claim(self, owner):
         with self.connect() as c:

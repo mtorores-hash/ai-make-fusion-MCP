@@ -1,8 +1,14 @@
 # Current state
 
-Branch: workbench. Version: v0.4.1 development; modeling rules version 1.0.4.
+Branch: workbench. Version: v0.5.0 development; modeling rules version 1.0.5.
 
 ## Now
+
+2026-10-08: implemented Fusion cloud project/folder creation, named native part/version saves,
+opening, linked insertion and selected reference updates. Added single-use pre-edit tokens and
+clean cloud-version manifests for linked checkpoints. 28 MCP tools; user edits and existing
+assembly links are preserved. Cloud copy is not automatic assembly/joint migration.
+
 
 2026-10-08: rules 1.0.4 require connection selection before hardware, a short rationale per
 distinct connection and final fastener/access review. Manual guidance, not automatic optimization.
@@ -29,23 +35,25 @@ Prior verification roadmap coverage remains in docs/upgrade-v0.4.md; this update
 
 ## Last experiment / evidence
 
-80 automated tests pass (including 17 hygiene regressions); real STDIO MCP checks pass with
-25 tools and the modeling-rules resource. These include API doubles, not native Fusion execution.
-Reported by Mauricio: v0.4 is running in local Fusion. No result of the requested read-only smoke
-test was supplied. No v0.4.1 live geometry, audit or export validation occurred here.
+106 automated tests pass (API doubles, numerical and filesystem tests). Real STDIO MCP
+initialize/list/schema/rules/resource/job checks pass with 28 tools using Python 3.12 and MCP
+1.30.0. Tests cover user-edit rejection, version conflicts, pending/completed saves, duplicate
+requests, restart interruption, component-copy futures and selective reference updates.
+No live Fusion cloud/kernel test or installation on Mauricio's PC performed here.
 
 ## Next question
 
-After updating both installed processes to v0.4.1, can the client retrieve the rules and audit a
-copy without changing it? Confirm under-constrained fixture blocks checked export and recovery
-checkpoint remains available; follow docs/modeling-hygiene.md live acceptance.
+Upgrade BOTH local server/add-in to v0.5.0 and retrieve rules 1.0.5. Run the disposable-project
+acceptance in docs/cloud-workflow.md: manually edit/save a named part, update its assembly
+reference, inspect placements/joints, save and resume AI work without discarding the edit.
 
 ## Files touched
 
-Rules/source docs, AGENTS and installed guidance, MCP server/dispatcher/resource, hygiene inspector,
-batch helpers, capability/version metadata, regression/protocol tests and working-state records.
+Cloud module, dispatcher, job store, server schemas, batch checkpoints, experiment boundary,
+versions/rules, tests, install/workflow/reference docs and working-state records.
 
 ## Open gates
 
-Live Fusion acceptance; manual review of non-automatable rules; remaining verification roadmap;
-license/public release. No challenge clock, budget or physical outcome inferred.
+Live Fusion cloud and geometry acceptance; no distributed locking or arbitrary-Python sandbox;
+existing-component linkage migration remains deliberate work; license/public release.
+No challenge clock, budget, physical outcome or installed-PC update inferred.

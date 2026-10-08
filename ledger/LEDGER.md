@@ -105,3 +105,19 @@ No automatic connection optimizer, load certification or live Fusion validation.
 BOM: no consumption. Cost/time: not measured. Video: none. Shelf: no consumption event.
 Idempotency key: fusion-mcp-connection-rules-20261008. usageEventId: none.
 Next: refresh local installation and retrieve rules 1.0.4.
+
+
+## 2026-10-08 — cloud files and shared editing
+
+Request: implement Fusion cloud projects and named part files so the user can manually design
+parts and the AI continues from those versions. Advanced: v0.5.0 / rules 1.0.5, 28 tools,
+durable cloud operations, optimistic single-use edit checks and linked cloud-version checkpoints.
+Existing component copies preserve original assemblies; no automatic joint migration or rollback.
+Reused from: existing custom-event bridge, durable SQLite operation-ID jobs and modeling rules.
+Evidence: 106 automated tests (including API doubles) and real STDIO MCP checks pass using
+Python 3.12 / MCP 1.30.0. Autodesk API contracts checked, including refresh(None). No live
+Fusion cloud/kernel validation, installation on user's PC, hardware or physical test.
+BOM: none consumed. Cost/time: not measured. Video candidate: manual part edit followed by AI
+resumption, not yet captured. Shelf: no consumption event; usageEventId: none.
+Idempotency key: fusion-mcp-cloud-editing-20261008.
+Next: upgrade both local processes, run disposable cloud project/part/reference acceptance.

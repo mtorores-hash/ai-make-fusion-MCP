@@ -8,7 +8,7 @@ import time
 import uuid
 import adsk.core
 import adsk.fusion
-from . import advanced, model_tools, batch_runner
+from . import advanced, model_tools, batch_runner, cloud
 from .job_store import Store, BridgeLock
 
 ROOT = Path.home() / '.fusion-prompt-mcp'
@@ -19,7 +19,7 @@ _owner = uuid.uuid4().hex
 _app = _event = _handler = _thread = None
 _stop = threading.Event()
 _documents = []
-ALLOWED = {'inspect', 'new_design', 'rectangle', 'circle', 'extrude', 'parameter', 'export'} | advanced.OPS | {'inspect_full', 'select_geometry', 'measure_distance', 'check_interference', 'validate_model', 'audit_hygiene'}
+ALLOWED = {'browse_cloud', 'document_state'} | {'inspect', 'new_design', 'rectangle', 'circle', 'extrude', 'parameter', 'export'} | advanced.OPS | {'inspect_full', 'select_geometry', 'measure_distance', 'check_interference', 'validate_model', 'audit_hygiene'}
 
 def atomic_json(path, value):
     temp = path.with_suffix('.tmp')
@@ -58,7 +58,7 @@ def inspect():
         bodies.append(dict(ref(body), size_mm=[10 * (getattr(box.maxPoint, a) -
                            getattr(box.minPoint, a)) for a in ('x','y','z')]))
     return {'design_id': design_id(), 'document': _app.activeDocument.name,
-            'version': '0.4.1', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
+            'version': '0.5.0', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
             'sketches': [dict(ref(s), profiles=s.profiles.count) for s in items(root.sketches)],
             'parameters': [{'name': p.name, 'expression': p.expression, 'unit': p.unit}
                            for p in items(d.allParameters)],
@@ -89,7 +89,11 @@ def execute(op, a):
         _app.documents.add(adsk.core.DocumentTypes.FusionDesignDocumentType)
         design().designType = adsk.fusion.DesignTypes.ParametricDesignType
         return inspect()
+    if op == 'browse_cloud': return cloud.browse(_app,a)
     d = design()
+    if op == 'document_state':
+        if a['document_id'] != design_id(): raise ValueError('Active document changed')
+        return cloud.inspect_state(_app,d,design_id())
     if op == 'inspect':
         return inspect()
     if a.get('design_id') != design_id():
@@ -112,6 +116,9 @@ def execute(op, a):
     if op == 'audit_hygiene':
         from .hygiene import audit
         return audit(d)
+    if op in ('rectangle','circle','extrude','parameter','fillet','joint'):
+        if cloud._pending: raise ValueError('Cloud save pending; poll before modeling')
+        cloud.require_edit(_app,d,design_id(),a.get('edit_token',''))
     if op in advanced.OPS:
         return advanced.execute(op, a, d, _app)
     root = d.rootComponent
@@ -238,9 +245,14 @@ class Handler(adsk.core.CustomEventHandler):
         if _app.userInterface.activeCommand != 'SelectCommand':
             _store.waiting('Finish the active Fusion command/dialog to start the batch.')
             return
+        cloud.tick(_store)
+        if cloud._pending: return
         job = _store.claim(_owner)
         if job:
-            batch_runner.execute_job(_store, job, _app, design, design_id)
+            if job['request'].get('kind') == 'cloud':
+                cloud.start(_store,job,_app,design,design_id)
+            else:
+                batch_runner.execute_job(_store, job, _app, design, design_id)
 
 def watch():
     while not _stop.wait(0.2):
@@ -255,6 +267,7 @@ def run(context):
     _lock = BridgeLock(ROOT)
     _lock.acquire()
     _store.recover()
+    cloud.reset()
     # Never replay work left behind by a crash/restart.
     for pattern in ('*.request', '*.processing'):
         for path in ROOT.glob(pattern):
@@ -277,5 +290,6 @@ def stop(context):
     if _app:
         _app.unregisterCustomEvent(EVENT_ID)
     _documents.clear()
+    cloud.reset()
     if _lock:
         _lock.close()

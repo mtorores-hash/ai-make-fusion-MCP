@@ -75,3 +75,8 @@ access-path acceptance fixtures remain future work; no pass is recorded for them
 ## v0.4.1 hygiene
 
 See [hygiene live acceptance](modeling-hygiene.md#installation-and-live-acceptance).
+
+## v0.5.0 cloud/shared editing
+
+See [disposable-project acceptance](cloud-workflow.md#local-fusion-acceptance).
+106 automated checks and real 28-tool STDIO checks pass; live cloud/geometry evidence remains pending.

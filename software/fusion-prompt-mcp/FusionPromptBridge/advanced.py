@@ -57,7 +57,7 @@ def assembly(d):
             'token': o.entityToken, 'component': ref(o.component),
             'grounded': o.isGrounded, 'linked': o.isReferencedComponent,
             'bodies': [ref(b) for b in each(o.component.bRepBodies)]})
-    return {'version': '0.4.1', 'root_bodies': [ref(b) for b in each(root.bRepBodies)],
+    return {'version': '0.5.0', 'root_bodies': [ref(b) for b in each(root.bRepBodies)],
             'occurrences': occurrences,
             'joints': [health(j) for j in each(root.joints)],
             'as_built_joints': [health(j) for j in each(root.asBuiltJoints)]}
@@ -91,7 +91,7 @@ def geometry(d, token, occurrence_token, keypoint):
 
 def execute(op, a, d, app):
     if op == 'capabilities':
-        return {'version': '0.4.1', 'fillets': ['constant_radius'],
+        return {'version': '0.5.0', 'fillets': ['constant_radius'],
                 'joints': ['rigid', 'revolute', 'slider', 'cylindrical'],
                 'joint_mode': 'standard joints (can reposition components)',
                 'batch_scripts': True, 'persistent_jobs': True, 'full_adsk_access': True,
@@ -101,7 +101,8 @@ def execute(op, a, d, app):
                 'tolerance_budgets': True, 'semantic_selectors': True,
                 'surface_review_candidates': True, 'full_print_audit': False,
                 'release_hash_revision_checks': True, 'modeling_hygiene_audit': True,
-                'checked_export_gate': True, 'modeling_rules_version': '1.0.4'}
+                'cloud_file_management': True, 'edit_guard_required': True, 'cloud_version_checkpoints': True,
+                'checked_export_gate': True, 'modeling_rules_version': '1.0.5'}
     if op == 'inspect_assembly':
         return assembly(d)
     if op == 'read_selection':

@@ -1,6 +1,6 @@
 # Fusion modeling rules — AI Make
 
-Rules version: 1.0.4. Supplied by Mauricio; applied to native parametric authoring.
+Rules version: 1.0.5. Supplied by Mauricio; applied to native parametric authoring.
 Read these rules before modeling. Project-specific instructions and explicit user decisions
 control dimensions, materials, fits and documented exceptions. Report a conflict rather
 than quietly dropping a rule. Preserve existing models and imported hardware.
@@ -192,3 +192,31 @@ including native definitions of linked components; report source ownership befor
 Before calling the model finished, confirm component ownership/names, constraints and anchoring,
 parameter usage and perturbation, reference stability, feature ordering/health, joint intent,
 restored timeline, commercial-hardware sourcing/fidelity, junction evidence, connection selection/fastener review and save description. Automatic checks cannot infer all of these.
+
+## Fusion cloud files and shared human/AI editing
+
+Use Fusion cloud storage as the editable CAD source of truth. Select the intended hub and
+create/reuse a named project with `Assembly`, `Parts`, and `Purchased Components` folders.
+Save independently editable custom parts as descriptively named native Fusion documents;
+assemble them with external references where useful. Use stable cloud file IDs and versions
+for identity, not filenames or transient entity tokens. Record the project, folder, part IDs,
+assembly links and current versions in the design project's handoff. Keep supplier originals.
+
+Before resuming, inspect the open document, unsaved changes, cloud versions, components,
+parameters and reference health. Call `inspect_document_state` before each mutation and pass
+its single-use `edit_token`. If anything changes, reinspect and adapt to the user's work.
+Do not replace manually designed geometry, discard unsaved edits, break links or rebuild a part
+from an old script. Opening a cloud file must preserve other open documents. Update selected
+references deliberately, then check joints, geometry and interference before saving the assembly.
+
+Save new versions of the same file; do not proliferate renamed duplicates. Confirm cloud
+processing is complete before handing work back. Leave a short handoff naming the project,
+assembly, parts changed, versions and remaining checks. The user should be able to open a part,
+edit it normally in Fusion and save; subsequent AI work continues from that saved design.
+
+Cloud copies of existing internal components do not automatically become linked replacements.
+Preserve the original assembly and joints; migrate deliberately after inspection. For linked
+assemblies, checkpoint a clean completed cloud version plus its reference-version manifest.
+Do not call a cloud manifest a self-contained F3D archive. Split long changes into save/inspect/
+checkpoint stages when needed. Optimistic guards do not provide distributed locking or sandbox
+trusted Python. Never replay an interrupted/uncertain cloud mutation under a fresh operation ID.

@@ -1,4 +1,4 @@
-> v0.4.1 adds installed modeling rules, `get_modeling_rules`, `audit_modeling_hygiene`,
+> v0.5.0 adds installed modeling rules, `get_modeling_rules`, `audit_modeling_hygiene`,
 > the `fusion://modeling-rules` resource and explicit `ctx.export_checked`. Copy the entire
 > folder, including `modeling-rules.md`. See `../../docs/modeling-hygiene.md`.
 
@@ -277,3 +277,10 @@ is required by this server: your connected Codex client supplies the model inter
 - [Joint driving](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_RevoluteJointMotion_rotationValue.htm)
 - [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)
 - [Local MCP configuration](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
+
+## v0.5.0 shared editing
+
+Call `inspect_document_state` before mutations and pass the returned `edit_token`.
+Use `browse_cloud` and durable `cloud_operation` jobs for project/folder creation, named native
+part saves, linked insertion and version updates. Full workflow, arguments and local acceptance:
+[cloud workflow](../../docs/cloud-workflow.md). Requires updating both server and add-in.

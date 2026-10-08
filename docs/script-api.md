@@ -116,3 +116,13 @@ Read [modeling rules](modeling-rules.md) before authoring. Contracts: [hygiene](
 
 `audit_hygiene` is also allowed in restricted read-only batches. Plain exports/checkpoints remain
 available for recovery/work in progress and never imply full-standard compliance.
+
+## v0.5.0 shared-edit contract
+
+Obtain a fresh `edit_token` from `inspect_document_state(document_id)` and pass it into
+`run_model_script`. The bridge rejects a changed state before executing module-level Python.
+Read-only batches do not need a token. Reinspect before each subsequent modeling job.
+For a linked design, `ctx.checkpoint()` requires a clean, completed cloud save and writes a
+JSON cloud-version/reference manifest. A dirty linked design stops at the checkpoint; split
+work into separate batch/save/inspect stages. `ctx.try_feature` rejects cloud checkpoints
+because its disposable experiment requires a self-contained F3D archive.

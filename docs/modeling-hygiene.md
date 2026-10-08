@@ -8,7 +8,7 @@ No geometry was modified while introducing these rules.
 ## How connected AI clients receive the rules
 
 - MCP initialization instructions tell the client to call `get_modeling_rules` before modeling.
-- `get_modeling_rules()` returns the full installed rules text, version `1.0.4`, and SHA-256.
+- `get_modeling_rules()` returns the full installed rules text, version `1.0.5`, and SHA-256.
   It works without opening Fusion.
 - Resource `fusion://modeling-rules` exposes the same text for clients that use MCP resources.
 - Repository `AGENTS.md` references the same rules for coding/modeling work.
@@ -92,8 +92,8 @@ be saved for further work. There are no silent auto-waivers for known failures.
 
 Update the complete `software/fusion-prompt-mcp` folder, including `modeling-rules.md` and the
 new `FusionPromptBridge/modeling_rules.py` and `hygiene.py`. Restart Fusion and the MCP process.
-`fusion_capabilities` should report `0.4.1`, `modeling_hygiene_audit: true` and
-`modeling_rules_version: '1.0.4'`. The MCP exposes 25 tools. See [installation](installation.md).
+`fusion_capabilities` should report `0.5.0`, `modeling_hygiene_audit: true` and
+`modeling_rules_version: '1.0.5'`. The MCP exposes 28 tools. See [installation](installation.md).
 
 On a COPY of a local design:
 

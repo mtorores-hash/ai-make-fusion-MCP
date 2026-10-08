@@ -5,7 +5,9 @@
 1. `inspect_design` returns `design_id` and `root_component.token`.
 2. `inspect_assembly` / `inspect_full_assembly` identifies another component if desired.
    Select an explicit **Component** token, not an occurrence token, for modeling scope.
-3. `run_model_script` accepts operation_id, document_id, component_token, units, script,
+3. Call `inspect_document_state(design_id)` immediately before editing. Pass its single-use
+   `edit_token` to the mutation. The bridge compares current state before executing code.
+   `run_model_script` accepts operation_id, document_id, component_token, units, script,
    checkpoint_before (default true) and validate_after (default true).
 4. Submission durably stores the request and returns a job_id immediately.
 5. Poll `job_status(job_id)`; call `job_result(job_id)` for partial/final structured results.
@@ -39,7 +41,7 @@ result manifest. File paths are returned, not uploaded to a remote chat automati
 The default checkpoint is before ANY submitted module code runs. `ctx.stage` adds explicit
 checkpoints before major changes. There is no automatic identification of stage boundaries
 inside arbitrary Python. Failure/cancellation can leave partial geometry changes. Restore
-by opening the last usable F3D checkpoint as a separate design and inspecting it; automatic
+by opening the last usable F3D checkpoint or recorded cloud version and inspecting it; automatic
 restore could overwrite unrelated work, so it is intentionally not performed.
 
 Submission idempotency prevents accidental repeated execution under normal operation.
@@ -52,3 +54,17 @@ timestamp as proof a running job can be safely replayed.
 ## v0.4 update
 
 See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.
+
+## Cloud operations (v0.5.0)
+
+`cloud_operation` shares the durable queue/idempotency journal. Main-thread custom events
+start API calls and poll upload futures/documents without a sleep/doEvents loop.
+Individual Fusion API calls, including synchronous metadata refresh, can still block the UI. While an
+upload is monitored, queued mutations wait; status tools read SQLite independently. Restart
+interrupts a running job and retains partial results without resubmitting its cloud action.
+`browse_cloud` and `inspect_document_state` use the same main-thread dispatcher as inspection.
+Tokens cover component revisions, parameter expressions, dirty state, file/reference versions,
+processing and editability. They are single-use and session-local, checked before code runs.
+The full Python runner remains trusted and unrestricted. No distributed lock is claimed.
+
+See [cloud workflow](cloud-workflow.md) for save completion, IDs, linked checkpoints and recovery.

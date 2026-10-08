@@ -1,3 +1,14 @@
+# v0.5.0 development — 2026-10-08
+
+- Three new MCP tools: browse_cloud, inspect_document_state, cloud_operation (28 total).
+- Durable project/folder, save/copy, open, linked insertion and selected reference-update jobs.
+- Single-use pre-edit tokens detect local component/parameter, dirty-state and cloud-version changes.
+- Cloud uploads polled on the Fusion custom event; success requires isComplete.
+- Linked-assembly checkpoints record clean saved cloud versions and dependencies; no silent rollback.
+- Rules 1.0.5 require named native cloud part documents and preservation of manual edits.
+- Breaking workflow change: modeling mutations need a fresh edit_token. Update both processes.
+- API-double/protocol tests only; local Fusion cloud acceptance remains pending.
+
 # v0.4.1 — Modeling hygiene (development)
 
 ## Unreleased — connection selection (2026-10-08)
