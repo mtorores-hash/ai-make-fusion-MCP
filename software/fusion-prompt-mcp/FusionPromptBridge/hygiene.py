@@ -2,18 +2,19 @@
 import re
 import adsk.fusion
 from . import advanced
+from . import scope as scopes
 from .modeling_rules import get_rules
 
 DEFAULT_NAME=re.compile(r'^(Sketch|Body|Component|Plane|Axis|Point|Extrude|Fillet|Chamfer|Hole|Revolve|Sweep|Loft|Mirror|Pattern|Move|Joint)\s*\d+(?::\d+)?$',re.I)
 MANUAL_REVIEW=[
     'Connection selection rationale, loads/motion/service assumptions, locating/load/retention roles and fastener/access review',
-    'Junction intent, complete attachment, measured width/thickness and intended tangency; current close-up and section evidence',
+    'Junction intent, complete attachment, measured width/thickness and intended tangency; dependency-current close-up and section evidence at the applicable milestone',
     'PCB connector/pin clearance envelopes and cable destination, mating direction and exit orientation; detail only when requested',
-    'Commercial hardware sourcing order, exact variant, CAD provenance and critical dimensions; reconstructed/placeholder limits',
+    'External-part source provenance, minimum functional fidelity and critical interface evidence; unknown/placeholder limits',
     'Correct component activation/ownership and documented root-body exceptions',
     'Origin anchoring and constraint intent (fully constrained does not prove this)',
     'Driving parameter use, intentional constants, duplicate values and circularity',
-    'Observed parameter perturbation/extreme-value test and restoration',
+    'Applicable parameter/extreme-value evidence and restoration, reused while dependencies remain current',
     'Projection/reference stability and intended parent-child relationships',
     'Feature order, repair-feature avoidance, timeline grouping/end-marker position',
     'Joint/grounding intent, stale assembly contexts and external-link ownership',
@@ -21,7 +22,8 @@ MANUAL_REVIEW=[
 ]
 
 
-def audit(design):
+def audit(design, scope=None, modified_ids=()):
+    selection=scopes.Selection(design,scope) if scope is not None else None
     rules=get_rules()
     findings=[]; unknown=[]; counts={'components':0,'bodies':0,'sketches':0,'features':0,'joints':0,'parameters':0}
     def reference(entity):
@@ -65,14 +67,21 @@ def audit(design):
         elif value!=states.HealthyFeatureHealthState:
             finding('TIMELINE_STATE','review',entity,'Review non-healthy/suppressed/rolled-back state.',health=str(value))
     mode=read(design,'designType')
-    if mode is not None and mode!=adsk.fusion.DesignTypes.ParametricDesignType:
+    if (selection is None or any(selection.authored(c,modified_ids) for c in selection.components())) and mode is not None and mode!=adsk.fusion.DesignTypes.ParametricDesignType:
         finding('PARAMETRIC_HISTORY','error',design,'Native parametric authoring requires design history; preserve imported source and review conversion explicitly.')
     root=read(design,'rootComponent')
-    components=each(design,'allComponents')
+    components=selection.components() if selection else each(design,'allComponents')
     if not components:
         unavailable(design,'allComponents','No component definitions were returned')
     for component in components:
         counts['components']+=1
+        if selection and not selection.authored(component,modified_ids):
+            for collection in ('features','joints','asBuiltJoints'):
+                for entity in each(component,collection):
+                    value=read(entity,'healthState')
+                    if value==adsk.fusion.FeatureHealthStates.ErrorFeatureHealthState:
+                        finding('REFERENCE_HEALTH','error',entity,'Relevant reference feature failed',detail=read(entity,'errorOrWarningMessage'))
+            continue
         if component!=root:name_check(component)
         for body in each(component,'bRepBodies'):
             counts['bodies']+=1;name_check(body)
@@ -108,6 +117,7 @@ def audit(design):
             for joint in each(component,collection):
                 counts['joints']+=1;name_check(joint);health(joint)
     for parameter in each(design,'userParameters'):
+        if selection and parameter.name not in selection.spec.get('parameter_names',[]):continue
         counts['parameters']+=1
         name=read(parameter,'name')
         if name is not None and not re.fullmatch(r'[a-z][a-z0-9]*(?:_[a-z0-9]+)*',name):
@@ -121,14 +131,22 @@ def audit(design):
         dependents=each(parameter,'dependentParameters')
         if not dependents:
             finding('PARAMETER_USAGE','review',parameter,'No dependent parameter equations found. Review usage; this alone does not prove the parameter is unused. Do not auto-delete it.')
+    evidence_rows=[];gaps=[]
+    if selection:
+        evidence_rows,gaps=scopes.evidence(selection)
+        unknown.extend(gaps)
     errors=[f for f in findings if f['severity']=='error']
     reviews=[f for f in findings if f['severity']=='review']
     return {'rules_version':rules['rules_version'],'rules_sha256':rules['sha256'],
-            'scope':'whole-design component definitions, including imported/linked definitions; occurrences are not duplicated',
+            'scope':selection.report() if selection else 'legacy full-design authoring checks, including imported/linked definitions',
+            'applicable_checks':['authored naming/constraints/parameters','relevant feature health','caller evidence freshness'],
+            'exclusions':selection.exclusions if selection else [],'evidence':evidence_rows,'evidence_gaps':gaps,
+            'approval_status':'not_evaluated',
+            'not_applicable':[{'id':m['id'],'checks':'authoring style on untouched external geometry','reason':m['role']} for m,c in selection.entries if not selection.authored(c,modified_ids)] if selection else [],
             'counts':counts,'findings':findings,'unavailable_checks':unknown,
             'error_count':len(errors),'review_count':len(reviews),'inspection_complete':not unknown,
             'automated_checks_passed':not errors and not unknown,
-            'full_standard_verified':False,'manual_review_required':MANUAL_REVIEW,
+            'full_standard_verified':False,'manual_review_required':MANUAL_REVIEW if selection is None else selection.spec.get('required_checks',[]),
             'geometry_modified':False,'regeneration_performed':False}
 
 

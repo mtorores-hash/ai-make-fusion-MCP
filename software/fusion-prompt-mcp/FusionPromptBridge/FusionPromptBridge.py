@@ -9,6 +9,7 @@ import uuid
 import adsk.core
 import adsk.fusion
 from . import advanced, model_tools, batch_runner, cloud
+from . import scope as scopes
 from .job_store import Store, BridgeLock
 
 ROOT = Path.home() / '.fusion-prompt-mcp'
@@ -19,7 +20,7 @@ _owner = uuid.uuid4().hex
 _app = _event = _handler = _thread = None
 _stop = threading.Event()
 _documents = []
-ALLOWED = {'browse_cloud', 'document_state'} | {'inspect', 'new_design', 'rectangle', 'circle', 'extrude', 'parameter', 'export'} | advanced.OPS | {'inspect_full', 'select_geometry', 'measure_distance', 'check_interference', 'validate_model', 'audit_hygiene'}
+ALLOWED = {'browse_cloud','document_state','acquire_edit_token','release_edit_token','reconcile_cloud_job'} | {'inspect', 'new_design', 'rectangle', 'circle', 'extrude', 'parameter', 'export'} | advanced.OPS | {'inspect_full', 'select_geometry', 'measure_distance', 'check_interference', 'validate_model', 'audit_hygiene'}
 
 def atomic_json(path, value):
     temp = path.with_suffix('.tmp')
@@ -58,7 +59,7 @@ def inspect():
         bodies.append(dict(ref(body), size_mm=[10 * (getattr(box.maxPoint, a) -
                            getattr(box.minPoint, a)) for a in ('x','y','z')]))
     return {'design_id': design_id(), 'document': _app.activeDocument.name,
-            'version': '0.5.0', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
+            'version': '0.6.0', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
             'sketches': [dict(ref(s), profiles=s.profiles.count) for s in items(root.sketches)],
             'parameters': [{'name': p.name, 'expression': p.expression, 'unit': p.unit}
                            for p in items(d.allParameters)],
@@ -80,26 +81,32 @@ def entity(d, token, cls):
         raise ValueError('Wrong entity type.')
     return result
 
-def execute(op, a):
+def _execute(op, a):
     if op not in ALLOWED:
         raise ValueError('Unknown operation.')
     if _app.userInterface.activeCommand != 'SelectCommand':
         raise ValueError('Finish the active Fusion command or dialog first.')
     if op == 'new_design':
+        if _store is not None:_store.assert_no_uncertain_cloud()
         _app.documents.add(adsk.core.DocumentTypes.FusionDesignDocumentType)
         design().designType = adsk.fusion.DesignTypes.ParametricDesignType
         return inspect()
     if op == 'browse_cloud': return cloud.browse(_app,a)
+    if op == 'reconcile_cloud_job':return cloud.reconcile(_store,_app,a['job_id'],a['version_id'],a['confirmation_note'])
+    if op == 'release_edit_token':return cloud.release_token(a['document_id'],a['edit_token'],a['writer_id'])
     d = design()
+    if op == 'acquire_edit_token':
+        if a['document_id']!=design_id():raise ValueError('Active document changed')
+        return cloud.inspect_state(_app,d,design_id(),True,a['writer_id'],a.get('accepted_reference_versions'))
     if op == 'document_state':
         if a['document_id'] != design_id(): raise ValueError('Active document changed')
-        return cloud.inspect_state(_app,d,design_id())
+        return cloud.inspect_state(_app,d,design_id(),a.get('acquire_token',False))
     if op == 'inspect':
         return inspect()
     if a.get('design_id') != design_id():
         raise ValueError('Active document changed. Inspect and confirm the target design again.')
     if op == 'inspect_full':
-        return model_tools.inspect_full(d, a['include_topology'], a['offset'], a['limit'])
+        return model_tools.inspect_full(d, a['include_topology'], a['offset'], a['limit'],a.get('scope'),a.get('include_context',False))
     if op == 'select_geometry':
         body = advanced.native(advanced.resolve(d, a['body_token'], adsk.fusion.BRepBody))
         feature = advanced.resolve(d, a['feature_token']) if a['feature_token'] else None
@@ -112,13 +119,15 @@ def execute(op, a):
     if op == 'check_interference':
         return model_tools.interference(d, a['references'])
     if op == 'validate_model':
-        return model_tools.validate(d)
+        return model_tools.validate(d,a.get('scope'))
     if op == 'audit_hygiene':
         from .hygiene import audit
-        return audit(d)
+        return audit(d,a.get('scope'))
     if op in ('rectangle','circle','extrude','parameter','fillet','joint'):
         if cloud._pending: raise ValueError('Cloud save pending; poll before modeling')
-        cloud.require_edit(_app,d,design_id(),a.get('edit_token',''))
+        if _store is not None:_store.assert_no_uncertain_cloud()
+        cloud.require_edit(_app,d,design_id(),a.get('edit_token',''),
+            accepted_reference_versions=a.get('accepted_reference_versions'),writer_id=(a.get('task') or {}).get('writer_id','legacy'))
     if op in advanced.OPS:
         return advanced.execute(op, a, d, _app)
     root = d.rootComponent
@@ -210,6 +219,44 @@ def execute(op, a):
         if not manager.execute(options):
             raise RuntimeError('Fusion export failed.')
         return {'path': str(path), 'bytes': path.stat().st_size}
+
+def execute(op,a):
+    mutating=op in ('rectangle','circle','extrude','parameter','fillet','joint')
+    if not mutating or (a.get('task') is None and a.get('scope') is None):return _execute(op,a)
+    if not a.get('scope'):raise ValueError('Task-bound narrow operations require explicit scope')
+    d=design();selection=scopes.Selection(d,a['scope']);target=d.rootComponent
+    owners=[]
+    if op=='fillet':
+        owners=[advanced.native(advanced.resolve(d,t,adsk.fusion.BRepEdge)).body.parentComponent for t in a['edge_tokens']]
+        if not owners:raise ValueError('No edges selected')
+        target=owners[0]
+    if op=='joint':
+        owners=[advanced.resolve(d,a[k],adsk.fusion.Occurrence).component for k in ('occurrence_one','occurrence_two') if a.get(k)]
+    if not selection.contains(target,targets=True):raise ValueError('Operation target outside selected targets')
+    boundary=scopes.EditBoundary(d,selection,a.get('task'),target)
+    for owner in owners:
+        if not selection.contains(owner):raise ValueError('Operation owner outside selected scope')
+        boundary.require_component(owner)
+    if op=='parameter':boundary.require_parameter(a['name'])
+    before=scopes.health_snapshot(d)
+    try:
+        result=_execute(op,a)
+        if not d.computeAll():raise RuntimeError('Regeneration failed after narrow operation')
+    except Exception as exc:
+        report={'execution_status':'failed','partial_changes_possible':True,'approval_status':'not_evaluated'}
+        try:
+            report['edit_boundary']=boundary.post()
+            report['validation']=scopes.health_report(d,selection,before)
+            report['validation']['validation_status']='unproven'
+            report['validation']['inspection_gaps'].append({'check':'failed_operation','message':'Final regeneration not established'})
+        except Exception as inspection_error:report['inspection_error']=str(inspection_error)
+        raise RuntimeError(str(exc)+'; partial-state report: '+json.dumps(report)) from exc
+    result['execution_status']='completed'
+    result['edit_boundary']=boundary.post();result['validation']=scopes.health_report(d,selection,before)
+    result['approval_status']='not_evaluated'
+    if result['edit_boundary'].get('violations') or result['validation']['feature_errors'] or result['validation']['inspection_gaps'] or result['validation']['evidence_status']!='pass':
+        raise RuntimeError('Narrow operation applied with failed postconditions: '+json.dumps(result))
+    return result
 
 class Handler(adsk.core.CustomEventHandler):
     def notify(self, args):

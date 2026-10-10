@@ -3,7 +3,8 @@ from mcp.server.fastmcp import FastMCP
 from bridge_client import call
 
 mcp = FastMCP('Fusion Prompt MCP', instructions='Inspect the active document and target component before mutations. '
-    'Before each mutation call inspect_document_state and supply its edit_token. Preserve manual edits; '
+    'Observe with inspect_document_state; acquire_edit_token with the designated writer before mutations. '
+    'Use selected scope and task contract 1.0 for bounded work; legacy calls remain unbounded. Preserve manual edits; '
     'save named parts in Fusion cloud projects and link them into assemblies. '
     'For complex work use run_model_script once, then poll job_status; reuse the SAME operation_id and '
     'identical request after a connection timeout. Interrupted jobs are NEVER automatically replayed. '
@@ -15,12 +16,12 @@ mcp = FastMCP('Fusion Prompt MCP', instructions='Inspect the active document and
     'Inspect/validate results. Do not equate sampled motion clearance with continuous collision freedom.')
 
 @mcp.tool()
-def get_modeling_rules() -> dict:
+def get_modeling_rules(known_sha256: str = '') -> dict:
     """Read the installed authoring rules, version and SHA-256 before any design task.
     No Fusion connection required. Rules include required behavior, preferences, exceptions,
     manual-review items and the limits of automated hygiene enforcement."""
     from FusionPromptBridge.modeling_rules import get_rules
-    return get_rules()
+    return get_rules(known_sha256)
 
 @mcp.resource('fusion://modeling-rules')
 def modeling_rules_resource() -> str:
@@ -28,8 +29,8 @@ def modeling_rules_resource() -> str:
     return get_modeling_rules()['text']
 
 @mcp.tool()
-def audit_modeling_hygiene(design_id: str) -> dict:
-    """Read-only whole-design audit: naming, sketch constraints/size/Fix, timeline health,
+def audit_modeling_hygiene(design_id: str, scope: dict | None = None) -> dict:
+    """Read-only scoped audit (scope omitted = legacy whole-design authoring checks): naming, sketch constraints/size/Fix, timeline health,
     parameter metadata/dependencies and root-body review. Does not regenerate or repair.
     Unknown API data fails completeness; zero errors is NOT proof of the full standard.
     Imported/linked definitions are included; preserve ownership before proposing repairs."""
@@ -48,29 +49,33 @@ def new_design() -> dict:
 @mcp.tool()
 def rectangle_sketch(design_id: str, name: str, width_mm: float, height_mm: float,
                      x_mm: float = 0, y_mm: float = 0,
-                     plane: Literal['XY','XZ','YZ'] = 'XY', edit_token: str = '') -> dict:
-    """Create a rectangle in a new root sketch from a lower-left corner. Size is initial geometry,
+                     plane: Literal['XY','XZ','YZ'] = 'XY', edit_token: str = '', scope: dict | None = None, task: dict | None = None,
+                 accepted_reference_versions: dict | None = None) -> dict:
+    """CONCEPT PRIMITIVE: create a rectangle in a new root sketch from a lower-left corner. Size is initial geometry,
     not driven by named parameters. Returns a sketch token for extrude."""
     return call('rectangle', locals())
 
 @mcp.tool()
 def circle_sketch(design_id: str, name: str, diameter_mm: float,
                   x_mm: float = 0, y_mm: float = 0,
-                  plane: Literal['XY','XZ','YZ'] = 'XY', edit_token: str = '') -> dict:
-    """Create a circle in a new root sketch. Coordinates are sketch-local mm."""
+                  plane: Literal['XY','XZ','YZ'] = 'XY', edit_token: str = '', scope: dict | None = None, task: dict | None = None,
+                 accepted_reference_versions: dict | None = None) -> dict:
+    """CONCEPT PRIMITIVE: create a circle in a new root sketch; no driving constraints promised. Coordinates are sketch-local mm."""
     return call('circle', locals())
 
 @mcp.tool()
 def extrude(design_id: str, sketch_token: str, distance: str, name: str,
             operation: Literal['new_body','new_component','join','cut'] = 'new_body',
-            profile_index: int = 0, target_body_token: str = '', edit_token: str = '') -> dict:
-    """Extrude a profile; distance is positive, e.g. '4 mm' or 'plate_thickness'.
+            profile_index: int = 0, target_body_token: str = '', edit_token: str = '', scope: dict | None = None, task: dict | None = None,
+                 accepted_reference_versions: dict | None = None) -> dict:
+    """ROOT CONCEPT PRIMITIVE: extrude a root profile; distance is positive, e.g. '4 mm' or 'plate_thickness'.
     new_component creates an assembly component. Cut requires target_body_token. Starts at sketch plane in positive normal direction.
     Join may affect touching root bodies. Inspect before and after."""
     return call('extrude', locals())
 
 @mcp.tool()
-def set_parameter(design_id: str, name: str, expression: str, unit: str = 'mm', edit_token: str = '') -> dict:
+def set_parameter(design_id: str, name: str, expression: str, unit: str = 'mm', edit_token: str = '', scope: dict | None = None, task: dict | None = None,
+                 accepted_reference_versions: dict | None = None) -> dict:
     """Create/update a user parameter. Existing model parameters can also be updated by name.
     Example expression '4 mm'. Only features that reference it will change."""
     return call('parameter', locals())
@@ -108,7 +113,8 @@ def read_selection(design_id: str) -> dict:
 @mcp.tool()
 def fillet_edges(design_id: str, edge_tokens: list[str], radius: str,
                  name: str = 'MCP Fillet', tangent_chain: bool = False,
-                 rolling_ball: bool = True, edit_token: str = '') -> dict:
+                 rolling_ball: bool = True, edit_token: str = '', scope: dict | None = None, task: dict | None = None,
+                 accepted_reference_versions: dict | None = None) -> dict:
     """Create a native constant-radius fillet on explicitly inspected/selected edges of one body.
     Radius accepts '2 mm' or a parameter. Works inside local components; modifying a component
     definition affects ALL its instances. Linked components must be edited in their source.
@@ -122,7 +128,8 @@ def create_joint(design_id: str, geometry_one: str, geometry_two: str,
                  name: str = 'MCP Joint', axis: Literal['X','Y','Z'] = 'Z',
                  keypoint_one: Literal['center','start','end','middle'] = 'center',
                  keypoint_two: Literal['center','start','end','middle'] = 'center',
-                 offset: str = '0 mm', angle: str = '0 deg', flipped: bool = False, edit_token: str = '') -> dict:
+                 offset: str = '0 mm', angle: str = '0 deg', flipped: bool = False, edit_token: str = '', scope: dict | None = None, task: dict | None = None,
+                 accepted_reference_versions: dict | None = None) -> dict:
     """Create a STANDARD joint: Fusion may reposition components to align the references.
     Use planar face centers, compatible edge keypoints, or vertices from inspect_body/selection.
     Each component reference needs its occurrence token from inspect_assembly; empty means root.
@@ -138,17 +145,19 @@ def job_store():
 def run_model_script(operation_id: str, document_id: str, component_token: str,
                      units: Literal['mm','cm','m','in'], script: str,
                      checkpoint_before: bool = True, validate_after: bool = True,
-                     mode: Literal['modeling','read_only'] = 'modeling', edit_token: str = '') -> dict:
+                     mode: Literal['modeling','read_only'] = 'modeling', edit_token: str = '', scope: dict | None = None, task: dict | None = None,
+                 accepted_reference_versions: dict | None = None) -> dict:
     """Enqueue a complete trusted Fusion Python script defining run(ctx); returns immediately.
     Arbitrary Python executes with the user's permissions INSIDE Fusion, on its main thread.
     document_id is inspect_design.design_id; component_token is an explicit Component token or @root.
     mode=read_only accepts ONLY def run(ctx): return queries with literal arguments to
-    ctx.inspect/validate/minimum_distance/interference/capture/audit_hygiene. Set checkpoint_before=False.
+    ctx.inspect/validate/minimum_distance/interference/capture/audit_hygiene/evidence_fingerprint. Set checkpoint_before=False.
     Read-only queries do not regenerate. Full Python modeling always regenerates at completion.
     Use ctx.target, ctx.point/value, ctx.progress, ctx.stage, ctx.record, ctx.export and return JSON.
     The same operation_id + exact request returns the same job; changed content is rejected.
     Poll job_status/job_result; NEVER auto-retry an interrupted job with a fresh ID.
-    Modeling requires a fresh inspect_document_state edit_token. Checkpoints use local F3D or
+    Modeling requires acquire_edit_token (matching task.writer_id), or the explicit legacy writer path.
+    scope/task use caller contract 1.0; scope revisions are checked before execution, and allowed edits afterward. Checkpoints use local F3D or
     a completed clean cloud version manifest for linked assemblies. Failure aborts before modeling.
     Cancellation is cooperative; a kernel call or tight Python loop cannot be forcibly interrupted.
     Units declare helper inputs; raw adsk floats STILL use Fusion native cm/radians."""
@@ -177,10 +186,11 @@ def cancel_job(job_id: str) -> dict:
 
 @mcp.tool()
 def inspect_full_assembly(design_id: str, include_topology: bool = False,
-                          offset: int = 0, limit: int = 10) -> dict:
-    """Page all component definitions including nested bodies, feature/joint health, sketch dimensions,
+                          offset: int = 0, limit: int = 10, scope: dict | None = None,
+                          include_context: bool = False) -> dict:
+    """Page selected components (scope omitted = legacy full design), including bodies, health, sketch dimensions,
     named parameters and occurrence transforms. Optional faces/edges can be large. Follow next_offset.
-    Geometry is component-local mm; transform matrices use cm. ctx.inspect(True) returns all pages in a batch."""
+    Occurrences/parameters appear on page zero or include_context=True. Geometry is component-local mm; transform matrices use cm. ctx.inspect(True) returns all pages in a batch."""
     return call('inspect_full', locals())
 
 @mcp.tool()
@@ -207,7 +217,7 @@ def check_interference(design_id: str, references: list[dict]) -> dict:
     return call('check_interference', locals())
 
 @mcp.tool()
-def validate_model(design_id: str) -> dict:
+def validate_model(design_id: str, scope: dict | None = None) -> dict:
     """Report feature/joint errors and warnings across component definitions. Not a printability guarantee."""
     return call('validate_model', locals())
 
@@ -219,11 +229,11 @@ def browse_cloud(hub_id: str = '', project_id: str = '', folder_id: str = '') ->
     return call('browse_cloud', locals())
 
 @mcp.tool()
-def inspect_document_state(document_id: str) -> dict:
-    """Read active document's cloud identity/versions, dirty state and nested reference versions.
-    Returns a single-use edit_token required before every modeling mutation or cloud save.
-    If a user edits after inspection, the mutation is rejected. Inspect geometry too before adapting.
-    The token acknowledges the inspected unsaved state; it never discards, reloads or saves it."""
+def inspect_document_state(document_id: str, acquire_token: bool = False) -> dict:
+    """Read-only observation by default: cloud identity, dirty state, revisions and references.
+    Does not invalidate a writer token. acquire_token=True is the v0.5 legacy writer path.
+    New writers use acquire_edit_token, with writer identity and explicit accepted reference pins.
+    Historical inspection never authorizes overwriting a newer cloud target."""
     return call('document_state', locals())
 
 @mcp.tool()
@@ -233,7 +243,7 @@ def cloud_operation(operation_id: str,
     """Durable main-thread cloud job. Poll job_status/job_result; retry SAME ID+arguments.
     ensure_project: hub_id,name; creates/reuses project and Assembly/Parts/Purchased Components folders.
     ensure_folder: hub_id,project_id,folder_id (parent),name.
-    open: version_id,expected_version; preserves all open documents, refuses stale/dirty target.
+    open: version_id,expected_version; allow_historical=True permits inspection, never stale-target writes.
     save: document_id,edit_token,description; FIRST save also hub_id,project_id,folder_id,name.
     save_component: same first-save arguments + component_token; independent native copy, NOT link replacement.
     insert: document_id,edit_token,version_id,expected_version,transform_cm (16 matrix values).
@@ -241,8 +251,49 @@ def cloud_operation(operation_id: str,
     Insert/update require a clean completed cloud save as recovery checkpoint. Insert links same-project files.
     Save succeeds only after isComplete. Cancellation stops monitoring, not the actual cloud upload.
     Results preserve file id/version_id and source mapping. Interrupted jobs are never replayed.
+    Mutating arguments also take writer_id and accepted_reference_versions (file_id: exact current version).
+    Historical insert needs allow_historical=True and accepted_insert_version.
+    Dirty/stale preservation: save with accepted pins; update one reference; repin current versions and save; repeat.
+    Uncertain terminal saves block further mutations until reconcile_cloud_job records an observed version and caller note.
     No deletes, share links, contributor changes or automatic replacement of existing components."""
     return job_store().submit_cloud(locals())
+
+@mcp.tool()
+def acquire_edit_token(document_id: str, writer_id: str,
+                       accepted_reference_versions: dict | None = None) -> dict:
+    """Acquire/reuse one unchanged writer baseline. Pins map cloud file_id to exact accepted version.
+    A different writer cannot replace the lease; release it explicitly. Single-use token, optimistic
+    checks only. Writer IDs and approval text are caller assertions, not authenticated authorization."""
+    return call('acquire_edit_token',locals())
+
+@mcp.tool()
+def release_edit_token(document_id: str, writer_id: str, edit_token: str) -> dict:
+    """Release an unused writer token by exact identity; does not change the model."""
+    return call('release_edit_token',locals())
+
+@mcp.tool()
+def reconcile_cloud_job(job_id: str, version_id: str = '', confirmation_note: str = '') -> dict:
+    """Observe a failed/cancelled/interrupted save's expected cloud version without replay.
+    Provide version_id from Fusion history. A nonempty confirmation_note records the caller's
+    verification of its contents and clears the mutation block; it is NOT authenticated approval.
+    Original terminal execution status remains intact. Unknown/absent outcomes need manual recovery."""
+    return call('reconcile_cloud_job',locals())
+
+@mcp.tool()
+def retire_occurrences(operation_id: str, document_id: str, occurrence_tokens: list[str],
+                       reason: str, dependency_review_note: str, scope: dict, task: dict,
+                       edit_token: str, replacement_id: str = '',
+                       accepted_reference_versions: dict | None = None) -> dict:
+    """Durably remove selected top-level leaf occurrences using native Remove features.
+    Requires explicit scope/task, permitted root and source members, completed checkpoint and reviewed
+    dependencies. Refuses live joints/rigid groups, derived occurrences or nested/subtree removal.
+    Preserves shared definitions and source/history, verifies surviving placements. Returns lifecycle
+    facts for caller reconciliation; does not update BOM/graph/site. Projection/derive review is caller-owned."""
+    source='def run(ctx): return ctx.retire_occurrences('+','.join(repr(v) for v in
+             (occurrence_tokens,reason,replacement_id,dependency_review_note))+')'
+    return job_store().submit(dict(operation_id=operation_id,document_id=document_id,component_token='@root',
+        units='mm',script=source,checkpoint_before=True,validate_after=True,edit_token=edit_token,
+        scope=scope,task=task,accepted_reference_versions=accepted_reference_versions))
 
 if __name__ == '__main__':
     mcp.run(transport='stdio')

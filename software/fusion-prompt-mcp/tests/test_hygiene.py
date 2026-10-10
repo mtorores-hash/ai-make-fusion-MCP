@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import Mock, patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from test_advanced import Node, Collection, fusion
-from FusionPromptBridge import hygiene, batch_runner
+from FusionPromptBridge import hygiene, batch_runner, scope as scopes
 from FusionPromptBridge.modeling_rules import get_rules
 from FusionPromptBridge.execution_policy import validate_read_only
 import ast
@@ -23,15 +23,17 @@ class HygieneTests(unittest.TestCase):
         self.root=self.component('Untitled')
         self.param=self.entity('wall',comment='Wall thickness; maintain bore clearance',isFavorite=True,
                                dependentParameters=Collection([Node(name='d1')]))
-        self.design=Node(rootComponent=self.root,allComponents=Collection([self.root,self.part]),
+        self.root.allOccurrences=Collection([Node(component=self.part)])
+        self.design=Node(findEntityByToken=lambda t:[c for c in (self.root,self.part) if c.entityToken==t],
+                         allParameters=Collection([self.param]),rootComponent=self.root,allComponents=Collection([self.root,self.part]),
                          userParameters=Collection([self.param]),designType=1,computeAll=Mock())
     def entity(self,name,**kwargs):
-        return Node(name=name,entityToken=name,healthState=0,errorOrWarningMessage='',**kwargs)
+        return Node(name=name,entityToken=name,isValid=True,healthState=0,errorOrWarningMessage='',**kwargs)
     def component(self,name,**kwargs):
-        values={k:Collection() for k in ('bRepBodies','sketches','features','joints','asBuiltJoints',
+        values={k:Collection() for k in ('occurrences','allOccurrences','bRepBodies','sketches','features','joints','asBuiltJoints',
                                        'constructionPlanes','constructionAxes','constructionPoints')}
         values.update(kwargs)
-        return self.entity(name,**values)
+        return self.entity(name,tag='Component',revisionId='r1',**values)
     def test_clean_automated_subset_is_not_full_standard_approval(self):
         report=hygiene.audit(self.design)
         self.assertTrue(report['automated_checks_passed'])
@@ -103,7 +105,9 @@ class HygieneTests(unittest.TestCase):
         validate_read_only(ast.parse('def run(ctx): return ctx.audit_hygiene()'))
     def context(self):
         ctx=object.__new__(batch_runner.Context)
-        ctx.design=self.design;ctx.check_cancel=Mock();ctx.record=Mock()
+        ctx.design=self.design;ctx.check_cancel=Mock();ctx.record=Mock();ctx.target=self.part;ctx.result={}
+        spec=scopes.selected(self.design,self.part);spec['dependency_review']='complete'
+        ctx.selection=scopes.Selection(self.design,spec)
         ctx.export=Mock(return_value={'path':'part.f3d','sha256':'test'})
         ctx.synchronize=Mock()
         return ctx
@@ -112,13 +116,13 @@ class HygieneTests(unittest.TestCase):
         ctx=self.context()
         with self.assertRaises(RuntimeError):ctx.export_checked('part.f3d',manual_review_note='Reviewed source references')
         ctx.export.assert_not_called()
-        ctx.record.assert_called_once()
+        self.assertIn('modeling_hygiene',[c.args[0] for c in ctx.record.call_args_list])
     def test_checked_export_requires_manual_note_and_preserves_audit_scope(self):
         ctx=self.context()
         with self.assertRaises(ValueError):ctx.export_checked('part.f3d')
         ctx.export.assert_not_called()
         result=ctx.export_checked('part.f3d',manual_review_note='Reviewed references; parameter test recorded separately')
-        ctx.export.assert_called_once_with('part.f3d',None)
+        ctx.export.assert_called_once_with('part.f3d',self.part)
         self.assertFalse(result['hygiene']['full_standard_verified'])
         self.assertIn('rules_sha256',result['hygiene'])
     def test_runtime_rules_and_optional_repo_copy_are_identical(self):
@@ -127,7 +131,7 @@ class HygieneTests(unittest.TestCase):
         if repo_copy.is_file():
             self.assertEqual((software/'modeling-rules.md').read_bytes(),repo_copy.read_bytes())
         rules=get_rules()
-        self.assertEqual(rules['rules_version'],'1.0.5')
+        self.assertEqual(rules['rules_version'],'1.1.0')
         self.assertEqual(len(rules['sha256']),64)
         self.assertIn('Component first',rules['text'])
     def test_bridge_dispatch_checks_target_document(self):

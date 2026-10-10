@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch, Mock
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from test_advanced import Node
+from test_advanced import Collection, Node
 from FusionPromptBridge import experiments
 
 class ExperimentTests(unittest.TestCase):
@@ -18,7 +18,7 @@ class ExperimentTests(unittest.TestCase):
     def run_case(self,volume,accepted,fail=False):
         with tempfile.TemporaryDirectory() as folder:
             app=Node()
-            source=Node(isValid=True)
+            source=Node(isValid=True,allDocumentReferences=Collection())
             candidate=Node(isValid=True,products=Node(itemByProductType=lambda _:Node(rootComponent='candidate_root')))
             def activate(doc): app.activeDocument=doc;return True
             source.activate=lambda:activate(source)

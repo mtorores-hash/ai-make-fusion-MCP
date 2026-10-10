@@ -28,9 +28,9 @@ Use the structured hygiene audit and explicitly review what it cannot prove. See
 docs/modeling-hygiene.md for gate scope, legitimate exceptions and live acceptance.
 Do not rename, convert or repair existing/imported hardware merely to obtain a clean report.
 
-For commercial hardware, follow the sourcing order in docs/modeling-rules.md: online CAD,
-ask the user, reconstruct from published specifications, then a labeled placeholder as last resort.
-Verify exact variant and critical dimensions; record sources and uncertainty in the design project.
+For all external parts, use the minimum functional source-grounded representation required by
+the approved task. Supplier CAD is useful, but a drawing-derived envelope need not wait for
+richer CAD once interfaces are known. Preserve provenance and unknowns; see docs/modeling-rules.md.
 
 For PCB layout, default to connector/pin clearance volumes and cable routes to the correct
 board area/orientation. Detailed connector/pin modeling requires an explicit user request;
@@ -47,3 +47,6 @@ redundant/inaccessible fasteners. Follow the connection-selection rule in docs/m
 Use Fusion cloud projects and named native part files for shared editing. Read
 `docs/cloud-workflow.md`; preserve user edits, file IDs and links, use edit tokens before
 mutations, and confirm completed cloud saves before handoff. Never silently migrate assemblies.
+
+Use caller contract 1.0 in docs/caller-contract.md. MCP executes scoped operations; the caller owns
+workflow approvals and external records. Review packages do not authorize push, installation or live CAD tests.

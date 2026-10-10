@@ -45,33 +45,60 @@ def snapshot(app, design, document_id):
             'components': [(c.name, c.revisionId) for c in each(design.allComponents)],
             'parameters': [(p.name, p.expression) for p in each(design.allParameters)]}
 
-def inspect_state(app, design, document_id):
-    state = snapshot(app, design, document_id)
-    # Hash includes dirty-to-dirty component changes, parameters, and external versions.
-    digest = hashlib.sha256(json.dumps(state, sort_keys=True).encode()).hexdigest()
-    token = uuid.uuid4().hex
-    _tokens[document_id] = (token, digest)
-    return dict(state, edit_token=token,
-                guard_scope='Optimistic pre-operation check, not a distributed lock or Python sandbox')
+def digest_state(state, pins):
+    value=json.loads(json.dumps(state))
+    for ref in value['references']:
+        if pins.get(ref['id'])==ref['referenced_version']:
+            # A new AVAILABLE version does not alter an explicitly accepted dependency.
+            ref.pop('latest_version',None);ref.pop('out_of_date',None)
+    return hashlib.sha256(json.dumps(value,sort_keys=True).encode()).hexdigest()
 
-def require_edit(app, design, document_id, token, allow_stale_refs=False):
-    previous = _tokens.get(document_id)
-    if not token or not previous or previous[0] != token:
-        raise ValueError('Inspect document state and supply its current edit_token')
-    state = snapshot(app, design, document_id)
-    current = hashlib.sha256(json.dumps(state, sort_keys=True).encode()).hexdigest()
-    if current != previous[1]:
-        raise ValueError('Document or cloud versions changed since inspection. Reinspect and adapt to user edits.')
-    file = state['file']
-    if file and (file['version'] != file['latest_version'] or file['read_only'] or file['in_use'] or not file['complete']):
-        raise ValueError('Target is stale, read-only, in use by another user, or still processing. Resolve in Fusion first.')
+def inspect_state(app, design, document_id, acquire=True, writer_id='legacy', accepted_reference_versions=None):
+    state=snapshot(app,design,document_id)
+    result=dict(state,guard_scope='Optimistic pre-operation check, not a distributed lock or Python sandbox')
+    if not acquire:return result
+    if not isinstance(writer_id,str) or not writer_id.strip():raise ValueError('writer_id required')
+    pins=accepted_reference_versions or {}
+    if not isinstance(pins,dict) or any(not isinstance(k,str) or type(v) is not int or v<1 for k,v in pins.items()):
+        raise ValueError('accepted_reference_versions maps file IDs to positive version numbers')
+    actual={r['id']:r['referenced_version'] for r in state['references']}
+    if any(r['id'] in pins and actual[r['id']]!=r['referenced_version'] for r in state['references']):
+        raise ValueError('Mixed versions of one file require an explicit subassembly workflow; file-level pin is ambiguous')
+    if any(actual.get(k)!=v for k,v in pins.items()):raise ValueError('Accepted pin does not match current referenced version')
+    digest=digest_state(state,pins);previous=_tokens.get(document_id)
+    if previous and previous['writer_id']!=writer_id:
+        raise ValueError('Another writer holds the token. Release it explicitly; observation does not take ownership.')
+    if not previous or previous['digest']!=digest or previous['pins']!=pins:
+        previous={'token':uuid.uuid4().hex,'digest':digest,'writer_id':writer_id,'pins':dict(pins)}
+        _tokens[document_id]=previous
+    return dict(result,edit_token=previous['token'],writer_id=writer_id,accepted_reference_versions=pins)
+
+def release_token(document_id,token,writer_id):
+    previous=_tokens.get(document_id)
+    if not previous or previous['token']!=token or previous['writer_id']!=writer_id:
+        raise ValueError('Writer/token mismatch')
+    del _tokens[document_id]
+    return {'released':True,'document_id':document_id,'writer_id':writer_id}
+
+def require_edit(app, design, document_id, token, allow_stale_refs=False,
+                 accepted_reference_versions=None, writer_id='legacy'):
+    previous=_tokens.get(document_id)
+    if not token or not previous or previous['token']!=token or previous['writer_id']!=writer_id:
+        raise ValueError('Acquire a writer edit_token for this document and writer_id')
+    pins=accepted_reference_versions or {}
+    if pins!=previous['pins']:raise ValueError('Accepted reference pins differ from writer baseline')
+    state=snapshot(app,design,document_id)
+    if digest_state(state,pins)!=previous['digest']:
+        raise ValueError('Document or relevant cloud versions changed since inspection. Reinspect and adapt to user edits.')
+    file=state['file']
+    if file and (file['version']!=file['latest_version'] or file['read_only'] or file['in_use'] or not file['complete']):
+        raise ValueError('Target is stale, read-only, in use by another user, or still processing. Historical inspection does not authorize overwriting latest.')
     for ref in state['references']:
         if ref['open_document_modified'] or not ref['complete']:
             raise ValueError('Referenced document has unsaved changes or pending cloud processing')
-        if ref['out_of_date'] and not allow_stale_refs:
-            raise ValueError('References are out of date. Inspect and update selected references first.')
-    # One inspection authorizes one mutation; failed operations also require reinspection.
-    _tokens.pop(document_id, None)
+        if ref['out_of_date'] and not allow_stale_refs and pins.get(ref['id'])!=ref['referenced_version']:
+            raise ValueError('References are out of date without an explicit accepted pin. Preserve exact versions or update deliberately.')
+    del _tokens[document_id]
     return state
 
 def cloud_checkpoint(app, design, document_id):
@@ -132,14 +159,15 @@ def get_file(app, args):
     if not f.refresh(None): raise RuntimeError('Fusion cloud metadata refresh failed')
     if f.versionNumber != args['expected_version'] or not f.isComplete:
         raise ValueError('Requested version mismatch or file still processing')
-    if f.latestVersionNumber != args['expected_version']:
+    if f.latestVersionNumber != args['expected_version'] and not args.get('allow_historical',False):
         raise ValueError('A newer cloud version exists. Reinspect before opening/inserting.')
     return f
 
 def start(store, job, app, design_getter, document_id_getter):
     request = job['request']; action = request['action']; args = request['arguments']; ident=job['job_id']
-    result = {'action': action, 'cloud_complete': False, 'partial_changes_possible': False}
+    result = {'action': action, 'cloud_complete': False, 'partial_changes_possible': False, 'uncertain':False, 'approval_status':'not_evaluated'}
     try:
+        store.assert_no_uncertain_cloud(exclude_job_id=ident)
         if _pending: raise ValueError('A cloud upload is pending. Poll it before another cloud operation.')
         store.partial(ident,result)
         if action == 'ensure_project':
@@ -163,16 +191,22 @@ def start(store, job, app, design_getter, document_id_getter):
             else:
                 opened=required(app.documents.open(f,True), 'Opened document')
                 if not opened.activate(): raise RuntimeError('Could not activate the opened document')
-            result.update(file=file_info(f), document_id=document_id_getter())
+            result.update(file=file_info(f), document_id=document_id_getter(),
+                          historical_inspection=f.versionNumber!=f.latestVersionNumber)
         else:
             doc_id = args['document_id']
             if document_id_getter() != doc_id: raise ValueError('Active document changed')
             design = design_getter(); doc=app.activeDocument
-            state = require_edit(app,design,doc_id,args['edit_token'],action=='update_reference')
+            state = require_edit(app,design,doc_id,args['edit_token'],action=='update_reference',
+                                 args.get('accepted_reference_versions'),args.get('writer_id','legacy'))
             result['before'] = state
+            result['task_link']=args.get('task_link')
             store.partial(ident,result)
             if action in ('save','save_component'):
                 baseline = doc.dataFile.versionNumber if doc.isSaved else 0
+                result['save_intent']={'document_id':doc_id,'before_file':state['file'],
+                                       'expected_version':baseline+1 if action=='save' else 1,
+                                       'references':state['references'],'name':args.get('name',doc.name)}
                 if action == 'save':
                     if doc.isSaved:
                         if any(args.get(k) for k in ('name','folder_id','project_id','hub_id')):
@@ -180,9 +214,11 @@ def start(store, job, app, design_getter, document_id_getter):
                         if not doc.isModified:
                             result.update(file=file_info(doc.dataFile),cloud_complete=True)
                             store.finish(ident,'succeeded',result); return
+                        result['uncertain']=True;store.partial(ident,result)
                         ok = doc.save(args.get('description','MCP shared-edit checkpoint'))
                     else:
                         target=destination(app,args)
+                        result['uncertain']=True;store.partial(ident,result)
                         ok=doc.saveAs(args['name'],target,args.get('description',''),'')
                     if not ok: raise RuntimeError('Fusion rejected save')
                     future=None
@@ -190,6 +226,7 @@ def start(store, job, app, design_getter, document_id_getter):
                     target=destination(app,args)
                     component=advanced.resolve(design,args['component_token'],adsk.fusion.Component)
                     advanced.editable(design,component)
+                    result['uncertain']=True;store.partial(ident,result)
                     future=required(component.saveCopyAs(args['name'],target,args.get('description',''),''),'Component save future')
                     result['source_component_token']=args['component_token']
                     result['note']='Independent native copy; existing occurrences and joints are NOT replaced. Open/edit this new file by ID.'
@@ -199,6 +236,8 @@ def start(store, job, app, design_getter, document_id_getter):
                 store.partial(ident,result); store.progress(ident,0.5,'Waiting for Fusion cloud processing'); return
             elif action == 'insert':
                 f=get_file(app,args)
+                if f.versionNumber!=f.latestVersionNumber and args.get('accepted_insert_version')!=f.versionNumber:
+                    raise ValueError('Historical insertion needs accepted_insert_version matching the inspected version')
                 if not doc.isSaved or doc.dataFile.parentProject.id!=f.parentProject.id:
                     raise ValueError('Linked insertion requires an assembly saved in the same project')
                 if doc.dataFile.id==f.id: raise ValueError('Cannot insert a design into itself')
@@ -220,6 +259,9 @@ def start(store, job, app, design_getter, document_id_getter):
                 ref=matches[0]
                 if ref.dataFile.latestVersionNumber != args['expected_latest_version']:
                     raise ValueError('Reference version changed since inspection')
+                latest=file_info(ref.dataFile.latestVersion)
+                if not latest['complete'] or latest['version']!=args['expected_latest_version']:
+                    raise ValueError('Requested reference version is not fully processed')
                 # Pin exact inspected version rather than racing getLatestVersion().
                 ref.version=args['expected_latest_version']
                 if ref.version!=args['expected_latest_version']: raise RuntimeError('Reference update failed')
@@ -257,7 +299,7 @@ def tick(store):
             info=file_info(file)
             result['file']=info; store.partial(ident,result)
             if not info['complete']: continue
-            result.update(cloud_complete=True,status_note='Cloud version fully processed')
+            result.update(cloud_complete=True,uncertain=False,status_note='Cloud version fully processed')
             store.finish(ident,'succeeded',result); del _pending[ident]
         except Exception as exc:
             result.update(message=str(exc),traceback=traceback.format_exc(),partial_changes_possible=True)
@@ -265,3 +307,25 @@ def tick(store):
 
 def reset():
     _pending.clear(); _tokens.clear()
+
+
+def reconcile(store,app,job_id,version_id='',confirmation_note=''):
+    """Observe a late save; acknowledgement is explicit caller evidence, never automatic replay."""
+    row=store.result(job_id);result=row.get('result') or {}
+    if not result.get('uncertain'):return dict(row,reconciliation_required=False)
+    if row['status'] not in ('failed','cancelled','interrupted'):
+        raise ValueError('Poll the running job; reconciliation is only for an uncertain terminal job')
+    if not version_id:raise ValueError('Inspect original job/Fusion version history and provide the observed version_id')
+    file=required(app.data.findFileById(version_id),'Observed cloud version')
+    info=file_info(file);intent=result.get('save_intent',{});before=intent.get('before_file')
+    if not info['complete']:raise ValueError('Observed cloud version still processing')
+    if result.get('action')=='save' and before and info['id']!=before['id']:
+        raise ValueError('Observed file identity differs from original save target')
+    if info['version']!=intent.get('expected_version'):raise ValueError('Observed version differs from expected save outcome')
+    report={'observed_file':info,'association':'caller must confirm this version contains the intended edits',
+            'original_status':row['status'],'replayed':False}
+    if confirmation_note.strip():
+        report.update(confirmation_note=confirmation_note,confirmation_status='caller_reported_not_authenticated')
+        result.update(uncertain=False,reconciliation=report)
+        store.annotate_result(job_id,result)
+    return dict(row,reconciliation=report,reconciliation_required=not bool(confirmation_note.strip()))

@@ -1,0 +1,31 @@
+{
+  "operation_id": "fixture-scoped-validation",
+  "document_id": "doc",
+  "component_token": "carrier",
+  "units": "mm",
+  "mode": "read_only",
+  "checkpoint_before": false,
+  "validate_after": true,
+  "script": "def run(ctx): return ctx.validate()",
+  "scope": {
+    "version": "1.0",
+    "mode": "selected",
+    "targets": [
+      "carrier"
+    ],
+    "dependencies": [],
+    "members": [
+      {
+        "id": "carrier",
+        "component_token": "carrier",
+        "revision": "r1",
+        "membership": "active",
+        "maturity": "working",
+        "role": "authored"
+      }
+    ],
+    "parameter_names": [],
+    "required_checks": [],
+    "dependency_review": "complete"
+  }
+}

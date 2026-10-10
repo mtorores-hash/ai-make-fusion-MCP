@@ -11,6 +11,7 @@ import traceback
 import adsk.core
 import adsk.fusion
 from . import advanced, model_tools, verification, cloud
+from . import scope as scopes
 from .execution_policy import validate_read_only
 import ast
 
@@ -24,9 +25,9 @@ class LimitedLog(io.TextIOBase):
         return len(text)
     def getvalue(self): return ''.join(self.parts)+ ('\n[log truncated]' if self.truncated else '')
 
-def inventory(d):
+def inventory(d, components=None):
     entities=[]
-    for c in model_tools.each(d.allComponents):
+    for c in (components if components is not None else model_tools.each(d.allComponents)):
         entities.append(c)
         for collection in (c.bRepBodies,c.sketches,c.features,c.joints,c.asBuiltJoints):
             entities.extend(model_tools.each(collection))
@@ -37,6 +38,7 @@ class Context:
         self.store=store; self.job_id=job['job_id']; self.operation_id=job['operation_id']
         self.request=job['request']; self.app=app; self.design=design; self.target=target
         self.document=app.activeDocument; self.units=self.request['units']; self.guard=guard
+        self.selection=None;self.boundary=None;self.health_baseline=None;self.started=time.monotonic()
         self.read_only=self.request.get('mode','modeling')=='read_only'
         self.timings={k:0.0 for k in ('solve','measurement','export','checkpoint','script')}
         self.output_dir=store.root/'artifacts'/self.job_id
@@ -69,6 +71,9 @@ class Context:
 
     def check_cancel(self):
         self.guard()
+        bound=self.request.get('task',{}).get('max_seconds')
+        if bound is not None and time.monotonic()-self.started>bound:
+            raise Cancelled('Caller per-operation time bound reached at cooperative checkpoint; kernel calls cannot be interrupted')
         if self.store.row(self.job_id)['cancel_requested']: raise Cancelled('Cancellation requested at cooperative boundary.')
 
     def flush(self): self.store.partial(self.job_id,self.result)
@@ -89,28 +94,44 @@ class Context:
         factor={'mm':0.1,'cm':1,'m':100,'in':2.54}[self.units]
         return adsk.core.Point3D.create(x*factor,y*factor,z*factor)
     def parameter(self,name,expression,unit=None):
+        if self.boundary:self.boundary.require_parameter(name)
         p=self.design.userParameters.itemByName(name)
         if p: p.expression=expression
         else: p=self.design.userParameters.add(name,adsk.core.ValueInput.createByString(expression),unit or self.units,'Batch MCP')
         return p
-    def audit_hygiene(self):
+    def audit_hygiene(self, scope=None):
         from .hygiene import audit
         self.check_cancel()
-        return audit(self.design)
-    def require_hygiene(self,strict_reviews=False):
+        return audit(self.design,scope if scope is not None else (self.selection.current_spec() if self.selection and not self.selection.legacy else None),
+                     [m['id'] for m,c in self.selection.entries if c.revisionId!=m['revision']] if self.selection and not self.selection.legacy else [])
+    def require_hygiene(self,strict_reviews=False,scope=None):
         from .hygiene import require
-        report=self.audit_hygiene()
+        report=self.audit_hygiene(scope)
         self.record('modeling_hygiene',report)
         return require(report,strict_reviews)
-    def export_checked(self,filename,entity=None,manual_review_note='',strict_reviews=False):
+    def export_checked(self,filename,entity=None,manual_review_note='',strict_reviews=False,scope=None):
         if not isinstance(manual_review_note,str) or not manual_review_note.strip():
             raise ValueError('Record a manual_review_note covering non-automated rules before a checked export')
+        self.check_cancel()
+        entity=entity or self.target
+        chosen=scope if scope is not None else (self.selection.current_spec() if self.selection and not self.selection.legacy else scopes.selected(self.design,advanced.native(entity) if adsk.fusion.Component.cast(advanced.native(entity)) else advanced.native(entity).parentComponent))
+        selection=scopes.Selection(self.design,chosen);selection.check_export(entity)
         self.synchronize()
-        report=self.require_hygiene(strict_reviews)
+        # Recompute must not silently make a supplied revision scope current.
+        selection=scopes.Selection(self.design,chosen);selection.check_export(entity)
+        integrity=scopes.health_report(self.design,selection,getattr(self,'health_baseline',None))
+        self.record('checked_export_integrity',integrity)
+        if integrity['feature_errors'] or integrity['inspection_gaps']:
+            raise RuntimeError('Checked export blocked by new/relevant integrity errors or unavailable checks')
+        boundary=getattr(self,'boundary',None)
+        if boundary and boundary.post().get('violations'):raise RuntimeError('Checked export blocked by edit-scope violation')
+        report=self.require_hygiene(strict_reviews,chosen)
         self.record('modeling_hygiene_manual_review',manual_review_note)
         artifact=self.export(filename,entity)
         result={'artifact':artifact,'hygiene':report,'manual_review_note':manual_review_note,
-                'scope':'Automated-subset gate plus caller-reported manual review; not a full design certification.'}
+                'scope':selection.report(),'validation_status':'pass','approval_status':'not_evaluated',
+                'integrity':integrity,
+                'claim':'Selected automated checks and caller-reported evidence; not whole-assembly approval.'}
         self.record('checked_export_'+filename,result)
         return result
     def tag_geometry(self,body,name,kind,filters,feature=None,role='functional',requirement=''):
@@ -123,6 +144,12 @@ class Context:
         from .design_intent import surface_audit
         with self.timed('measurement'):
             return surface_audit(body,short_edge_mm,small_face_mm2,slender_width_mm,protected_entities)
+    def retire_occurrences(self,occurrence_tokens,reason,replacement_id='',dependency_review_note=''):
+        from .retirement import retire
+        return retire(self,occurrence_tokens,reason,replacement_id,dependency_review_note)
+    def parametric_circle(self,name,diameter_parameter):
+        from .authoring import circle
+        return circle(self,name,diameter_parameter)
     def try_feature(self,*args,**kwargs):
         from .experiments import try_feature
         return try_feature(self,*args,**kwargs)
@@ -140,8 +167,11 @@ class Context:
     def expect_one(matches):
         if len(matches)!=1: raise ValueError('Expected exactly one geometry match; got '+str(len(matches)))
         return matches[0]
-    def inspect(self,include_topology=False): return model_tools.inspect_full(self.design,include_topology)
-    def validate(self): return model_tools.validate(self.design)
+    def inspect(self,include_topology=False,scope=None): return model_tools.inspect_full(self.design,include_topology,scope=scope if scope is not None else (self.selection.current_spec() if self.selection and not self.selection.legacy else None))
+    def evidence_fingerprint(self,member_ids):
+        if not self.selection or self.selection.legacy:raise ValueError('Explicit scope required for evidence reuse')
+        return scopes.evidence_fingerprint(self.selection,member_ids)
+    def validate(self,scope=None): return model_tools.validate(self.design,scope if scope is not None else (self.selection.current_spec() if self.selection and not self.selection.legacy else None))
     def minimum_distance(self,one,two):
         with self.timed('measurement'): return model_tools.measure(self.app,self.design,one,two)
     def interference(self,references):
@@ -366,7 +396,8 @@ class Context:
 
 
 def execute_job(store,job,app,design_getter,document_id_getter):
-    request=job['request']; ctx=None; log=LimitedLog(); before=[]
+    request=job['request']; ctx=None; log=LimitedLog(); before=[];health_before=None;script_completed=False;post_checked=False;regenerated=False
+    start=time.monotonic()
     result={'created':[],'measurements':{},'warnings':[],'files':[],'checkpoints':[],
             'traceback':None,'return_value':None,'validation':None}
     status='failed'
@@ -374,14 +405,20 @@ def execute_job(store,job,app,design_getter,document_id_getter):
         def guard():
             if document_id_getter()!=request['document_id']: raise ValueError('Active document ID changed; job target rejected.')
         guard(); d=design_getter()
-        if request.get('mode','modeling')!='read_only':
-            cloud.require_edit(app,d,request['document_id'],request.get('edit_token',''))
+        if request.get('mode','modeling')!='read_only':store.assert_no_uncertain_cloud()
         target=d.rootComponent if request['component_token']=='@root' else advanced.resolve(d,request['component_token'],adsk.fusion.Component)
         if request.get('mode','modeling')!='read_only': advanced.editable(d,target)
         ctx=Context(store,job,app,d,target,guard); result=ctx.result
+        ctx.selection=scopes.Selection(d,request['scope'] if request.get('scope') is not None else (None if ctx.read_only else scopes.selected(d,target)))
+        ctx.boundary=scopes.EditBoundary(d,ctx.selection,request.get('task'),target)
+        if not ctx.read_only:
+            cloud.require_edit(app,d,request['document_id'],request.get('edit_token',''),
+                               accepted_reference_versions=request.get('accepted_reference_versions'),
+                               writer_id=request.get('task',{}).get('writer_id','legacy'))
+            health_before=scopes.health_snapshot(d);ctx.health_baseline=health_before
         ctx.check_cancel()
         if ctx.read_only: validate_read_only(ast.parse(request['script']))
-        else: before=inventory(d)
+        else: before=inventory(d,ctx.selection.components())
         if request['checkpoint_before']: ctx.checkpoint('before_batch')
         store.progress(job['job_id'],0,'Executing script on Fusion main thread')
         namespace={'__name__':'fusion_batch_job','__file__':str(ctx.output_dir/'script.py'),
@@ -391,12 +428,18 @@ def execute_job(store,job,app,design_getter,document_id_getter):
             exec(compile(request['script'],namespace['__file__'],'exec'),namespace)
             value=namespace['run'](ctx)
         json.dumps(value,allow_nan=False)
-        result['return_value']=value
+        result['return_value']=value;script_completed=True
         ctx.check_cancel()
-        if not ctx.read_only: ctx.synchronize()
-        if request['validate_after']:
-            result['validation']=ctx.validate()
-            if result['validation']['feature_errors']: raise RuntimeError('Model built, but feature/joint errors remain. Inspect validation.')
+        if not ctx.read_only:
+            ctx.synchronize();regenerated=True
+        if not ctx.read_only:
+            result['edit_boundary']=ctx.boundary.post();post_checked=True
+        if request['validate_after'] or not ctx.read_only:
+            result['validation']=scopes.health_report(d,ctx.selection,health_before)
+            if result['validation']['feature_errors'] or result['validation']['inspection_gaps'] or (request.get('scope') and result['validation']['evidence_status']!='pass'):
+                raise RuntimeError('New/relevant feature damage or unavailable integrity checks; inspect validation')
+        if result.get('edit_boundary',{}).get('violations'):
+            raise RuntimeError('Observed changes exceeded permitted edit set; no automatic rollback')
         status='succeeded'
     except Cancelled as exc:
         status='cancelled'; result['message']=str(exc); result['traceback']=traceback.format_exc()
@@ -404,11 +447,24 @@ def execute_job(store,job,app,design_getter,document_id_getter):
         result['message']=str(exc); result['traceback']=traceback.format_exc()
     finally:
         result['stdout']=log.getvalue()
+        result['execution_status']='completed' if script_completed else 'cancelled' if status=='cancelled' else 'failed'
+        result['approval_status']='not_evaluated'
+        result['regeneration_performed']=regenerated
+        result['elapsed_seconds']=time.monotonic()-start
+        result['operation_id']=job['operation_id'];result['task']=request.get('task')
+        if ctx and ctx.boundary and not post_checked and health_before is not None:
+            try:
+                result['edit_boundary']=ctx.boundary.post()
+                result['validation']=scopes.health_report(ctx.design,ctx.selection,health_before)
+                if not regenerated and result['validation']['validation_status']=='pass':
+                    result['validation']['validation_status']='unproven'
+                    result['validation']['inspection_gaps'].append({'check':'final_regeneration','message':'Script failed/cancelled before final regeneration'})
+            except Exception as exc:result['warnings'].append('Post-failure inspection unavailable: '+str(exc))
         if ctx:
             result['recompute_policy']='read_only_no_regeneration' if ctx.read_only else 'modeling_final_regeneration'
             try:
                 # Compare live API objects, not entityToken strings: Fusion may change token text.
-                new=[] if ctx.read_only else [e for e in inventory(ctx.design) if not any(e==old for old in before)]
+                new=[] if ctx.read_only else [e for e in inventory(ctx.design,ctx.selection.components() if ctx.selection else None) if not any(e==old for old in before)]
                 result['created_detected']=[model_tools.ref(e) for e in new]
             except Exception as exc: result['warnings'].append('Post-job inventory unavailable: '+str(exc))
             result['output_dir']=str(ctx.output_dir)

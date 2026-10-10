@@ -5,8 +5,9 @@
 1. `inspect_design` returns `design_id` and `root_component.token`.
 2. `inspect_assembly` / `inspect_full_assembly` identifies another component if desired.
    Select an explicit **Component** token, not an occurrence token, for modeling scope.
-3. Call `inspect_document_state(design_id)` immediately before editing. Pass its single-use
-   `edit_token` to the mutation. The bridge compares current state before executing code.
+3. Observe with `inspect_document_state(design_id)`, then `acquire_edit_token` with writer
+   identity and accepted reference pins. Pass the token, explicit scope and task to the mutation.
+   The bridge checks state before code and reports bounded changes afterward.
    `run_model_script` accepts operation_id, document_id, component_token, units, script,
    checkpoint_before (default true) and validate_after (default true).
 4. Submission durably stores the request and returns a job_id immediately.
@@ -53,9 +54,9 @@ timestamp as proof a running job can be safely replayed.
 
 ## v0.4 update
 
-See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.
+See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for the earlier verification helpers; [caller contract 1.0](caller-contract.md) defines current scope and migration.
 
-## Cloud operations (v0.5.0)
+## Cloud operations (v0.6.0)
 
 `cloud_operation` shares the durable queue/idempotency journal. Main-thread custom events
 start API calls and poll upload futures/documents without a sleep/doEvents loop.
@@ -68,3 +69,13 @@ processing and editability. They are single-use and session-local, checked befor
 The full Python runner remains trusted and unrestricted. No distributed lock is claimed.
 
 See [cloud workflow](cloud-workflow.md) for save completion, IDs, linked checkpoints and recovery.
+
+## Scope and postconditions
+
+`scope.py` centralizes selected membership, revisions, evidence and edit boundaries.
+`hygiene.py` applies authoring checks to relevant authored/modified parts. `health_snapshot`
+keeps a cheap global feature/joint baseline to detect new damage outside the task.
+`retirement.py` uses conservative native Remove features; `authoring.py` provides the reusable
+constrained circle path. No workflow approvals, external graph/BOM writes or scheduler exist.
+Cloud uncertainty is durable in job-result JSON; observer/writer leases remain session-local.
+See [caller contract](caller-contract.md) for prevention versus post-detection boundaries.

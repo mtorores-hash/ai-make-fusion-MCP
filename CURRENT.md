@@ -1,59 +1,33 @@
 # Current state
 
-Branch: workbench. Version: v0.5.0 development; modeling rules version 1.0.5.
+Branch: `workbench`. Mauricio approved pushing the prepared update on 2026-10-10.
+Based on verified workbench `b15d491fe87fd4b1a1953ea148378f045f621f14`.
+Version: **0.6.0 development**, rules **1.1.0**, caller contract **1.0**, **32 tools**.
 
 ## Now
 
-2026-10-08: implemented Fusion cloud project/folder creation, named native part/version saves,
-opening, linked insertion and selected reference updates. Added single-use pre-edit tokens and
-clean cloud-version manifests for linked checkpoints. 28 MCP tools; user edits and existing
-assembly links are preserved. Cloud copy is not automatic assembly/joint migration.
+2026-10-10: implemented scoped validation/checked exports, role-aware hygiene and dependency
+evidence; allowed/frozen edit boundaries; native leaf-occurrence retirement; observer/writer
+separation, accepted pins, preservative dirty/stale sequential save/update path and uncertain
+save reconciliation. Added component-owned driven circle helper and rules hash reuse.
+Operational rules align minimum external fidelity, joining intent, milestone evidence and
+finite sampled motion. Original supplied best-practices source preserved.
 
+## Evidence and limits
 
-2026-10-08: rules 1.0.4 require connection selection before hardware, a short rationale per
-distinct connection and final fastener/access review. Manual guidance, not automatic optimization.
+150 unit/source-contract tests pass (106 baseline first passed unchanged); syntax and rules
+consistency checked. New real STDIO test is not run: MCP SDK absent and no install authorized.
+API doubles do not establish loaded Fusion behavior. Native/cloud/Windows acceptance is pending.
+Source update pushed to workbench with approval. No merge to main, AI_MAKE edits, installation,
+live model changes or hardware operation performed.
 
-2026-10-08: rules 1.0.3 require complete intended junctions, local width/thickness checks,
-intentional surface continuity and revision-specific close-up/section evidence before completion.
-Added manual audit reminder; no automatic junction-geometry validator is claimed.
+## Next
 
-2026-10-07: rules 1.0.2 default to simple PCB connector/pin clearance volumes and cable
-routes to the correct board area/orientation. Detail is opt-in; supplier CAD originals preserved.
-Rules copy/version/loader and Python syntax checks pass; no new live Fusion validation.
-
-2026-09-27: rules 1.0.1 require commercial-hardware CAD sourcing before reconstruction or
-placeholders. Served rules and audit manual-review checklist updated; runtime stays v0.4.1.
-
-2026-09-27: working documentation and spring-cup example generalized; project anecdotes removed
-from the lessons summary. Runtime behavior and version remain v0.4.1. Original source is in Git history.
-
-Mauricio supplied a parametric modeling standard. Original preserved in
-docs/Fusion-Parametric-Modeling-Best-Practices.md; operational rules shipped with the software,
-linked from AGENTS, and exposed by MCP tool/resource. Added read-only whole-design hygiene audit
-and explicit checked-export gate. Existing checkpoints/working exports are not blocked.
-Prior verification roadmap coverage remains in docs/upgrade-v0.4.md; this update does not complete it.
-
-## Last experiment / evidence
-
-106 automated tests pass (API doubles, numerical and filesystem tests). Real STDIO MCP
-initialize/list/schema/rules/resource/job checks pass with 28 tools using Python 3.12 and MCP
-1.30.0. Tests cover user-edit rejection, version conflicts, pending/completed saves, duplicate
-requests, restart interruption, component-copy futures and selective reference updates.
-No live Fusion cloud/kernel test or installation on Mauricio's PC performed here.
-
-## Next question
-
-Upgrade BOTH local server/add-in to v0.5.0 and retrieve rules 1.0.5. Run the disposable-project
-acceptance in docs/cloud-workflow.md: manually edit/save a named part, update its assembly
-reference, inspect placements/joints, save and resume AI work without discarding the edit.
-
-## Files touched
-
-Cloud module, dispatcher, job store, server schemas, batch checkpoints, experiment boundary,
-versions/rules, tests, install/workflow/reference docs and working-state records.
+Review the caller contract and installation/rollback instructions. Installation and disposable
+native acceptance still need separate approval; pushing source does not deploy it to Fusion. See docs/upgrade-v0.6.md and docs/compatibility-handoff-ai-make.md.
 
 ## Open gates
 
-Live Fusion cloud and geometry acceptance; no distributed locking or arbitrary-Python sandbox;
-existing-component linkage migration remains deliberate work; license/public release.
-No challenge clock, budget, physical outcome or installed-PC update inferred.
+Native APIs/kernel/cloud/exports and real MCP schema/STDIO; full dependency discovery, nested
+retirement and bounded new-component authoring remain unsupported. Trusted Python is not
+sandboxed, tokens are optimistic, and caller approvals are not authenticated.

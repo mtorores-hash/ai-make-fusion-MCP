@@ -1,4 +1,50 @@
-# Test summary — v0.5.0 development
+# Test summary — v0.6.0 development (2026-10-10)
+
+**150 automated tests pass** on Python 3.12.14: 106 baseline tests first passed unchanged;
+44 additional targeted regressions/source-contract checks now pass with the retained suite.
+Tests use API doubles, temporary journals/files, numerical policies and source registration.
+No Autodesk process or live design was accessed. No dependencies were installed.
+
+| Verification | Result / evidence boundary |
+| --- | --- |
+| `python -m unittest discover -s tests -v` | 150 pass; final log included in review package |
+| `python -m compileall -q software/fusion-prompt-mcp` | Pass; Python syntax only |
+| Source registration and binding | 32 tool declarations, optional fields, observer default, resource/rules and example request binding checked with a lightweight registration stub; **not a real MCP schema/STDIO test** |
+| Real `tests/check_mcp.py` | **Not run for v0.6**: MCP SDK absent; installation not authorized. Script updated for 32 tools/rules 1.1.0 and ready for existing installed environment |
+| Rules/source integrity | Both rule copies identical; version/hash cache tested. Original supplied best-practices document unchanged against baseline |
+| Patch and rollback | Forward applies to verified baseline; reverse returns original tree byte-for-byte; checks included in review package |
+| Native Fusion/Windows/cloud | **Not run**. Separate approval required for disposable procedure |
+
+New regressions cover scoped supplier exemptions and required interface evidence; stale/empty/
+nonexistent/mismatched/descendant exports; new outside damage versus unrelated old findings;
+frozen active components and added instances; after-failure narrow reports; native helper call
+construction; conservative shared-instance/last-instance retirement and blockers; component-name
+versus geometry evidence reuse; accepted older pins, actual state conflicts, observers and single-use
+tokens; dirty assembly preservation with two sequential updates; uncertain saves, late completion,
+wrong-version rejection and explicit reconciliation; linked experiment rejection before callbacks.
+
+Remaining limitations:
+
+- Real SDK serialization/schema compatibility and loaded Fusion APIs/kernel/solver/exports need validation.
+- Scoped dependency sets are caller-reviewed. No complete projection/derive graph or automatic mechanical proof.
+- Retirement is top-level non-derived leaf Remove only; native history/shared-instance behavior awaits acceptance.
+- Bounded tasks detect arbitrary-Python changes afterward, with no rollback/sandbox or cross-document protection.
+  New component definitions are rejected after bounded execution; prepare approved components beforehand.
+- Component revision propagation can conservatively flag ancestor edits. BRep fingerprint supports conservative
+  component-name reuse, not universal geometry equivalence, mesh/sketch-only reuse or arbitrary metadata immunity.
+- Uncertain completion recovery requires an observed complete expected version plus caller verification. Failed
+  uploads with no such version require manual recovery. Old v0.5 jobs have no retroactive uncertainty proof.
+- Task/approval references are unauthenticated metadata; cloud operations do not enforce modeling member sets.
+- No distributed locking, automatic joint/link migration, continuous collision proof or physical certification.
+
+Current workbench was rechecked before packaging and still equals
+`b15d491fe87fd4b1a1953ea148378f045f621f14`; all 57 original blobs were matched to its Git tree
+before editing. The prepared changes were subsequently pushed to workbench with Mauricio's approval. No merge
+to main, installation, live Fusion mutation, hardware action or AI_MAKE write occurred.
+
+---
+
+# Historical v0.5.0 evidence
 
 **106 automated tests pass**. Coverage adds cloud API doubles for edit-token consumption,
 dirty-to-dirty manual edits, stale/read-only/processing/other-editor rejection, reference
@@ -10,7 +56,7 @@ persistent batch and cloud-job submission, deduplication and cancellation. Envir
 Python 3.12, MCP 1.30.0, declared dependency range unchanged. Syntax and identical rules
 copies checked. No live Fusion cloud/kernel, Windows install or native geometry test here.
 
-The decisive next check is [local Fusion acceptance](cloud-workflow.md#local-fusion-acceptance):
+The decisive next check is [local Fusion acceptance](disposable-acceptance-v0.6.md):
 manual edit/save of a named part, selected assembly-reference update, inspection and AI resumption.
 
 ## Historical v0.4.1 evidence
@@ -29,7 +75,7 @@ validation. Runtime and repository rule copies are compared in the repository te
 
 These are numerical/API-double and real protocol tests, **not live Fusion kernel tests**.
 Mauricio reported v0.4 running in Fusion; v0.4.1 is not installed or live-validated by this session.
-Run [live hygiene acceptance](modeling-hygiene.md#installation-and-live-acceptance) after updating.
+Run [live hygiene acceptance](disposable-acceptance-v0.6.md) after updating.
 
 ---
 

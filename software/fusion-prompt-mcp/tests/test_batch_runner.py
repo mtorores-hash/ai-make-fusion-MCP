@@ -20,10 +20,13 @@ from FusionPromptBridge import batch_runner as runner, model_tools
 class BatchTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup); self.store=Store(self.tmp.name)
-        self.target=Node('Component',entityToken='root',name='Root')
+        runner.cloud.reset();self.addCleanup(runner.cloud.reset)
+        fusion.FeatureHealthStates=Node(HealthyFeatureHealthState=0,WarningFeatureHealthState=1,ErrorFeatureHealthState=2)
+        self.target=Node('Component',entityToken='root',name='Root',revisionId='r1',isValid=True,
+                         features=Collection(),joints=Collection(),asBuiltJoints=Collection(),allOccurrences=Collection())
         self.design=Node(findEntityByToken=lambda t:[self.target] if t=='root' else [],
-                         rootComponent=Node(allOccurrences=Collection()),computeAll=lambda:True,
-                         allComponents=Collection([Node(name='Root',revisionId='r1')]),allParameters=Collection())
+                         rootComponent=self.target,computeAll=lambda:True,
+                         allComponents=Collection([self.target]),allParameters=Collection())
         self.app=Node(activeDocument=Node(name='Test',isModified=False,isSaved=False,allDocumentReferences=Collection()))
         self.req=dict(operation_id='batch',document_id='doc',component_token='root',units='mm',
                       script='def run(ctx):\n    ctx.progress(0.5,"half")\n    print("hello")\n    ctx.record("diameter_mm",12)\n    return {"ok":True}',

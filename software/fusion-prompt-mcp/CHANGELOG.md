@@ -1,3 +1,18 @@
+# 0.6.0 development — local review, 2026-10-10
+
+- Caller contract 1.0; 32 tools; explicit selected/full-design scopes, roles/lifecycle/maturity,
+  dependency evidence, scoped checked exports and global new-damage classification.
+- Bounded task metadata, narrow preconditions and trusted-script post-detection; frozen boundaries.
+- Native top-level leaf retirement through Remove with shared-instance/history preservation checks.
+- Separate observers/writer tokens, accepted older pins, dirty/stale preservation, sequential updates,
+  durable uncertain-save markers and original-job reconciliation; linked experiments reject early.
+- Reusable driven component-owned circle, concise paged context and rules SHA reuse.
+- Rules 1.1.0: minimum functional external geometry, early joining intent/exact hardware later,
+  applicability/milestone evidence reuse and truthful sampled-motion limits.
+- 150 tests pass; real v0.6 STDIO and native acceptance unrun. Installation/rollback and caller handoff included.
+
+Previous history follows.
+
 # v0.5.0 development — 2026-10-08
 
 - Three new MCP tools: browse_cloud, inspect_document_state, cloud_operation (28 total).

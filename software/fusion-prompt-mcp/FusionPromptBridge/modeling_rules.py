@@ -2,12 +2,16 @@
 import hashlib
 from pathlib import Path
 
-RULES_VERSION = '1.0.5'
+RULES_VERSION = '1.1.0'
 
 
-def get_rules():
+def get_rules(known_sha256=''):
     path=Path(__file__).resolve().parents[1] / 'modeling-rules.md'
     data=path.read_bytes()  # Fail visibly when an incomplete installation omits the rules.
-    return {'rules_version':RULES_VERSION,'sha256':hashlib.sha256(data).hexdigest(),
+    digest=hashlib.sha256(data).hexdigest()
+    result={'rules_version':RULES_VERSION,'sha256':hashlib.sha256(data).hexdigest(),
             'text':data.decode('utf-8'),'scope':'native parametric authoring; explicit project exceptions',
-            'enforcement':'Guidance plus explicit automated-subset audit/export gate; not a global save interceptor.'}
+            'enforcement':'Scoped automated checks plus caller evidence; not approval or a global save interceptor.'}
+    result['unchanged']=known_sha256==digest
+    if result['unchanged']:result.pop('text')
+    return result

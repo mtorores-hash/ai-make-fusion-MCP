@@ -46,16 +46,16 @@ Avoid `adsk.doEvents()` loops and never call Fusion APIs from script-created thr
 | `point(x,y,z=0)` / `value(expression)` | Explicit unit conversion / Fusion ValueInput |
 | `parameter(name,expression,unit=None)` | Create/update named user parameter |
 | `progress(fraction,message)` | Persist progress, check target/cancellation |
-| `stage(label,fraction,checkpoint=True)` | Progress plus pre-stage native archive |
-| `checkpoint(label)` | Full-design F3D archive; fail visibly if export is unavailable |
+| `stage(label,fraction,checkpoint=True)` | Progress plus pre-stage checkpoint; linked dirty state must be saved between batches |
+| `checkpoint(label)` | Unlinked: F3D archive. Linked: clean completed cloud version/reference manifest |
 | `created(entity)` / `ref(entity)` | Register or obtain native references with occurrence context |
 | `record(name,value)` / `warn(message)` | Structured measurements / warnings |
-| `inspect(include_topology=False)` | All components, nested occurrences, health, dimensions, transforms |
+| `inspect(include_topology=False,scope=None)` | Selected scope or legacy full design, health, dimensions, transforms |
 | `resolve(reference,world=False)` | Resolve `{token, occurrence_token}` to native/proxy geometry |
 | `select_edges(body,filters,feature=None)` | Geometric predicates plus optional current feature boundary |
 | `select_faces(body,filters,feature=None)` | Surface predicates plus optional current feature faces |
 | `expect_one(matches)` | Reject zero/ambiguous selections |
-| `validate()` | Feature/joint health across components |
+| `validate(scope=None)` | Scoped integrity and required evidence, separately reported |
 | `minimum_distance(one,two)` | World-space minimum distance in mm |
 | `interference(references)` | Current-pose interference results and volumes in mm³ |
 | `section_sketch(body,plane,offset,name)` | Body/plane intersection curves in an editable sketch |
@@ -80,9 +80,9 @@ just create unused user parameters.
 Section helpers create **section curves**, not an interactive clipped-solid Section
 Analysis display. Rendered frames are exported PNGs, not an encoded animation video.
 F3D archives retain editable native design data; STEP/STL do not retain the feature timeline.
-Linked/external-reference designs may reject F3D checkpoints: the batch then fails BEFORE
-executing the script. Use an appropriate editable local source design; do not silently
-skip a failed checkpoint. Cloud project save/version management is not automated here.
+Linked checkpoints are clean completed cloud version/reference manifests, not local archives.
+Save and poll between linked batches; do not detach references to satisfy an experiment helper.
+See [cloud workflow](cloud-workflow.md).
 
 
 ## v0.4 verification helpers
@@ -110,19 +110,32 @@ Read [modeling rules](modeling-rules.md) before authoring. Contracts: [hygiene](
 
 | Helper | Behavior |
 | --- | --- |
-| `audit_hygiene()` | Read-only whole-design automated subset; no regeneration/repair |
-| `require_hygiene(strict_reviews=False)` | Record audit; raise on errors/incomplete inspection, optionally reviews |
-| `export_checked(filename,entity=None,manual_review_note='',strict_reviews=False)` | Synchronize, require audit/manual note, then export and record report/hash |
+| `audit_hygiene(scope=None)` | Read-only scoped automated subset; no regeneration/repair |
+| `require_hygiene(strict_reviews=False,scope=None)` | Record audit; raise on errors/incomplete inspection, optionally reviews |
+| `export_checked(filename,entity=None,manual_review_note='',strict_reviews=False,scope=None)` | Synchronize, require audit/manual note, then export and record report/hash |
 
 `audit_hygiene` is also allowed in restricted read-only batches. Plain exports/checkpoints remain
 available for recovery/work in progress and never imply full-standard compliance.
 
-## v0.5.0 shared-edit contract
+## v0.6.0 scoped authoring and shared-edit contract
 
-Obtain a fresh `edit_token` from `inspect_document_state(document_id)` and pass it into
-`run_model_script`. The bridge rejects a changed state before executing module-level Python.
-Read-only batches do not need a token. Reinspect before each subsequent modeling job.
-For a linked design, `ctx.checkpoint()` requires a clean, completed cloud save and writes a
-JSON cloud-version/reference manifest. A dirty linked design stops at the checkpoint; split
-work into separate batch/save/inspect stages. `ctx.try_feature` rejects cloud checkpoints
-because its disposable experiment requires a self-contained F3D archive.
+Use [caller contract 1.0](caller-contract.md): acquire a writer token separately, pass explicit
+scope/task/pins, and preserve current revisions and caller evidence. Implicit batch scope is
+target-only and unbounded; use explicit scope for checked deliverables. Required checks are
+caller-selected for the milestone. If a script computes fresh evidence, it may update its
+`ctx.selection.spec['evidence']` with actual source/revision records before final validation;
+never relabel an old measurement with a new revision. Fetch current component revisions after
+regeneration. Post-batch integrity and evidence status are separate from execution/approval.
+
+Additional helpers:
+
+- `ctx.parametric_circle(name, diameter_parameter)`: native component-owned constrained circle,
+  using an existing named length parameter; checks full constraint after regeneration.
+- `ctx.evidence_fingerprint(member_ids)`: conservative BRep/placement/declared-parameter reuse
+  signature; complete dependency mapping still required. Allowed in restricted read-only mode.
+- `ctx.retire_occurrences(occurrence_tokens, reason, replacement_id='', dependency_review_note='')`:
+  explicit task/checkpoint required; conservative Remove-feature lifecycle operation. Use the
+  dedicated durable tool for the normal caller path.
+
+Linked checkpoints and unsupported experiments: [cloud workflow](cloud-workflow.md).
+Native solver behavior is still unverified: [prepared acceptance](disposable-acceptance-v0.6.md).

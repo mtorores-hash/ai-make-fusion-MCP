@@ -3,7 +3,7 @@
 This is a supporting tool for prompt-driven CAD. No Project-specific mechanism geometry, motor model,
 challenge budget, validated physical fit or production readiness is included.
 
-| Requested capability | v0.3 implementation | Evidence / boundary |
+| Requested capability | Implementation | Evidence / boundary |
 | --- | --- | --- |
 | Batch script execution | Full trusted adsk script via durable jobs | Persistence/protocol tested; Fusion execution needs live acceptance |
 | Full assembly inspection | Component definitions, nested occurrences, bodies, optional topology, dimensions, transforms, feature health | Implemented; real nested geometry validation pending |
@@ -23,9 +23,17 @@ tag, repo visibility change or challenge-story material is part of this import.
 
 ## v0.4 update
 
-See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for the latest behavior.
+See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for earlier verification helpers.
 
 ## v0.5.0 update
 
 [Cloud workflow](cloud-workflow.md) adds named project/part files, external links, selected reference
 updates and optimistic shared-edit checks. Cloud/kernel acceptance is pending.
+
+## v0.6.0 workflow compatibility
+
+Selected validation/hygiene/export, separate lifecycle/maturity/roles, caller evidence, bounded
+edit postconditions, top-level leaf retirement, accepted cloud pins, observer/writer separation
+and uncertain-save reconciliation are implemented. No universal projection/derive dependency
+graph, nested retirement, automatic rollback or native acceptance is claimed. Read
+[caller contract 1.0](caller-contract.md) and [remaining limitations](test-summary.md).

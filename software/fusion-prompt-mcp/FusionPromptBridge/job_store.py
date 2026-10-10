@@ -3,6 +3,7 @@ import ast
 from contextlib import contextmanager
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 import sqlite3
@@ -66,10 +67,19 @@ class Store:
             validate_read_only(tree)
             if request['checkpoint_before']:
                 raise ValueError('read_only does not create checkpoints; set checkpoint_before=False')
+        task=request.get('task') or {}
+        for key in ('scope','task'):
+            if request.get(key) is not None and (not isinstance(request[key],dict) or not request[key]):
+                raise ValueError(key+' must be a nonempty contract object or null')
+        if task.get('max_seconds') is not None:
+            bound=task['max_seconds']
+            if type(bound) not in (int,float) or (not math.isfinite(bound) or bound<=0):raise ValueError('task.max_seconds must be finite and >0; cooperative only')
         # Preserve v0.3 idempotency digests for the unchanged default modeling behavior.
         request=dict(request)
         if request.get('mode')=='modeling': request.pop('mode')
         if not request.get('edit_token'): request.pop('edit_token',None)
+        for optional in ('scope','task','accepted_reference_versions'):
+            if request.get(optional) is None or (optional=='accepted_reference_versions' and request.get(optional)=={}):request.pop(optional,None)
         return self._enqueue(request)
 
     def submit_cloud(self, request):
@@ -99,6 +109,17 @@ class Store:
             c.execute('INSERT INTO jobs(job_id,operation_id,digest,request,status,created,updated) VALUES(?,?,?,?,?,?,?)',
                       (job_id, operation_id, digest, encoded, 'queued', now, now))
         return self.status(job_id)
+
+    def assert_no_uncertain_cloud(self, exclude_job_id=''):
+        with self.connect() as c:
+            rows=c.execute("SELECT job_id,result FROM jobs WHERE job_id!=? AND result IS NOT NULL",(exclude_job_id,)).fetchall()
+        unresolved=[r['job_id'] for r in rows if json.loads(r['result']).get('uncertain')]
+        if unresolved:raise ValueError('Uncertain cloud operations require original-job reconciliation before mutation: '+','.join(unresolved))
+
+    def annotate_result(self, job_id, result):
+        # Reconciliation records an observation, never rewrites the original execution status.
+        with self.connect() as c:
+            c.execute('UPDATE jobs SET result=?,updated=? WHERE job_id=?',(canonical(result),time.time(),job_id))
 
     def row(self, job_id):
         with self.connect() as c:

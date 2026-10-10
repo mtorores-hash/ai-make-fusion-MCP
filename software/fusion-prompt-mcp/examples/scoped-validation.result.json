@@ -1,0 +1,147 @@
+{
+  "job_id": "d9483bd79faa4a68bd4689397a7e0d44",
+  "operation_id": "fixture-scoped-validation",
+  "status": "succeeded",
+  "created": 1791643952.5051763,
+  "updated": 1791643952.5164316,
+  "progress": 1.0,
+  "message": "succeeded",
+  "cancel_requested": 0,
+  "result": {
+    "approval_status": "not_evaluated",
+    "checkpoints": [],
+    "created": [],
+    "created_detected": [],
+    "elapsed_seconds": 0.005958980000286829,
+    "execution_status": "completed",
+    "files": [],
+    "measurements": {},
+    "message": "succeeded",
+    "operation_id": "fixture-scoped-validation",
+    "output_dir": "/tmp/tmphgy1z8m6/artifacts/d9483bd79faa4a68bd4689397a7e0d44",
+    "partial_changes_possible": false,
+    "recompute_policy": "read_only_no_regeneration",
+    "regeneration_performed": false,
+    "return_value": {
+      "approval_status": "not_evaluated",
+      "evidence": [],
+      "evidence_gaps": [],
+      "evidence_status": "pass",
+      "feature_errors": [],
+      "healthy": true,
+      "inspection_gaps": [],
+      "limitation": "Feature/joint integrity only. Functional evidence and approval are separate.",
+      "new_errors": [],
+      "relevant_preexisting": [],
+      "scope": {
+        "approval_status": "not_evaluated",
+        "contract_version": "1.0",
+        "coverage": "selected",
+        "dependencies": [],
+        "evidence_gaps": [],
+        "exclusions": [
+          {
+            "component_token": "root",
+            "reason": "outside selected task/dependencies"
+          },
+          {
+            "component_token": "other",
+            "reason": "outside selected task/dependencies"
+          },
+          {
+            "component_token": "Component1",
+            "reason": "outside selected task/dependencies"
+          }
+        ],
+        "legacy_full_design": false,
+        "members": [
+          {
+            "component_token": "carrier",
+            "current_revision": "r1",
+            "id": "carrier",
+            "maturity": "working",
+            "membership": "active",
+            "revision": "r1",
+            "role": "authored"
+          }
+        ],
+        "milestone": "unspecified",
+        "mode": "selected",
+        "targets": [
+          "carrier"
+        ]
+      },
+      "unrelated_preexisting": [],
+      "unrelated_unavailable": [],
+      "validation_kind": "feature_joint_integrity",
+      "validation_status": "pass",
+      "warnings": []
+    },
+    "stdout": "",
+    "task": null,
+    "timings_seconds": {
+      "checkpoint": 0.0,
+      "export": 0.0,
+      "measurement": 0.0,
+      "script": 0.000195340999198379,
+      "solve": 0.0
+    },
+    "traceback": null,
+    "validation": {
+      "approval_status": "not_evaluated",
+      "evidence": [],
+      "evidence_gaps": [],
+      "evidence_status": "pass",
+      "feature_errors": [],
+      "healthy": true,
+      "inspection_gaps": [],
+      "limitation": "Feature/joint integrity only. Functional evidence and approval are separate.",
+      "new_errors": [],
+      "relevant_preexisting": [],
+      "scope": {
+        "approval_status": "not_evaluated",
+        "contract_version": "1.0",
+        "coverage": "selected",
+        "dependencies": [],
+        "evidence_gaps": [],
+        "exclusions": [
+          {
+            "component_token": "root",
+            "reason": "outside selected task/dependencies"
+          },
+          {
+            "component_token": "other",
+            "reason": "outside selected task/dependencies"
+          },
+          {
+            "component_token": "Component1",
+            "reason": "outside selected task/dependencies"
+          }
+        ],
+        "legacy_full_design": false,
+        "members": [
+          {
+            "component_token": "carrier",
+            "current_revision": "r1",
+            "id": "carrier",
+            "maturity": "working",
+            "membership": "active",
+            "revision": "r1",
+            "role": "authored"
+          }
+        ],
+        "milestone": "unspecified",
+        "mode": "selected",
+        "targets": [
+          "carrier"
+        ]
+      },
+      "unrelated_preexisting": [],
+      "unrelated_unavailable": [],
+      "validation_kind": "feature_joint_integrity",
+      "validation_status": "pass",
+      "warnings": []
+    },
+    "warnings": []
+  }
+}

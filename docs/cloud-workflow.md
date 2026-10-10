@@ -1,115 +1,51 @@
-# Fusion cloud workflow — v0.5.0 development
+# Fusion cloud workflow — v0.6.0
 
-This build adds executable tools for shared human/AI CAD editing. It has not been validated
-against a live Fusion cloud account here. Both the MCP server and add-in must be upgraded.
+Fusion projects, named native part documents and linked assemblies let the human edit a part and the AI resume from the actual geometry. Do not automatically rebuild existing models, detach links, or replace occurrences/joints with independent copies. Cloud saving is independent of GitHub synchronization.
 
-## Normal workflow
+## Identity and observation
 
-1. `browse_cloud()` lists accessible hubs. Select the user's intended hub by ID.
-2. `cloud_operation(operation_id, "ensure_project", {"hub_id": ..., "name": ...})` creates
-   or reuses an unambiguous project and Assembly, Parts and Purchased Components folders.
-   Poll `job_result` for IDs. No contributors, permissions or public sharing are changed.
-3. Create a new native part with `new_design`, name its geometry and model parametrically.
-   Before every mutation get `inspect_document_state(document_id)` and pass its edit_token.
-4. First `save` supplies document_id, edit_token, hub_id, project_id, folder_id, name and
-   optional description. Later saves supply only document_id, edit_token and description:
-   they create versions of the same file in place. Poll until succeeded AND cloud_complete.
-5. Create/save a named assembly in Assembly. Use `insert` with the part's version_id,
-   expected_version and an explicit transform_cm matrix. Only linked same-project insertion
-   is supported. Identity matrix: `[1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]`.
-   The assembly must be clean and fully saved before each insertion/reference update.
-6. Save the assembly, and hand off its project/name/file ID plus the part IDs and versions.
+Use `browse_cloud` for hubs/projects/folders/files and `cloud_operation` for durable actions. File `id` is persistent lineage identity; `version_id` opens one specific version; `document_id` and entity tokens are bridge/Fusion session identities. Preserve the full mapping and save descriptions. Project creation ensures Assembly, Parts and Purchased Components folders. New named part documents are preferable to later migration from internal assembly definitions.
 
-The cloud file's `id` is stable lineage identity; `version_id` identifies one saved version
-and is accepted by Autodesk's findFileById. Bridge document_id and component tokens are not
-substitutes for persistent file identity. Record mappings in the design project's handoff;
-job results also retain returned IDs, versions and source component tokens locally.
+`inspect_document_state(document_id)` observes without touching writer ownership. `acquire_edit_token(document_id, writer_id, accepted_reference_versions)` acquires/reuses a baseline for one writer. Pass matching `writer_id` and pins inside cloud-operation `arguments`; modeling takes writer identity from `task.writer_id`. Legacy callers explicitly use `acquire_token=True` and omit task/writer/pins. A different writer must request explicit release; a restart clears all leases. This is optimistic same-process coordination, not distributed locking.
 
-## User edits and AI resumption
+Tokens are consumed at mutation preflight. Intervening component/parameter/document changes, unsaved referenced documents, target version changes, read-only/in-use/processing targets and token replay stop the write. Do not edit interactively while a batch is executing. A dirty current target can be acknowledged and saved; the tool never discards/reloads unsaved edits.
 
-Open the named part from Fusion's Data Panel, edit normally and save. The AI browses/inspects
-again, opens the latest inspected version, inspects the actual geometry and obtains a new
-token before editing. It must adapt to your geometry rather than rebuild from an old script.
-Dirty open documents are never discarded or silently reloaded. If the target is already open
-with unsaved changes or an old version, `open` stops and leaves it intact.
+## Accepted versions and preserving a dirty/stale assembly
 
-In the assembly, inspect state to see nested reference versions. For a direct reference use
-`update_reference` with file_id and expected_latest_version plus document_id/edit_token.
-It pins that inspected version, preserves the link and leaves the assembly dirty for review.
-Edit a nested subassembly in its own document to update its direct references. Inspect
-feature/joint health, placements and interference after updating; then save the assembly.
+`accepted_reference_versions` maps stable file IDs to **currently referenced exact integer versions**. It permits intentional older dependencies while reporting newer available versions. It cannot authorize writing a historical editing target. Mixed versions of one file inside a hierarchy cannot use a single file-level pin: edit the owning subassembly deliberately. Unpinned stale dependencies block normal modeling/saving.
 
-Tokens acknowledge the inspected state, including unsaved edits; they do not implicitly
-save it. Component revisions detect dirty-to-dirty edits. Stale/read-only/in-use/processing
-cloud targets and unsaved referenced documents block mutations. Stale references block normal
-modeling but may be updated explicitly. Tokens are consumed once; inspect again after a
-mutation. These are optimistic checks, not multi-user locking or isolation during arbitrary
-trusted scripts. Avoid editing interactively during a running batch. API metadata refresh
-cannot establish a transactional cloud lock.
+For an assembly with dirty work and outdated references A and B:
 
-## Existing internal components
+1. Observe all versions; decide explicitly to preserve its current pins, for example `{A:2,B:4}`. Acquire a writer token with those pins.
+2. `cloud_operation(operation_id, 'save', {document_id, edit_token, writer_id, accepted_reference_versions, description})`. Existing files save in place: omit destination/name. Poll until `cloud_complete:true`; retain exact returned file/version IDs. This preserves dirty work with its original references.
+3. Acquire a fresh token/current pins, then `update_reference` with `file_id:A` and inspected `expected_latest_version:3`. The operation first records the clean assembly's cloud checkpoint; it selects that exact processed version, not a moving latest value. Inspect joints, placements and relevant geometry.
+4. The assembly is now dirty. Acquire a fresh token with **updated** pins `{A:3,B:4}` and save/poll again. Do this before the second reference update.
+5. Update B, inspect, acquire pins matching both current references and save/poll again. Do not skip the intervening save or drop the accepted older pin on the remaining dependency.
 
-`save_component` takes the first-save arguments and an explicit native component_token.
-It saves an independent native cloud copy through Component.saveCopyAs and returns its file
-identity once upload/cloud processing completes. It does not replace any original occurrence
-or transfer joints to a new linked occurrence. Do not insert copies over existing parts and
-call that migration complete. Preserve the original assembly; plan and inspect the linkage
-and joint migration separately. For new work, separate part documents avoid this conversion.
+Numbers are examples, not fixed project versions. Every intentional new action gets a new operation ID; a retry of an uncertain submission uses the identical original ID/request. Saving creates recovery evidence, not design approval.
 
-## Jobs and recovery
+## Supported cloud arguments
 
-All cloud writes use durable operation IDs. Retry the identical request with the SAME ID
-when a connection times out. Changed content with that ID is rejected. After a failed or
-interrupted operation inspect partial results, Data Panel and version history before any new
-action. Project/folder creation reuses a unique exact name (case-insensitive comparison);
-ambiguous names stop. Existing destination filenames block new file/copy creation.
+| Action | Required action arguments beyond `operation_id/action/arguments` |
+| --- | --- |
+| `ensure_project` | `hub_id`, `name` |
+| `ensure_folder` | `hub_id`, `project_id`, parent `folder_id`, `name` |
+| `open` | `version_id`, `expected_version`; optional `allow_historical:true` for intentional inspection |
+| `save` | `document_id`, `edit_token`, optional `description`; first save also `hub_id/project_id/folder_id/name` |
+| `save_component` | First-save fields plus `component_token`; saves independent native copy, never migrates occurrences/joints |
+| `insert` | `document_id/edit_token/version_id/expected_version`, `transform_cm` (16 finite values); linked file must be same project; historical insertion also requires `allow_historical:true` and matching `accepted_insert_version` |
+| `update_reference` | `document_id/edit_token/file_id/expected_latest_version`; exactly one direct reference |
 
-Saves remain running while a DataFileFuture uploads or a new document version is processing.
-Success requires the expected new version and isComplete, not merely save() returning true.
-Monitoring is bounded to ten minutes; timeout/cancellation cannot undo the cloud upload.
-Cancelled or interrupted saves may finish later. Reconcile their actual status in Fusion.
-Never assume a cancelled monitor means the file was not saved. Offline/permissions/API errors
-are surfaced; the tool does not create a misleading local-file substitute.
+All document mutations additionally accept `writer_id` (default `legacy`), `accepted_reference_versions` and optional `task_link` for correlation only. Insert/update require a clean fully processed cloud save. First-save/copy destinations reject existing filenames instead of silently making duplicates. Dirty already-open documents are left intact by `open`; historical inspection never permits overwriting a newer target.
 
-For linked assemblies the checkpoint is a JSON manifest of the clean completed cloud version
-and its referenced versions. It is not a standalone archive or automatic rollback. Open the
-recorded version in Fusion and inspect its dependencies before choosing recovery manually.
-Unsaved linked assemblies must be saved/polled first. Mid-batch checkpoints after changes
-therefore stop; split modeling into batches separated by save jobs. Local unlinked designs
-keep F3D checkpoint behavior. Disposable F3D experiments reject linked cloud checkpoints.
+## Uncertain saves, durable recovery and checkpoints
 
-## Local Fusion acceptance
+Save intent and `uncertain:true` are journaled **before** calling Fusion save/saveAs/saveCopyAs. Completion requires the exact expected cloud version and `isComplete`. A timeout, interrupted bridge, failed call or cancelled monitor may leave a late upload. New cloud/modeling mutations are blocked while any journaled uncertain save remains. Observation/jobs/browse remain available. This is conservative across documents.
 
-Use a disposable project and simple parts first:
+Inspect original `job_status/job_result`, Fusion Data Panel/history and actual contents. Call `reconcile_cloud_job(job_id, version_id)` first to observe. It checks completion, expected version and (for an existing target save) stable file identity. Only after the caller verifies the intended contents, call again with a nonempty `confirmation_note`. This records caller evidence and clears the block; original failed/cancelled/interrupted execution status is preserved. It never replays the save or claims authenticated approval. First-save/component-copy association requires caller verification because there is no preexisting destination lineage. A missing/failed upload with no completed expected version cannot be automatically reconciled; preserve the journal and use explicit manual recovery. Do not erase the journal, invent a fresh-ID retry or claim no save occurred.
 
-1. Upgrade both processes; verify capabilities 0.5.0, 28 tools and rules 1.0.5.
-2. Create a project twice with the same operation ID: one job/project. Verify three folders.
-3. First-save a named native part; observe pending then complete; record ID/version.
-   Edit and save again: same ID and next version, no duplicate file.
-4. Inspect state, manually change a parameter, submit a batch with the old token: no script
-   runs. Reinspect and confirm the next authorized change preserves the manual feature.
-5. Save a second part and assembly, link both at known transforms, save after each insertion.
-   Open one part, manually modify/save it; verify assembly detects the newer reference.
-   Save/inspect assembly, update only that reference, inspect joints and placements, save.
-6. Try opening a dirty already-open part: it must stay open/unchanged. Try a stale version,
-   read-only target or wrong active document: mutation must stop.
-7. Save a component copy and verify native editability and preserved original occurrences/joints.
-8. Checkpoint a clean linked assembly: JSON records assembly/reference versions. Dirty linked
-   checkpoint stops. Verify recorded versions can actually be opened from Data Panel history.
-9. Disconnect/reconnect MCP during upload; poll the original job. Test add-in restart on a
-   disposable pending job: interrupted, no replay. Inspect any late cloud completion manually.
+v0.5 journals lack the new uncertainty marker; the update cannot retrospectively prove old pending outcomes. Inspect/reconcile outstanding old jobs and actual cloud history before upgrading. Local operation-ID deduplication is not a transaction across Autodesk cloud and SQLite; a crash after native geometry mutation can still leave a partial interrupted script requiring inspection.
 
-Record actual Fusion version/account type, returned IDs/versions and outcomes in the design
-project. Automated API doubles do not prove cloud availability, joint preservation after a
-real update, native editability of a copy, or the CAD kernel's behavior.
+Linked checkpoints are **JSON manifests** of clean completed assembly and reference versions, not self-contained local archives or automatic rollback. Dirty linked checkpoints stop; save/poll between batches. Local unlinked checkpoints remain F3D archives. `ctx.try_feature` rejects linked experiments before regeneration, snapshot or mutation. Alternative: work on a separately authorized unlinked local part copy with a self-contained archive, review it, and deliberately integrate it later; no automatic detach, assembly rebuild or joint migration.
 
-## Autodesk references
-
-- [Project creation](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/core_DataProjects_add.htm)
-- [Document save](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/core_Document_save.htm)
-- [First save](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/core_Document_saveAs.htm)
-- [Component copy](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_Component_saveCopyAs.htm)
-- [Linked insertion](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_Occurrences_addByInsert.htm)
-- [DataFile identity, versions and processing](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/core_DataFile.htm)
-- [Reference version](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/core_DocumentReference.htm)
-- [Component revision ID](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_Component_revisionId.htm)
+See [disposable acceptance](disposable-acceptance-v0.6.md) and [installation/rollback](upgrade-v0.6.md). Native cloud behavior remains unverified in this development session.

@@ -24,7 +24,10 @@ class CloudTests(unittest.TestCase):
         values=dict(id='stable-file-id',name='housing',versionId='version-1',versionNumber=1,
                     latestVersionNumber=1,isComplete=True,isReadOnly=False,isInUse=False,
                     parentProject=Node(id='p'),parentFolder=Node(id='folder'),refresh=Mock(return_value=True))
-        values.update(changes);return Node(**values)
+        values.update(changes);file=Node(**values)
+        file.latestVersion=file if file.versionNumber==file.latestVersionNumber else self.make_file(
+            id=file.id,versionNumber=file.latestVersionNumber,latestVersionNumber=file.latestVersionNumber,versionId='v'+str(file.latestVersionNumber))
+        return file
     def token(self):return cloud.inspect_state(self.app,self.design,'doc')['edit_token']
     def guard(self,token,**kw):return cloud.require_edit(self.app,self.design,'doc',token,**kw)
     def run_job(self,action,args):
@@ -35,9 +38,8 @@ class CloudTests(unittest.TestCase):
         self.token();self.file.refresh.assert_called_once_with(None)
         self.file.refresh.return_value=False
         with self.assertRaisesRegex(RuntimeError,'refresh failed'):self.token()
-    def test_reinspection_invalidates_previous_token_even_without_edit(self):
-        old=self.token();self.token()
-        with self.assertRaisesRegex(ValueError,'edit_token'):self.guard(old)
+    def test_reinspection_preserves_unchanged_writer_token(self):
+        old=self.token();self.assertEqual(old,self.token());self.guard(old)
     def test_first_save_uses_explicit_name_and_destination(self):
         self.doc.isSaved=False;self.doc.dataFile=None;self.doc.saveAs=Mock(return_value=True)
         destination=Node(id='parts')
@@ -167,5 +169,82 @@ class CloudTests(unittest.TestCase):
     def test_wrong_document_never_saves(self):
         ident=self.run_job('save',{'document_id':'other','edit_token':self.token()})
         self.assertEqual(self.store.status(ident)['status'],'failed');self.doc.save.assert_not_called()
+
+    def test_observers_do_not_invalidate_writer_and_second_writer_cannot_take_over(self):
+        first=cloud.inspect_state(self.app,self.design,'doc',True,'writer')
+        observed=cloud.inspect_state(self.app,self.design,'doc',False)
+        self.assertNotIn('edit_token',observed)
+        with self.assertRaisesRegex(ValueError,'Another writer'):cloud.inspect_state(self.app,self.design,'doc',True,'other')
+        cloud.require_edit(self.app,self.design,'doc',first['edit_token'],writer_id='writer')
+        with self.assertRaises(ValueError):cloud.require_edit(self.app,self.design,'doc',first['edit_token'],writer_id='writer')
+    def test_accepted_pin_survives_available_update_but_actual_change_rejects(self):
+        child=self.make_file(id='child',latestVersionNumber=2)
+        ref=Node(dataFile=child,version=1,isOutOfDate=True,referencedDocument=None)
+        self.doc.allDocumentReferences=Collection([ref]);pins={'child':1}
+        token=cloud.inspect_state(self.app,self.design,'doc',True,'writer',pins)['edit_token']
+        child.latestVersionNumber=3
+        cloud.require_edit(self.app,self.design,'doc',token,accepted_reference_versions=pins,writer_id='writer')
+        token=cloud.inspect_state(self.app,self.design,'doc',True,'writer',pins)['edit_token']
+        ref.version=2
+        with self.assertRaisesRegex(ValueError,'changed since inspection'):
+            cloud.require_edit(self.app,self.design,'doc',token,accepted_reference_versions=pins,writer_id='writer')
+    def test_historical_read_allowed_but_target_overwrite_blocked(self):
+        old=self.make_file(versionNumber=1,latestVersionNumber=2)
+        self.app.data=Node(findFileById=lambda _:old)
+        self.assertIs(cloud.get_file(self.app,{'version_id':'old','expected_version':1,'allow_historical':True}),old)
+        self.doc.dataFile=old
+        with self.assertRaisesRegex(ValueError,'Historical inspection'):self.guard(self.token())
+    def test_dirty_stale_save_and_two_sequential_reference_updates(self):
+        refs=[Node(dataFile=self.make_file(id='child'+str(i),latestVersionNumber=2),version=1,
+                   isOutOfDate=True,referencedDocument=None) for i in (1,2)]
+        self.doc.allDocumentReferences=self.doc.documentReferences=Collection(refs)
+        self.doc.isModified=True
+        def execute(action,op,**extra):
+            pins={r.dataFile.id:r.version for r in refs}
+            token=cloud.inspect_state(self.app,self.design,'doc',True,'writer',pins)['edit_token']
+            args=dict(document_id='doc',edit_token=token,writer_id='writer',accepted_reference_versions=pins,**extra)
+            job=self.store.submit_cloud(dict(operation_id=op,action=action,arguments=args))
+            cloud.start(self.store,self.store.claim('owner'),self.app,lambda:self.design,lambda:'doc')
+            return job['job_id']
+        def save(op):
+            previous=self.doc.dataFile.versionNumber;ident=execute('save',op)
+            self.assertEqual(self.store.status(ident)['status'],'running')
+            self.doc.isModified=False
+            self.doc.dataFile=self.make_file(versionNumber=previous+1,latestVersionNumber=previous+1,versionId='v'+str(previous+1))
+            cloud.tick(self.store);self.assertEqual(self.store.status(ident)['status'],'succeeded')
+        save('preserve-manual')
+        for i,ref in enumerate(refs):
+            ident=execute('update_reference','update-'+str(i),file_id=ref.dataFile.id,expected_latest_version=2)
+            result=self.store.result(ident)
+            self.assertEqual(result['status'],'succeeded',result)
+            self.assertEqual(ref.version,2)
+            self.doc.isModified=True;save('save-update-'+str(i))
+        self.assertEqual(self.doc.dataFile.versionNumber,4)
+    def test_uncertain_save_blocks_next_mutation_and_late_version_is_reconciled(self):
+        self.doc.isModified=True;ident=self.run_job('save',{'document_id':'doc','edit_token':self.token()})
+        self.store.cancel(ident);cloud.tick(self.store)
+        with self.assertRaisesRegex(ValueError,'reconciliation'):self.store.assert_no_uncertain_cloud()
+        late=self.make_file(versionNumber=2,latestVersionNumber=2,versionId='v2')
+        self.app.data=Node(findFileById=lambda _:late)
+        observed=cloud.reconcile(self.store,self.app,ident,'v2')
+        self.assertTrue(observed['reconciliation_required'])
+        with self.assertRaises(ValueError):self.store.assert_no_uncertain_cloud()
+        cloud.reconcile(self.store,self.app,ident,'v2','Checked Fusion history and the intended edits in this version')
+        self.store.assert_no_uncertain_cloud()
+        self.assertEqual(self.store.status(ident)['status'],'cancelled')
+        self.assertFalse(self.store.result(ident)['result']['uncertain']);self.doc.save.assert_called_once()
+    def test_reconciliation_rejects_wrong_file_and_wrong_version(self):
+        self.doc.isModified=True;ident=self.run_job('save',{'document_id':'doc','edit_token':self.token()})
+        self.store.cancel(ident);cloud.tick(self.store)
+        for file in [self.make_file(id='wrong',versionNumber=2,latestVersionNumber=2),self.make_file()]:
+            self.app.data=Node(findFileById=lambda _:file)
+            with self.assertRaises(ValueError):cloud.reconcile(self.store,self.app,ident,'candidate','checked')
+    def test_completed_pin_set_does_not_bypass_dirty_referenced_document(self):
+        ref=Node(dataFile=self.make_file(id='child',latestVersionNumber=2),version=1,isOutOfDate=True,
+                 referencedDocument=Node(isModified=True))
+        self.doc.allDocumentReferences=Collection([ref]);pins={'child':1}
+        token=cloud.inspect_state(self.app,self.design,'doc',True,'writer',pins)['edit_token']
+        with self.assertRaisesRegex(ValueError,'unsaved'):
+            cloud.require_edit(self.app,self.design,'doc',token,accepted_reference_versions=pins,writer_id='writer')
 
 if __name__=='__main__':unittest.main()

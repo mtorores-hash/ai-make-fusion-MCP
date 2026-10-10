@@ -5,20 +5,21 @@ Fusion models through typed tools or one complete Python modeling script.
 
 ## Current version and release status
 
-**v0.5.0 development snapshot, on `workbench`.** This is an unpublished supporting tool,
+**v0.6.0 development snapshot, on `workbench`.** This is an unpublished supporting tool,
 not a released or physically validated mechanical design. The repository remains private.
 `main` is a landing page; no public release or episode milestone is asserted.
 
 ## Capabilities
 
-- Fusion cloud projects, named native part files, version guards and linked references.
+- Fusion cloud projects, named parts, accepted version pins, separate observation/writer tokens and uncertain-save reconciliation.
+- Selected-part validation/checked exports, caller edit boundaries and conservative native occurrence retirement.
 - Full `adsk` batch scripts with explicit document/component targets and units.
 - Durable jobs, operation-ID duplicate protection, progress, results, traceback and checkpoints.
 - Sketch/extrude/fillet/joint tools plus nested assembly and geometry inspection.
 - Geometry-based selection, interference and clearance checks, motion sampling.
 - F3D/STEP/STL export, print-copy orientation and exact-size PNG capture helpers.
 
-The package exposes **28 MCP tools**. Full API access enables broader operations through
+The package exposes **32 MCP tools**. Full API access enables broader operations through
 batch scripts; those operations are not all independently validated convenience tools.
 
 ## Hardware and software
@@ -41,7 +42,7 @@ Its original package README, dependency file, Windows setup helper, examples and
 | --- | --- |
 | Architecture, persistent jobs and recovery | [architecture](docs/architecture.md) |
 | Script contract and helper API | [script API](docs/script-api.md) |
-| All 28 tools and argument signatures | [tool reference](docs/tool-reference.md) |
+| All 32 tools and argument signatures | [tool reference](docs/tool-reference.md) |
 | Geometry and feature-boundary selection | [geometry selection](docs/geometry-selection.md) |
 | Validation method and live acceptance | [validation](docs/validation.md) |
 | Evidence and test limits | [test summary](docs/test-summary.md) |
@@ -73,7 +74,10 @@ No MCP-specific published episode is recorded. General channel: [AI Make](https:
 See [CURRENT.md](CURRENT.md). The working [ledger](ledger/LEDGER.md) belongs on `workbench` only.
 Shared operating context is [AI_MAKE](https://github.com/mtorores-hash/AI_MAKE).
 
-Latest: [Execution and verification update and remaining work](docs/upgrade-v0.4.md).
+Latest: [v0.6 installation/rollback](docs/upgrade-v0.6.md), [caller contract 1.0](docs/caller-contract.md),
+and [compatibility handoff](docs/compatibility-handoff-ai-make.md).
+
+Source update pushed to `workbench` with approval. Not installed or native-Fusion tested.
 
 Modeling standard: [rules](docs/modeling-rules.md) and [audit / checked-export behavior](docs/modeling-hygiene.md).
 

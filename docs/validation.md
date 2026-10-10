@@ -37,7 +37,6 @@ infer or certify all mechanical access conditions automatically.
 ## Development verification
 
 ```sh
-python -m pip install -r requirements.txt
 python -m unittest discover -s tests -v
 python tests/check_mcp.py
 python -m compileall -q .
@@ -74,9 +73,15 @@ access-path acceptance fixtures remain future work; no pass is recorded for them
 
 ## v0.4.1 hygiene
 
-See [hygiene live acceptance](modeling-hygiene.md#installation-and-live-acceptance).
+See the current [disposable acceptance](disposable-acceptance-v0.6.md).
 
 ## v0.5.0 cloud/shared editing
 
-See [disposable-project acceptance](cloud-workflow.md#local-fusion-acceptance).
-106 automated checks and real 28-tool STDIO checks pass; live cloud/geometry evidence remains pending.
+Historical v0.5 evidence: 106 automated checks and real 28-tool STDIO checks passed then.
+Those protocol results do not validate v0.6. Current [test summary](test-summary.md) and
+[approval-required disposable acceptance](disposable-acceptance-v0.6.md) supersede the old procedure.
+
+## v0.6.0 current acceptance
+
+Use [the scoped disposable procedure](disposable-acceptance-v0.6.md) after separate approval.
+Do not execute native modeling or install dependencies as part of this review package.

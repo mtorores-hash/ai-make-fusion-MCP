@@ -121,3 +121,28 @@ BOM: none consumed. Cost/time: not measured. Video candidate: manual part edit f
 resumption, not yet captured. Shelf: no consumption event; usageEventId: none.
 Idempotency key: fusion-mcp-cloud-editing-20261008.
 Next: upgrade both local processes, run disposable cloud project/part/reference acceptance.
+
+
+## 2026-10-10 — scoped workflow implementation, local review only
+
+Request: execute only the Fusion-MCP implementation prompt in the supplied separate-repo ZIP.
+Base: verified current workbench b15d491fe87fd4b1a1953ea148378f045f621f14, matching all 57 blobs.
+Advanced: runtime 0.6.0 / rules 1.1.0 / caller contract 1.0; selected role-aware validation/export,
+bounded task checks, native leaf retirement, cloud pins/observer/uncertainty recovery, constrained
+helper, efficient inspection/rules reuse. Full source/patch, installation/rollback and AI_MAKE
+compatibility handoff prepared. Source best-practices preserved; no broader workflow execution.
+Evidence: baseline 106 tests passed first; final 150 unit/source-contract tests pass. SDK absent:
+new real STDIO unrun. Native API/cloud/kernel/Windows acceptance unrun; procedure requires approval.
+No push/merge, live installation/model edits, AI_MAKE changes, hardware or external-record update.
+BOM: no parts consumed. Cost/time: not measured. No challenge clock or release inferred.
+Idempotency key: fusion-mcp-workflow-v06-20261010. Next: review package and approve deployment/native tests separately.
+
+
+## 2026-10-10 — approved source push
+
+Mauricio instructed: "Push the update." Rechecked workbench; still b15d491fe87fd4b1a1953ea148378f045f621f14.
+Pushed the prepared 0.6.0 source change set to workbench, preserving its history; no force push
+or merge to main. Updated publication-status documentation; implementation matches the reviewed
+package. Retained evidence: 150 automated tests, syntax/rule consistency and patch/rollback checks.
+Installation, real STDIO and disposable native Fusion acceptance remain unperformed. No AI_MAKE
+changes, hardware action or live model modification. Idempotency key: fusion-mcp-v06-approved-push-20261010.

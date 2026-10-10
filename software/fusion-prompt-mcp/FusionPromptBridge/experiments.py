@@ -30,6 +30,8 @@ def try_feature(ctx, name, build, select_bodies, rules, protected_metrics=None, 
     if not callable(build) or not callable(select_bodies): raise ValueError('Callbacks required')
     if not name or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-' for c in name):
         raise ValueError('Experiment name must use letters, digits, underscore or hyphen')
+    if ctx.document.allDocumentReferences.count:
+        raise ValueError('Linked assembly disposable experiments unsupported before mutation; open a separately saved unlinked part for an F3D experiment')
     ctx.synchronize()
     source=ctx.document; source_design=ctx.design; source_target=ctx.target; source_guard=ctx.guard
     before=snapshot(source_design,select_bodies(source_design),

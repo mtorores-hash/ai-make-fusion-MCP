@@ -5,6 +5,7 @@ import struct
 import adsk.core
 import adsk.fusion
 from . import advanced, verification
+from . import scope as scopes
 
 def each(c): return [c.item(i) for i in range(c.count)]
 def xyz(p): return [p.x*10, p.y*10, p.z*10]
@@ -35,14 +36,15 @@ def topology(body):
         result['edges'].append(row)
     return result
 
-def inspect_full(d, include_topology=False, offset=0, limit=None):
+def inspect_full(d, include_topology=False, offset=0, limit=None, scope=None, include_context=False):
+    selection=scopes.Selection(d,scope) if scope is not None else None
     warnings=[]
     components=[]
-    all_components=each(d.allComponents)
+    all_components=selection.components() if selection else each(d.allComponents)
     if offset < 0 or (limit is not None and not 1 <= limit <= 100): raise ValueError('Invalid page bounds.')
     selected=all_components[offset:offset+limit if limit is not None else None]
     for c in selected:
-        row={'reference':ref(c),'bodies':[],'features':[],'sketches':[],'joints':[]}
+        row={'revision':c.revisionId,'reference':ref(c),'bodies':[],'features':[],'sketches':[],'joints':[]}
         for b in each(c.bRepBodies):
             try:
                 row['bodies'].append(topology(b) if include_topology else
@@ -60,14 +62,18 @@ def inspect_full(d, include_topology=False, offset=0, limit=None):
             for j in each(collection): row['joints'].append(advanced.health(j))
         components.append(row)
     occurrences=[]
-    for o in each(d.rootComponent.allOccurrences):
+    for o in each(d.rootComponent.allOccurrences) if include_context or offset==0 else []:
+        if selection and not selection.contains(advanced.native(o.component)):continue
         occurrences.append({'reference':{'token':o.entityToken,'occurrence_token':''},
             'path':o.fullPathName,'component':ref(o.component),'grounded':o.isGrounded,
             'linked':o.isReferencedComponent,'transform_cm':o.transform2.asArray()})
     return {'components':components,'occurrences':occurrences,
             'total_components':len(all_components),'offset':offset,
             'next_offset':offset+len(selected) if offset+len(selected)<len(all_components) else None,
-            'parameters':[{'name':p.name,'expression':p.expression,'unit':p.unit} for p in each(d.allParameters)],
+            'scope':selection.report() if selection else 'full_design',
+            'context_included':include_context or offset==0,
+            'parameters':[{'name':p.name,'expression':p.expression,'unit':p.unit} for p in each(d.allParameters)
+                          if (include_context or offset==0) and (not selection or p.name in selection.spec.get('parameter_names',[]))],
             'coordinate_notes':'Component geometry is local mm. Occurrence transform2 matrices use Fusion cm.',
             'topology_included':include_topology,'warnings':warnings,'complete':not warnings}
 
@@ -171,20 +177,10 @@ def interference(d,references):
     return {'interferences':rows,'count':len(rows),'checked':True,
             'note':'Current pose only. No tolerance envelope or insertion path inferred.'}
 
-def validate(d):
-    report=inspect_full(d,False)
-    errors=[]; warnings=list(report['warnings'])
-    for component in report['components']:
-        for f in component['features']+component['joints']:
-            # Enum-to-string varies between Fusion versions; use actual feature enums below instead.
-            if f['message']: warnings.append(f['name']+': '+f['message'])
-    for c in each(d.allComponents):
-        for collection in (c.features,c.joints,c.asBuiltJoints):
-            for f in each(collection):
-                if f.healthState==adsk.fusion.FeatureHealthStates.ErrorFeatureHealthState:
-                    errors.append(advanced.health(f))
-    return {'feature_errors':errors,'warnings':warnings,'healthy':not errors and not warnings,
-            'scope':'Feature/joint health only; printability and mechanism clearance need explicit checks.'}
+def validate(d, scope=None, baseline=None):
+    selection=scopes.Selection(d,scope)
+    return scopes.health_report(d,selection,baseline)
+
 
 def png_dimensions(path):
     with Path(path).open('rb') as f: header=f.read(24)
