@@ -1,4 +1,4 @@
-# MCP tool reference — 0.6.0
+# MCP tool reference — 0.7.0
 
 32 tools. Signatures/descriptions generated from server.py. See [caller contract](caller-contract.md)
 for dictionary fields, migration, enforcement and unverified behavior.
@@ -159,7 +159,7 @@ Use ctx.target, ctx.point/value, ctx.progress, ctx.stage, ctx.record, ctx.export
 The same operation_id + exact request returns the same job; changed content is rejected.
 Poll job_status/job_result; NEVER auto-retry an interrupted job with a fresh ID.
 Modeling requires acquire_edit_token (matching task.writer_id), or the explicit legacy writer path.
-scope/task use caller contract 1.0; scope revisions are checked before execution, and allowed edits afterward. Checkpoints use local F3D or
+Caller contract 1.1 retains scope/task schema 1.0; scope revisions are checked before execution, and allowed edits afterward. Checkpoints use local F3D or
 a completed clean cloud version manifest for linked assemblies. Failure aborts before modeling.
 Cancellation is cooperative; a kernel call or tight Python loop cannot be forcibly interrupted.
 Units declare helper inputs; raw adsk floats STILL use Fusion native cm/radians.
@@ -175,7 +175,7 @@ Read durable status/progress without waiting for Fusion's UI thread.
 ### job_result
 
 ```python
-job_result(job_id: str)
+job_result(job_id: str, section: Literal['full','engineering'] = 'full')
 ```
 
 Read structured results, created refs, measurements, warnings, files and full traceback.
@@ -330,3 +330,5 @@ Requires explicit scope/task, permitted root and source members, completed check
 dependencies. Refuses live joints/rigid groups, derived occurrences or nested/subtree removal.
 Preserves shared definitions and source/history, verifies surviving placements. Returns lifecycle
 facts for caller reconciliation; does not update BOM/graph/site. Projection/derive review is caller-owned.
+
+Engineering extension (caller 1.1): `job_result(job_id, section="engineering")` returns the latest hash-verified detailed engineering report. Default `full` preserves the prior result envelope. See [engineering-contract.md](engineering-contract.md); no additional MCP tools.

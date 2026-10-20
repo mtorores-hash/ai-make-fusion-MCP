@@ -139,3 +139,7 @@ Additional helpers:
 
 Linked checkpoints and unsupported experiments: [cloud workflow](cloud-workflow.md).
 Native solver behavior is still unverified: [prepared acceptance](disposable-acceptance-v0.6.md).
+
+## Engineering extension (0.7 development)
+
+Exact helper signatures, plans, examples and limits: [engineering-contract.md](engineering-contract.md). Existing helpers are retained. `surface_audit(..., intent_plan=plan)` adds declared checks; its original small-feature heuristics remain review candidates.

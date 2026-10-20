@@ -146,3 +146,33 @@ or merge to main. Updated publication-status documentation; implementation match
 package. Retained evidence: 150 automated tests, syntax/rule consistency and patch/rollback checks.
 Installation, real STDIO and disposable native Fusion acceptance remain unperformed. No AI_MAKE
 changes, hardware action or live model modification. Idempotency key: fusion-mcp-v06-approved-push-20261010.
+
+## 2026-10-19 — Reward Rocket lessons, bounded engineering implementation
+
+Baseline verified current workbench c0f7857cfcd38ef3e0c834a7ed1bfab323a8749c, preserving v0.6.
+Provided current-state gap analysis first. Implemented interface/revision evidence, declared
+wall/gap/overlap/sampled continuity and access-envelope checks, check-specific reuse/compact
+reports, signature fallback/error categories, stage journal/reconciliation without replay,
+protected metric checks and revision-bound manufacturing declarations/export gate. Runtime
+0.7.0 development, caller 1.1, rules 1.2.0, same 32 tools; no dependency additions.
+Evidence: original 150 tests passed unchanged; 9 additional meaningful API-double scenarios.
+Native disposable fixture runner supplied, not executed (no Fusion connection). Real STDIO
+unrun (SDK absent; no install). Timings/output/counters measured only in API-double harness.
+No source push/merge, installation, completed Reward Rocket access, AI_MAKE change, hardware
+operation or physical claim. Installation/rollback and caller handoff packaged for review.
+BOM: none consumed. Cost/challenge time: not measured. Idempotency: fusion-mcp-engineering-v07-20261019.
+
+
+## 2026-10-20 — Adopt reviewed v0.7 source; local install authorized
+
+Mauricio requested implementation and installation of `Fusion-MCP-v0.7.0-review.zip`.
+Baseline workbench: `c0f7857cfcd38ef3e0c834a7ed1bfab323a8749c`. ZIP SHA-256:
+`5cfff9bb99db2b257adcbfdbad5c87ba0634f4417944ee71b51b7ac2b781b57c`.
+All 80 candidate source hashes matched; 159 supplied unit/source-contract/API-double
+tests independently passed and Python compilation passed. Runtime code/tests preserved.
+Updated installation and current-status links, without changing the model roster or workflow.
+An isolated attempt to install the absent SDK failed on package-server DNS resolution;
+real STDIO remains unrun here. No remote Windows/Fusion execution connection is available
+in this chat: local application/reload and native/kernel/cloud checks remain pending,
+not refused or awaiting repeated approval. Follow docs/upgrade-v0.7.md locally.
+No CAD, hardware, main-branch release, permission or billing change; no savings claimed.

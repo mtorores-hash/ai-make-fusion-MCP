@@ -1,3 +1,9 @@
+# Current validation: 0.7.0 development
+
+159 tests pass (150 baseline plus 9 meaningful behavioral scenarios), syntax and diff checks pass. Native Fusion and real STDIO remain unrun. See [engineering-validation.md](engineering-validation.md) and [measured software evidence](engineering-metrics.json). These results do not prove production readiness.
+
+## Historical v0.6 record
+
 # Test summary — v0.6.0 development (2026-10-10)
 
 **150 automated tests pass** on Python 3.12.14: 106 baseline tests first passed unchanged;
@@ -164,3 +170,13 @@ Run [the live acceptance sequence](validation.md) on a copy of a local Fusion mo
 Fusion version, Windows version, actual outputs and failures before promoting release claims.
 Documentation checks for this import verify local links, exact source/package correspondence,
 23 generated tool entries and excluded-runtime-file rules; they are not new CAD tests.
+
+
+## 2026-10-20 adoption rerun
+
+The reviewed 0.7 package was independently checked again: all 80 source hashes matched,
+159 unit/source-contract/API-double tests passed, and compilation passed. Only supporting
+installation/status documentation was adjusted for adoption. An isolated SDK installation
+attempt failed because the execution environment could not resolve the package server;
+real STDIO and Windows/Fusion/native/cloud checks remain unrun here. Do not mistake source
+publication or these tests for installation. See CURRENT.md and upgrade-v0.7.md.

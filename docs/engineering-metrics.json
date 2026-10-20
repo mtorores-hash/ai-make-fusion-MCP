@@ -1,0 +1,36 @@
+{
+  "environment": "Python API doubles, axis-aligned box kernel; not real Fusion",
+  "defects_detected": 3,
+  "defect_cases": 3,
+  "false_positives": 0,
+  "intentional_control_cases": 2,
+  "batch_context_calls": 1,
+  "mcp_transport_calls": "unmeasured",
+  "latency_seconds": 0.009588606000306754,
+  "summary_bytes": 2629,
+  "detail_bytes": 9638,
+  "native_kernel_cases_executed": 0,
+  "diagnostics": {
+    "resolved_interfaces": 4,
+    "kernel_intersections": 2,
+    "distance_calls": 1,
+    "reused_checks": 0
+  },
+  "recovery": {
+    "action_invocations": 2,
+    "replayed_mutations": 0,
+    "completed_stages_preserved": 1,
+    "unresolved_stages_reported": 1,
+    "protected_comparisons": [
+      "pass",
+      "pass"
+    ]
+  },
+  "reference_and_protection": {
+    "signature_fallback_successes": 1,
+    "attempts": 1,
+    "ambiguous_matches_rejected": 1,
+    "protected_metric_changes_detected": 1,
+    "wrong_document_rejected": 1
+  }
+}

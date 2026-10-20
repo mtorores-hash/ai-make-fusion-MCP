@@ -1,0 +1,10 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "script",
+  "author": "AI Make",
+  "description": {
+    "": "Isolated native engineering fixtures, never opens existing models."
+  },
+  "version": "0.7.0",
+  "supportedOS": "windows|mac"
+}

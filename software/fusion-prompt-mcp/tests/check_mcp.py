@@ -33,12 +33,13 @@ async def main():
                           'get_modeling_rules','audit_modeling_hygiene','browse_cloud','inspect_document_state','cloud_operation','acquire_edit_token','release_edit_token','reconcile_cloud_job','retire_occurrences'}
                 assert {t.name for t in result.tools}==expected
                 rules=value(await session.call_tool('get_modeling_rules',{}))
-                assert rules['rules_version']=='1.1.0' and 'Component first' in rules['text']
+                assert rules['rules_version']=='1.2.0' and 'Component first' in rules['text']
                 cached=value(await session.call_tool('get_modeling_rules',{'known_sha256':rules['sha256']}))
                 assert cached['unchanged'] and 'text' not in cached
                 source_tools={t.name:t for t in result.tools}
                 for field in ('scope','task','accepted_reference_versions'):
                     assert field in source_tools['run_model_script'].inputSchema['properties']
+                assert 'section' in source_tools['job_result'].inputSchema['properties']
                 assert source_tools['inspect_document_state'].inputSchema['properties']['acquire_token']['default'] is False
                 resource=await session.read_resource('fusion://modeling-rules')
                 assert resource.contents[0].text==rules['text']

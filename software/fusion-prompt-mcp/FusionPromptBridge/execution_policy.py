@@ -1,7 +1,7 @@
 """Strict read-only batch grammar. This is a small query language, not a Python sandbox."""
 import ast
 
-READ_METHODS = {'inspect', 'validate', 'minimum_distance', 'interference', 'capture', 'audit_hygiene','evidence_fingerprint'}
+READ_METHODS = {'inspect', 'validate', 'minimum_distance', 'interference', 'capture', 'audit_hygiene','evidence_fingerprint','verify_engineering','reconcile_edit'}
 
 
 def validate_read_only(tree):

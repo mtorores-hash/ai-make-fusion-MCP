@@ -1,5 +1,13 @@
 # v0.4.1 — Modeling hygiene (development)
 
+## 0.7.0 development — 2026-10-20 source adoption
+
+Adopt the reviewed engineering/interface checks, affected-evidence reuse, staged recovery
+and manufacturing handoff. Caller contract 1.1, rules 1.2.0, 32 tools. Preserve reviewed
+runtime behavior; align installation/status documentation. 159 software tests passed;
+local Windows/Fusion installation and native acceptance remain pending from this session.
+
+
 ## Unreleased — connection selection (2026-10-08)
 
 Rules 1.0.4 require connection selection before hardware, brief design rationale and final

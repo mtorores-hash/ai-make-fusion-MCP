@@ -1,3 +1,7 @@
+## 0.7.0 development — 2026-10-19
+
+Declared interface evidence and bounded geometry/access checks; compact/hash-verified detailed results and dependency reuse; semantic signature fallback with ambiguity rejection; durable staged-edit reconciliation without replay; revision-bound manufacturing declarations and optional engineering export gate. No new tools or dependencies. Native Fusion, cloud and STDIO qualification remains unrun. See docs/engineering-contract.md.
+
 # 0.6.0 development — local review, 2026-10-10
 
 - Caller contract 1.0; 32 tools; explicit selected/full-design scopes, roles/lifecycle/maturity,

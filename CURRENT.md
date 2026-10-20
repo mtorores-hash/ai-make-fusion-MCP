@@ -1,33 +1,56 @@
 # Current state
 
-Branch: `workbench`. Mauricio approved pushing the prepared update on 2026-10-10.
-Based on verified workbench `b15d491fe87fd4b1a1953ea148378f045f621f14`.
-Version: **0.6.0 development**, rules **1.1.0**, caller contract **1.0**, **32 tools**.
+Branch: `workbench`. Version **0.7.0 development**, caller contract **1.1**,
+modeling rules **1.2.0**, **32 tools**. Scope/task and engineering/manufacturing
+schemas remain **1.0**.
 
-## Now
+## 2026-10-20 — implementation and installation request
 
-2026-10-10: implemented scoped validation/checked exports, role-aware hygiene and dependency
-evidence; allowed/frozen edit boundaries; native leaf-occurrence retirement; observer/writer
-separation, accepted pins, preservative dirty/stale sequential save/update path and uncertain
-save reconciliation. Added component-owned driven circle helper and rules hash reuse.
-Operational rules align minimum external fidelity, joining intent, milestone evidence and
-finite sampled motion. Original supplied best-practices source preserved.
+Mauricio authorized implementing and installing the supplied
+`Fusion-MCP-v0.7.0-review.zip`. This source update adopts that reviewed package
+on top of workbench `c0f7857cfcd38ef3e0c834a7ed1bfab323a8749c`; no main merge
+or public release is implied. Runtime code and tests are preserved from the
+reviewed candidate. Installation/status documentation is aligned here.
 
-## Evidence and limits
+Implemented: declared engineering checks and interface evidence, affected-check
+reuse and compact reporting, semantic signature fallback, durable staged-edit
+observations and no-replay reconciliation, and revision-matched manufacturing
+declarations with optional engineering export gates. Existing 32-tool surface
+and dependency requirements are retained.
 
-150 unit/source-contract tests pass (106 baseline first passed unchanged); syntax and rules
-consistency checked. New real STDIO test is not run: MCP SDK absent and no install authorized.
-API doubles do not establish loaded Fusion behavior. Native/cloud/Windows acceptance is pending.
-Source update pushed to workbench with approval. No merge to main, AI_MAKE edits, installation,
-live model changes or hardware operation performed.
+## Verification and actual installation status
 
-## Next
+The supplied ZIP SHA-256 is
+`5cfff9bb99db2b257adcbfdbad5c87ba0634f4417944ee71b51b7ac2b781b57c`.
+All 80 package source hashes matched. The forward/reverse package baseline
+reconstructs the current upstream tree exactly. Independently rerun here:
+**159 unit/source-contract/API-double tests passed**; Python compilation passed.
+The isolated attempt to obtain the missing MCP SDK failed because this execution
+environment could not resolve its package server. Real STDIO remains unrun here.
 
-Review the caller contract and installation/rollback instructions. Installation and disposable
-native acceptance still need separate approval; pushing source does not deploy it to Fusion. See docs/upgrade-v0.6.md and docs/compatibility-handoff-ai-make.md.
+This ChatGPT session has no execution connection to Mauricio's Windows/Fusion
+computer. **Installation is authorized but not performed by this source update.**
+The earlier 0.6 deployment remains user-reported. Do not label 0.7 locally installed
+until the actual server and add-in report matching versions after reload.
+No live Fusion/kernel/cloud, Windows installation or slicer acceptance is claimed.
+No completed Reward Rocket model or physical hardware was touched.
 
-## Open gates
+## Next executable action
 
-Native APIs/kernel/cloud/exports and real MCP schema/STDIO; full dependency discovery, nested
-retirement and bounded new-component authoring remain unsupported. Trusted Python is not
-sandboxed, tokens are optimistic, and caller approvals are not authenticated.
+Local Codex should follow `docs/upgrade-v0.7.md` using this committed source:
+preserve local edits and pending jobs, back up the existing installation/config
+and runtime, update both processes, reload safely, verify real STDIO and loaded
+versions, then run the disposable native fixture within the authorized scope.
+Do not ask for installation approval again; ask only for a genuinely unresolved
+permission, unsaved-work decision or unavoidable user-interface action.
+Do not reinstall the AI Make agent team or change model routing as part of this MCP update.
+
+## Limits
+
+See `docs/engineering-validation.md`, `docs/caller-contract.md` and
+`docs/engineering-contract.md`. Scoped signatures/samples do not establish full
+shape equivalence, global minimum wall thickness, continuous collision freedom,
+full dependency discovery, aesthetic acceptance, printability or physical success.
+Trusted Python is not sandboxed; new component definitions in bounded tasks and
+nested/jointed retirement remain unsupported. Keep these limits visible rather
+than disabling required checks or rerunning broad audits.

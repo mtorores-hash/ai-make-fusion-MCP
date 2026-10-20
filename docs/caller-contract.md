@@ -1,6 +1,10 @@
-# Fusion MCP caller contract 1.0
+# Fusion MCP caller contract 1.1
 
-Runtime **0.6.0 development**, rules **1.1.0**, **32 MCP tools**. Both server and add-in must match. This contract adds ordinary JSON dictionaries to existing tools; it introduces no external workflow service or database schema. All Fusion API calls remain on the main thread.
+Runtime **0.7.0 development**, rules **1.2.0**, **32 MCP tools**. Both server and add-in must match. This contract adds ordinary JSON dictionaries to existing tools; it introduces no external workflow service or database schema. All Fusion API calls remain on the main thread.
+
+## Additive engineering extension in 1.1
+
+See [engineering-contract.md](engineering-contract.md). Tool count stays 32. Scope/task JSON remains version 1.0. New batch helpers, optional export/manifest fields and `job_result(job_id, section="engineering")` are additive. Existing 1.0 callers retain behavior; new engineering gates require explicit caller plans. No silent global engineering certification is introduced.
 
 ## Tools and migration
 

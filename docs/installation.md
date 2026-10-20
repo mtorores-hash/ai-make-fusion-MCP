@@ -4,8 +4,8 @@ Repository source is in [`software/fusion-prompt-mcp`](../software/fusion-prompt
 
 ## Existing installation
 
-Follow [v0.6.0 upgrade and rollback](upgrade-v0.6.md). The update is available on `workbench`.
-Both server and add-in must be updated together after installation approval. Downloading the
+Follow [v0.7.0 upgrade and rollback](upgrade-v0.7.md). The update is available on `workbench`.
+Both server and add-in must be updated together. Mauricio authorized this upgrade on 20 October 2026; preserve that authorization without inferring local completion. Downloading the
 repository does not install the add-in or restart your MCP connection.
 
 ## Fresh Windows installation
@@ -38,4 +38,4 @@ instance can own the bridge; an OS lock enforces this. Hosted browser/mobile cha
 WSL/container environments do not share this local connection automatically.
 
 
-Current migration and rollback: [v0.6.0](upgrade-v0.6.md).
+Current migration and rollback: [v0.7.0](upgrade-v0.7.md).

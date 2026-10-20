@@ -13,9 +13,11 @@ import adsk.fusion
 from . import advanced, model_tools, verification, cloud
 from . import scope as scopes
 from .execution_policy import validate_read_only
+from .design_intent import ReferenceFailure
 import ast
 
-class Cancelled(Exception): pass
+class Cancelled(Exception):
+    code='cancelled'
 
 class LimitedLog(io.TextIOBase):
     def __init__(self,limit=1_000_000): self.parts=[]; self.size=0; self.limit=limit; self.truncated=False
@@ -109,7 +111,7 @@ class Context:
         report=self.audit_hygiene(scope)
         self.record('modeling_hygiene',report)
         return require(report,strict_reviews)
-    def export_checked(self,filename,entity=None,manual_review_note='',strict_reviews=False,scope=None):
+    def export_checked(self,filename,entity=None,manual_review_note='',strict_reviews=False,scope=None,engineering_plan=None,previous_job_id=''):
         if not isinstance(manual_review_note,str) or not manual_review_note.strip():
             raise ValueError('Record a manual_review_note covering non-automated rules before a checked export')
         self.check_cancel()
@@ -127,23 +129,42 @@ class Context:
         if boundary and boundary.post().get('violations'):raise RuntimeError('Checked export blocked by edit-scope violation')
         report=self.require_hygiene(strict_reviews,chosen)
         self.record('modeling_hygiene_manual_review',manual_review_note)
-        artifact=self.export(filename,entity)
+        engineering=None
+        if engineering_plan is not None:
+            engineering=self.verify_engineering(engineering_plan,previous_job_id)
+            if any(row['status']!='pass' for row in engineering['checks']) or engineering.get('dependency_scope_gaps') or engineering.get('protected_reference_gaps'):
+                raise RuntimeError('Checked export blocked by failed/unproven engineering checks; see engineering report')
+            if engineering.get('protected_comparison',{}).get('status','pass')!='pass':
+                raise RuntimeError('Checked export blocked by protected geometry comparison')
+        artifact=self.export(filename,entity,capture_identity=True) if engineering_plan is not None else self.export(filename,entity)
         result={'artifact':artifact,'hygiene':report,'manual_review_note':manual_review_note,
                 'scope':selection.report(),'validation_status':'pass','approval_status':'not_evaluated',
                 'integrity':integrity,
                 'claim':'Selected automated checks and caller-reported evidence; not whole-assembly approval.'}
+        if engineering is not None:result['engineering']=engineering
         self.record('checked_export_'+filename,result)
         return result
-    def tag_geometry(self,body,name,kind,filters,feature=None,role='functional',requirement=''):
+    def tag_geometry(self,body,name,kind,filters,feature=None,role='functional',requirement='',signature_tolerances=None,allow_feature_fallback=False):
         from .design_intent import tag_geometry
-        return tag_geometry(self.design,body,name,kind,filters,feature,role,requirement)
-    def resolve_tag(self,name):
+        return tag_geometry(self.design,body,name,kind,filters,feature,role,requirement,signature_tolerances,allow_feature_fallback)
+    def resolve_tag(self,name,diagnostics=False):
         from .design_intent import resolve_tag
-        return resolve_tag(self.design,name)
-    def surface_audit(self,body,short_edge_mm,small_face_mm2,slender_width_mm,protected_entities=()):
+        return resolve_tag(self.design,name,diagnostics)
+    def surface_audit(self,body,short_edge_mm,small_face_mm2,slender_width_mm,protected_entities=(),intent_plan=None):
         from .design_intent import surface_audit
         with self.timed('measurement'):
-            return surface_audit(body,short_edge_mm,small_face_mm2,slender_width_mm,protected_entities)
+            result=surface_audit(body,short_edge_mm,small_face_mm2,slender_width_mm,protected_entities)
+            if intent_plan is not None:result['intent_checks']=self.verify_engineering(intent_plan)
+            return result
+    def verify_engineering(self,plan,previous_job_id='',detail=False):
+        from .engineering import verify
+        return verify(self,plan,previous_job_id,detail)
+    def reconcile_edit(self,job_id):
+        from .recovery import reconcile
+        return reconcile(self,job_id)
+    def run_stage(self,stage_id,action,postcondition,protected_plan=None):
+        from .recovery import run_stage
+        return run_stage(self,stage_id,action,postcondition,protected_plan)
     def retire_occurrences(self,occurrence_tokens,reason,replacement_id='',dependency_review_note=''):
         from .retirement import retire
         return retire(self,occurrence_tokens,reason,replacement_id,dependency_review_note)
@@ -156,8 +177,11 @@ class Context:
     def geometry_snapshot(self,bodies,protected=None):
         from .experiments import snapshot
         return snapshot(self.design,bodies,protected)
-    def release_manifest(self,model_revision,entries,checks,filename='release_manifest.json'):
+    def release_manifest(self,model_revision,entries,checks,filename='release_manifest.json',manufacturing=None):
         manifest=verification.build_manifest(model_revision,entries,checks)
+        if manufacturing is not None:
+            from .manufacturing import handoff
+            manifest['manufacturing']=handoff(self,manifest['artifacts'],manufacturing)
         path=self.path(filename)
         path.write_text(json.dumps(manifest,indent=2,allow_nan=False),encoding='utf-8')
         return dict(manifest=manifest,file=self.artifact(path))
@@ -191,9 +215,11 @@ class Context:
         path=self.output_dir/filename
         if path.exists(): raise ValueError('Output already exists; use a unique filename.')
         return path
-    def export(self,filename,entity=None):
+    def export(self,filename,entity=None,capture_identity=False):
         self.check_cancel(); path=self.path(filename); manager=self.design.exportManager
         suffix=path.suffix.lower(); entity=entity or self.target
+        from .manufacturing import identity
+        source=identity(self,entity) if capture_identity else None
         if suffix=='.f3d': opts=manager.createFusionArchiveExportOptions(str(path),entity)
         elif suffix in ('.step','.stp'): opts=manager.createSTEPExportOptions(str(path),entity)
         elif suffix=='.stl':
@@ -201,7 +227,12 @@ class Context:
         else: raise ValueError('Supported exports: f3d, step, stp, stl.')
         with self.timed('export'):
             if not manager.execute(opts) or not path.exists(): raise RuntimeError('Fusion export failed: '+filename)
-        return self.artifact(path)
+        artifact=self.artifact(path)
+        if source is not None:
+            if identity(self,entity)!=source:raise RuntimeError('Geometry changed during export; artifact is not revision-matched')
+            artifact['geometry_identity']=source
+            self.flush()
+        return artifact
     def checkpoint(self,label):
         self.check_cancel()
         if self.document.allDocumentReferences.count:
@@ -403,7 +434,7 @@ def execute_job(store,job,app,design_getter,document_id_getter):
     status='failed'
     try:
         def guard():
-            if document_id_getter()!=request['document_id']: raise ValueError('Active document ID changed; job target rejected.')
+            if document_id_getter()!=request['document_id']: raise ReferenceFailure('wrong_document','Active document ID changed; job target rejected.')
         guard(); d=design_getter()
         if request.get('mode','modeling')!='read_only':store.assert_no_uncertain_cloud()
         target=d.rootComponent if request['component_token']=='@root' else advanced.resolve(d,request['component_token'],adsk.fusion.Component)
@@ -419,6 +450,10 @@ def execute_job(store,job,app,design_getter,document_id_getter):
         ctx.check_cancel()
         if ctx.read_only: validate_read_only(ast.parse(request['script']))
         else: before=inventory(d,ctx.selection.components())
+        if not ctx.read_only:
+            from .recovery import observe
+            try:result['before_observation']=observe(ctx);ctx.flush()
+            except Exception as exc:result['observation_warning']=str(exc)
         if request['checkpoint_before']: ctx.checkpoint('before_batch')
         store.progress(job['job_id'],0,'Executing script on Fusion main thread')
         namespace={'__name__':'fusion_batch_job','__file__':str(ctx.output_dir/'script.py'),
@@ -444,8 +479,14 @@ def execute_job(store,job,app,design_getter,document_id_getter):
     except Cancelled as exc:
         status='cancelled'; result['message']=str(exc); result['traceback']=traceback.format_exc()
     except BaseException as exc:
-        result['message']=str(exc); result['traceback']=traceback.format_exc()
+        result['message']=str(exc); result['error_code']=getattr(exc,'code','execution_failure'); result['traceback']=traceback.format_exc()
     finally:
+        if ctx and not ctx.read_only:
+            from .recovery import observe,changes
+            try:
+                result['after_observation']=observe(ctx)
+                result['change_observation']=changes(result.get('before_observation'),result['after_observation'])
+            except Exception as exc:result['change_observation']={'model_changed':None,'status':'unproven','reason':str(exc)}
         result['stdout']=log.getvalue()
         result['execution_status']='completed' if script_completed else 'cancelled' if status=='cancelled' else 'failed'
         result['approval_status']='not_evaluated'

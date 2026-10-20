@@ -1,6 +1,6 @@
 # Fusion modeling rules — AI Make
 
-Rules version: 1.1.0. Caller contract: 1.0. Runtime: 0.6.0 development.
+Rules version: 1.2.0. Caller contract: 1.1. Runtime: 0.7.0 development.
 
 These are operational CAD rules. The caller's approved task supplies intended use, dimensions,
 manufacturing context, phase/milestone, active configuration and permitted changes. The MCP
@@ -153,3 +153,15 @@ subtree dependencies and reports its dependency-review limits. Stop on blockers 
 Return lifecycle facts for the caller to reconcile; the MCP does not update external BOM/graph/site
 records or authorize a frozen part's reopening. Archived definitions without live occurrences stay
 outside current scoped QA and manufacturing selection.
+
+## Declared interfaces and physical assembly evidence
+
+Before detail work, declare mounting datums, protected mating surfaces, critical dimensions, source/uncertainty and body revision. Specify joining intent and insertion direction before choosing hardware. Reserve connected connector/wire-bend volumes, driver and fastener paths, heatset installation space and service removal paths. Conservative sourced envelopes are sufficient; default to no detailed PCB pins or irrelevant threads/cosmetics.
+
+Build one coherent controlling profile for a continuous wall. Declare where seams, ribs, chamfers, press interference and functional stops are intentional. Use the existing surface audit plus the bounded engineering plan where applicable. A short edge is a review candidate, not automatically a defect. Review critical junctions locally with measured points/sections. Native health, geometric quality, assembly feasibility and manufacturing readiness are separate conclusions; none proves acceptable appearance.
+
+Use one scoped verification batch for the affected interface dependency closure. Reuse evidence only when requirements, resolved geometry, body revisions, placements, datums and declared parameters still match. Undeclared dependencies, failed evaluators and gaps remain unproven. Do not increase sample counts or repeat broad audits without a concrete unresolved risk. Finite clear poses never prove continuous collision freedom.
+
+Checkpoint major edits using named stages and actual postconditions. After failure report observed change or unknown; reconcile the original job, preserve completed stages and verify protected metrics. Never retry the same failed hypothesis with a fresh operation ID. Ask for the specific missing datum/reference/intent when it cannot be determined.
+
+Handoff exports with generation-time geometry identity, declared print orientation/bed face, protected mates, allowed support regions/exceptions and overhang/bridge/access review. Verify source revisions and hashes. Actual bed contact, supports, printer profile, plate placement and per-object settings require slicer inspection. Geometry signatures are bounded guards, not full shape equivalence or manufacturing certification. See engineering-contract.md.

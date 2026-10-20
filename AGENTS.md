@@ -48,5 +48,9 @@ Use Fusion cloud projects and named native part files for shared editing. Read
 `docs/cloud-workflow.md`; preserve user edits, file IDs and links, use edit tokens before
 mutations, and confirm completed cloud saves before handoff. Never silently migrate assemblies.
 
-Use caller contract 1.0 in docs/caller-contract.md. MCP executes scoped operations; the caller owns
+Use caller contract 1.1 in docs/caller-contract.md. MCP executes scoped operations; the caller owns
 workflow approvals and external records. Review packages do not authorize push, installation or live CAD tests.
+
+For the 2026-10-20 update, Mauricio explicitly authorized implementation and installation.
+See CURRENT.md for the actual source/test/runtime states. Do not repeat a resolved approval
+request, infer installation from a source push, or change AI Make model routing.

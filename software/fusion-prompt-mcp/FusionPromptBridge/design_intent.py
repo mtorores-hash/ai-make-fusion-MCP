@@ -6,7 +6,7 @@ from . import advanced, model_tools, verification
 GROUP='AI_MAKE_MCP_INTENT'
 
 
-def tag_geometry(design, body, name, kind, filters, feature=None, role='functional', requirement=''):
+def tag_geometry(design, body, name, kind, filters, feature=None, role='functional', requirement='', signature_tolerances=None, allow_feature_fallback=False):
     if not name or name.startswith('_'): raise ValueError('Use a nonempty semantic name')
     body=advanced.native(body)
     # A semantic name is unique across component definitions. Repeated occurrences share it.
@@ -18,23 +18,40 @@ def tag_geometry(design, body, name, kind, filters, feature=None, role='function
     if len(matches)!=1: raise ValueError('Semantic selector must match exactly one current entity')
     definition={'kind':kind,'filters':filters,'feature_token':feature.entityToken if feature else '',
                 'role':role,'requirement':requirement}
+    if signature_tolerances is not None:
+        from .engineering_geometry import signature
+        definition.update(signature=signature(matches[0]),signature_tolerances=signature_tolerances,
+                          allow_feature_fallback=bool(allow_feature_fallback))
     if not body.attributes.add(GROUP,name,json.dumps(definition,allow_nan=False)):
         raise RuntimeError('Fusion could not store semantic selector')
     return dict(definition,name=name,entity=model_tools.ref(matches[0]))
 
 
-def resolve_tag(design, name):
+ReferenceFailure=advanced.ReferenceFailure
+
+
+def resolve_tag(design, name, diagnostics=False):
     found=[]
     for component in model_tools.each(design.allComponents):
         for body in model_tools.each(component.bRepBodies):
             attr=body.attributes.itemByName(GROUP,name)
-            if attr: found.append((body,json.loads(attr.value)))
-    if len(found)!=1: raise ValueError('Missing or ambiguous semantic tag: '+name)
-    body,definition=found[0]
-    feature=advanced.resolve(design,definition['feature_token']) if definition['feature_token'] else None
+            if attr:found.append((body,json.loads(attr.value)))
+    if len(found)!=1:
+        raise ReferenceFailure('reference_missing' if not found else 'reference_ambiguous','Missing or ambiguous semantic tag: '+name)
+    body,definition=found[0];feature=None;method='semantic_selector'
+    if definition['feature_token']:
+        try:feature=advanced.resolve(design,definition['feature_token'])
+        except ValueError:
+            if not definition.get('allow_feature_fallback') or not definition.get('signature'):
+                raise ReferenceFailure('stale_feature','Reinspect feature origin or authorize a bounded signature fallback: '+name)
+            method='signature_fallback_after_stale_feature'
     matches=model_tools.select(body,definition['kind'],definition['filters'],feature)
-    if len(matches)!=1: raise ValueError('Semantic tag no longer resolves uniquely: '+name)
-    return matches[0]
+    if definition.get('signature'):
+        from .engineering_geometry import signature,signature_changes
+        matches=[e for e in matches if not signature_changes(definition['signature'],signature(e),definition['signature_tolerances'])]
+    if len(matches)!=1:
+        raise ReferenceFailure('reference_stale' if not matches else 'reference_ambiguous','Semantic tag no longer resolves uniquely: '+name)
+    return {'entity':model_tools.ref(matches[0]),'method':method,'tag':name} if diagnostics else matches[0]
 
 
 def surface_audit(body, short_edge_mm, small_face_mm2, slender_width_mm, protected_entities=()):

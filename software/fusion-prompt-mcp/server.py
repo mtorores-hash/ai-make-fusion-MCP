@@ -157,7 +157,7 @@ def run_model_script(operation_id: str, document_id: str, component_token: str,
     The same operation_id + exact request returns the same job; changed content is rejected.
     Poll job_status/job_result; NEVER auto-retry an interrupted job with a fresh ID.
     Modeling requires acquire_edit_token (matching task.writer_id), or the explicit legacy writer path.
-    scope/task use caller contract 1.0; scope revisions are checked before execution, and allowed edits afterward. Checkpoints use local F3D or
+    Caller contract 1.1 retains scope/task version 1.0; scope revisions are checked before execution, and allowed edits afterward. Checkpoints use local F3D or
     a completed clean cloud version manifest for linked assemblies. Failure aborts before modeling.
     Cancellation is cooperative; a kernel call or tight Python loop cannot be forcibly interrupted.
     Units declare helper inputs; raw adsk floats STILL use Fusion native cm/radians."""
@@ -169,9 +169,13 @@ def job_status(job_id: str) -> dict:
     return job_store().status(job_id)
 
 @mcp.tool()
-def job_result(job_id: str) -> dict:
+def job_result(job_id: str, section: Literal['full','engineering'] = 'full') -> dict:
     """Read structured results, created refs, measurements, warnings, files and full traceback.
+    section='engineering' loads the latest hash-verified detailed engineering artifact.
     While running, returns the latest flushed partial result. Local file paths refer to Fusion's PC."""
+    if section=='engineering':
+        from FusionPromptBridge.job_store import load_engineering_report as load_report
+        return load_report(job_store(),job_id)
     return job_store().result(job_id)
 
 @mcp.tool()

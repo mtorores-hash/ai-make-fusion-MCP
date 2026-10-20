@@ -224,3 +224,13 @@ class BridgeLock:
     def close(self):
         if self.file:
             self.file.close(); self.file=None
+
+
+def load_engineering_report(store,job_id):
+    from .verification import file_hash
+    job=store.result(job_id);record=(job.get('result') or {}).get('engineering_report')
+    if not record:raise ValueError('Original job has no engineering report')
+    path=Path(record['artifact']['path']).resolve();root=(store.root/'artifacts'/job_id).resolve()
+    if not path.is_relative_to(root) or file_hash(path)!=record['artifact']['sha256']:
+        raise ValueError('Engineering artifact missing, outside original job or modified')
+    return json.loads(path.read_text(encoding='utf-8'))

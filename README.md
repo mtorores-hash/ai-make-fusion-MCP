@@ -5,9 +5,11 @@ Fusion models through typed tools or one complete Python modeling script.
 
 ## Current version and release status
 
-**v0.6.0 development snapshot, on `workbench`.** This is an unpublished supporting tool,
+**v0.7.0 development source on `workbench`, based on the reviewed package and baseline c0f7857. Windows installation is authorized but remains to be executed locally.** This is an unpublished supporting tool,
 not a released or physically validated mechanical design. The repository remains private.
 `main` is a landing page; no public release or episode milestone is asserted.
+
+Read the [current-state gap analysis](docs/engineering-gap-analysis.md), [engineering interfaces](docs/engineering-contract.md) and [v0.7 installation/rollback](docs/upgrade-v0.7.md).
 
 ## Capabilities
 
@@ -17,6 +19,7 @@ not a released or physically validated mechanical design. The repository remains
 - Durable jobs, operation-ID duplicate protection, progress, results, traceback and checkpoints.
 - Sketch/extrude/fillet/joint tools plus nested assembly and geometry inspection.
 - Geometry-based selection, interference and clearance checks, motion sampling.
+- Declared continuity/access checks with revision-dependent evidence reuse, stage reconciliation and manufacturing declarations; native acceptance pending.
 - F3D/STEP/STL export, print-copy orientation and exact-size PNG capture helpers.
 
 The package exposes **32 MCP tools**. Full API access enables broader operations through
@@ -74,7 +77,7 @@ No MCP-specific published episode is recorded. General channel: [AI Make](https:
 See [CURRENT.md](CURRENT.md). The working [ledger](ledger/LEDGER.md) belongs on `workbench` only.
 Shared operating context is [AI_MAKE](https://github.com/mtorores-hash/AI_MAKE).
 
-Latest: [v0.6 installation/rollback](docs/upgrade-v0.6.md), [caller contract 1.0](docs/caller-contract.md),
+Latest: [v0.7 installation/rollback](docs/upgrade-v0.7.md), [caller contract 1.1](docs/caller-contract.md),
 and [compatibility handoff](docs/compatibility-handoff-ai-make.md).
 
 Source update pushed to `workbench` with approval. Not installed or native-Fusion tested.

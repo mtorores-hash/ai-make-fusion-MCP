@@ -3,7 +3,7 @@
   "type": "addin",
   "author": "AI Make",
   "description": {"": "Local typed CAD tools for an MCP client."},
-  "version": "0.6.0",
+  "version": "0.7.0",
   "runOnStartup": false,
   "supportedOS": "windows|mac"
 }
