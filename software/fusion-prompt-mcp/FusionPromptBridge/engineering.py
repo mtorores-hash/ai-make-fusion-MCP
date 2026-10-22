@@ -7,8 +7,9 @@ import adsk.fusion
 from . import advanced, design_intent, engineering_geometry as geom, model_tools, scope, verification
 
 VERSION='1.0'
+EVALUATOR_REVISION='k1-cad-2026-10-22.1'
 CATEGORIES={'continuous_wall':'geometric_quality','gap':'geometric_quality','intersection':'geometric_quality',
-            'G1':'geometric_quality','G2':'geometric_quality','access':'assembly_feasibility'}
+            'G1':'geometric_quality','G2':'geometric_quality','access':'assembly_feasibility','solid_probe':'geometric_quality'}
 OPERATIONS={'insertion','removal','screwdriver','screw_insertion','connector_engagement','connected_wire','heatset','travel','stop'}
 
 
@@ -98,6 +99,25 @@ class Session:
         kind=item['kind'];tol=item.get('limits',{})
         if kind=='access':return self.access(item)
         ids=item['interfaces']
+        if kind=='solid_probe':
+            from .cad_review import probe_bounds
+            if len(ids)!=1:raise ValueError('Solid probe requires exactly one body interface')
+            body=self.resolve(ids[0])
+            if not adsk.fusion.BRepBody.cast(body) or not body.isSolid:raise ValueError('Solid probe requires a solid body')
+            volume,minimum=probe_bounds(item)
+            if item['probe'].get('geometry_revision')!=self.records[ids[0]]['body_revision']:
+                raise ValueError('Probe declaration is stale for the body revision')
+            self.ctx.check_cancel()
+            probe=geom.envelope_box(item['probe'],[0,0,0])
+            with self.ctx.operation('solid_probe_intersection',target=self.records[ids[0]]['body']):
+                result=geom.overlap(probe,geom.temporary_world(body))
+            self.diagnostics['kernel_intersections']+=result['method']=='temporary_BRep_intersection'
+            fraction=result['volume_mm3']/volume
+            return dict(result,status='pass' if fraction>=minimum else 'fail',fill_fraction=fraction,
+                        probe=item['probe'],probe_volume_mm3=volume,
+                        claim='Occupancy of the declared finite box only',
+                        not_checked=['connectivity_to_adjacent_regions','global_minimum_wall_thickness',
+                                     'undeclared_junctions','strength','slicer_supports'])
         if len(ids)!=2:raise ValueError('Geometric checks require exactly two interface IDs')
         a,b=(self.resolve(i) for i in ids)
         if kind=='continuous_wall':
@@ -183,7 +203,9 @@ def verify(ctx,plan,previous_job_id='',detail=False):
         row={'id':ident,'kind':kind,'category':CATEGORIES.get(kind,'geometric_quality'),'status':'unproven','intent':item.get('intent_reason','declared requirement')}
         try:
             ids=[item['moving']]+item['obstacles'] if kind=='access' else item['interfaces']
-            deps=session.state(ids);digest=verification.fingerprint({'version':VERSION,'check':item,'dependencies':deps})
+            deps=session.state(ids);digest=verification.fingerprint({'version':VERSION,'evaluator_revision':EVALUATOR_REVISION,'check':item,'dependencies':deps})
+            if item.get('contradicted_by'):
+                raise ValueError('Unresolved contradictory evidence: '+str(item['contradicted_by']))
             old=cached.get(ident)
             if old and old.get('dependency_fingerprint')==digest:
                 row=copy.deepcopy(old);row['reused_from_job']=previous_job_id;session.diagnostics['reused_checks']+=1
@@ -202,6 +224,8 @@ def verify(ctx,plan,previous_job_id='',detail=False):
             # A failed evaluator is unavailable evidence, not successful geometry.
             row.update(status='unproven',error_code=getattr(exc,'code','check_unavailable'),blocker=str(exc),
                        next_action='Inspect this reference/requirement and change the recovery method; do not repeat an unchanged failed call.')
+        row['evaluation_provenance']={'representation':'Fusion_native_BRep','evaluator_revision':EVALUATOR_REVISION,
+                                      'method':row.get('method',kind),'document_id':plan['document_id']}
         row['duration_seconds']=time.perf_counter()-begin;rows.append(row)
     ctx.check_cancel()
     health=scope.health_report(ctx.design,session.selection,getattr(ctx,'health_baseline',None))
