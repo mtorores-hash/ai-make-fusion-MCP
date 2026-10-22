@@ -19,7 +19,7 @@ class CloudTests(unittest.TestCase):
         self.design=Node(allComponents=Collection([self.component]),allParameters=Collection())
         self.doc=Node(name='housing',isModified=False,isSaved=True,dataFile=self.file,
                       allDocumentReferences=Collection(),documentReferences=Collection(),save=Mock(return_value=True))
-        self.app=Node(activeDocument=self.doc)
+        self.app=Node(activeDocument=self.doc,data=Node(findFileById=lambda _:self.file))
     def make_file(self,**changes):
         values=dict(id='stable-file-id',name='housing',versionId='version-1',versionNumber=1,
                     latestVersionNumber=1,isComplete=True,isReadOnly=False,isInUse=False,
@@ -42,7 +42,7 @@ class CloudTests(unittest.TestCase):
         old=self.token();self.assertEqual(old,self.token());self.guard(old)
     def test_first_save_uses_explicit_name_and_destination(self):
         self.doc.isSaved=False;self.doc.dataFile=None;self.doc.saveAs=Mock(return_value=True)
-        destination=Node(id='parts')
+        destination=Node(id='folder')
         with patch.object(cloud,'destination',return_value=destination):
             ident=self.run_job('save',{'document_id':'doc','edit_token':self.token(),'name':'housing'})
         self.doc.saveAs.assert_called_once_with('housing',destination,'','')
@@ -51,7 +51,7 @@ class CloudTests(unittest.TestCase):
     def test_component_copy_waits_for_future_and_does_not_replace_source(self):
         core.UploadStates=Node(UploadFailed=2,UploadFinished=1)
         future=Node(uploadState=0,dataFile=self.file)
-        component=Node(saveCopyAs=Mock(return_value=future));destination=Node(id='parts')
+        component=Node(saveCopyAs=Mock(return_value=future));destination=Node(id='folder')
         with patch.object(cloud,'destination',return_value=destination), \
              patch.object(cloud.advanced,'resolve',return_value=component), \
              patch.object(cloud.advanced,'editable'),patch.object(fusion,'Component',create=True):

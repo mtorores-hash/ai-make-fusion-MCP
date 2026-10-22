@@ -18,7 +18,8 @@ async def main():
     with tempfile.TemporaryDirectory() as home:
         bootstrap=('import sys; sys.path.insert(0,sys.argv[1]); import server; '
                    'from FusionPromptBridge.job_store import Store; '
-                   'server.job_store=lambda:Store(sys.argv[2]); server.mcp.run(transport="stdio")')
+                   'server.job_store=lambda:Store(sys.argv[2]); '
+                   'server.require_compatible_bridge=lambda:None; server.mcp.run(transport="stdio")')
         params=StdioServerParameters(command=sys.executable,args=['-c',bootstrap,str(Path(server).parent),home],
                                      env={'PYTHONPATH':os.pathsep.join(sys.path)})
         async with stdio_client(params) as (read,write):
@@ -33,7 +34,7 @@ async def main():
                           'get_modeling_rules','audit_modeling_hygiene','browse_cloud','inspect_document_state','cloud_operation','acquire_edit_token','release_edit_token','reconcile_cloud_job','retire_occurrences'}
                 assert {t.name for t in result.tools}==expected
                 rules=value(await session.call_tool('get_modeling_rules',{}))
-                assert rules['rules_version']=='1.2.0' and 'Component first' in rules['text']
+                assert rules['rules_version']=='1.3.0' and 'Component first' in rules['text']
                 cached=value(await session.call_tool('get_modeling_rules',{'known_sha256':rules['sha256']}))
                 assert cached['unchanged'] and 'text' not in cached
                 source_tools={t.name:t for t in result.tools}
@@ -56,6 +57,15 @@ async def main():
                 assert conflict.isError
                 status=value(await session.call_tool('job_status',{'job_id':ident})); assert status['status']=='queued'
                 cancelled=value(await session.call_tool('cancel_job',{'job_id':ident})); assert cancelled['status']=='cancelled'
+                compact=value(await session.call_tool('job_result',{'job_id':ident}))
+                assert compact['details_omitted'] and compact['detail']['immutable']
+                full=value(await session.call_tool('job_result',{'job_id':ident,'section':'full'}))
+                assert 'result' in full and full['status']=='cancelled'
+                page=value(await session.call_tool('job_result',{'report_id':compact['detail']['report_id'],'section':'raw','limit':32768}))
+                import hashlib
+                assert hashlib.sha256(page['text'].encode()).hexdigest()==compact['detail']['sha256']
+                same=value(await session.call_tool('job_result',{'job_id':ident,'after_revision':compact['revision']}))
+                assert same['unchanged']
                 readonly=dict(request,operation_id='read-test',mode='read_only',checkpoint_before=False,
                               script='def run(ctx): return ctx.inspect(False)')
                 assert not (await session.call_tool('run_model_script',readonly)).isError
@@ -66,6 +76,6 @@ async def main():
                 assert cloud['status']=='queued'
                 assert value(await session.call_tool('cloud_operation',cloud_request))['job_id']==cloud['job_id']
                 assert (await session.call_tool('cloud_operation',dict(cloud_request,action='delete'))).isError
-                print('PASS: MCP initialize; 32 tools; modeling rules tool/resource; validation; persistent enqueue/status; duplicate protection; cancellation')
+                print('PASS: real STDIO initialize; 32 tools; rules; validation; isolated enqueue/status; duplicate protection; cancellation. Native handshake explicitly stubbed in this offline harness; not native acceptance.')
 
 asyncio.run(main())

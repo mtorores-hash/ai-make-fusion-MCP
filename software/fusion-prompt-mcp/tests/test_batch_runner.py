@@ -93,7 +93,7 @@ class BatchTests(unittest.TestCase):
         with patch.object(ctx,'minimum_distance',side_effect=RuntimeError('measurement failed')):
             with self.assertRaisesRegex(RuntimeError,'measurement failed'):
                 matrix=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
-                occ=Node(transform2=Node(asArray=lambda:matrix))
+                occ=Node(component=self.target,transform2=Node(asArray=lambda:matrix))
                 self.design.rootComponent.allOccurrences=Collection([occ])
                 with patch.object(runner.model_tools,'ref',return_value={}):
                     ctx.sample_motion(joint,[0.5,1.0],[('a','b')],expected_world=lambda p:[(occ,matrix)])
@@ -123,7 +123,7 @@ class BatchTests(unittest.TestCase):
         self.design.unitsManager=Node(convert=lambda x,a,b:x)
         matrix=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
         expected=list(matrix); expected[3]=1
-        occ=Node(transform2=Node(asArray=lambda:matrix))
+        occ=Node(component=self.target,transform2=Node(asArray=lambda:matrix))
         self.design.rootComponent.allOccurrences=Collection([occ])
         from unittest.mock import Mock
         with patch.object(runner.adsk,'doEvents',Mock(),create=True), \

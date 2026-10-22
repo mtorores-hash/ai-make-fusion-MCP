@@ -21,7 +21,7 @@ class HygieneTests(unittest.TestCase):
         self.part=self.component('housing',sketches=Collection([self.sketch]),
                                  bRepBodies=Collection([self.entity('housing_body')]))
         self.root=self.component('Untitled')
-        self.param=self.entity('wall',comment='Wall thickness; maintain bore clearance',isFavorite=True,
+        self.param=self.entity('wall',expression='2 mm',comment='Wall thickness; maintain bore clearance',isFavorite=True,
                                dependentParameters=Collection([Node(name='d1')]))
         self.root.allOccurrences=Collection([Node(component=self.part)])
         self.design=Node(findEntityByToken=lambda t:[c for c in (self.root,self.part) if c.entityToken==t],
@@ -131,7 +131,7 @@ class HygieneTests(unittest.TestCase):
         if repo_copy.is_file():
             self.assertEqual((software/'modeling-rules.md').read_bytes(),repo_copy.read_bytes())
         rules=get_rules()
-        self.assertEqual(rules['rules_version'],'1.2.0')
+        self.assertEqual(rules['rules_version'],'1.3.0')
         self.assertEqual(len(rules['sha256']),64)
         self.assertIn('Component first',rules['text'])
     def test_bridge_dispatch_checks_target_document(self):

@@ -53,6 +53,18 @@ class WorkflowTests(unittest.TestCase):
     def task(self,allowed=None):
         return dict(version='1.0',task_id='TASK-1',issue_id='ISSUE-1',attempt=1,writer_id='writer',baseline_id='B1',
                     allowed_member_ids=allowed or ['carrier'],frozen_member_ids=[],allowed_parameter_names=[],approval_reference='caller-text')
+    def test_default_root_scope_uses_supported_root_sentinel_when_token_is_unresolvable(self):
+        self.refs.pop(self.root.entityToken)
+        spec=scope.selected(self.design,self.root)
+        self.assertEqual(spec['members'][0]['component_token'],'@root')
+        spec['dependency_review']='complete'
+        selected=scope.Selection(self.design,spec)
+        self.assertTrue(selected.contains(self.root,targets=True))
+    def test_default_child_scope_preserves_observed_component_token(self):
+        spec=scope.selected(self.design,self.part)
+        self.assertEqual(spec['members'][0]['component_token'],self.part.entityToken)
+        spec['dependency_review']='complete'
+        self.assertTrue(scope.Selection(self.design,spec).contains(self.part,targets=True))
     def test_unrelated_supplier_naming_does_not_block_selected_authoring(self):
         report=hygiene.audit(self.design,self.spec)
         self.assertTrue(report['automated_checks_passed']);self.assertEqual(report['counts']['components'],1)
@@ -195,7 +207,10 @@ class WorkflowTests(unittest.TestCase):
     def dispatcher(self,implementation):
         path=Path(__file__).resolve().parents[1]/'FusionPromptBridge/FusionPromptBridge.py'
         node=next(n for n in ast.parse(path.read_text()).body if isinstance(n,ast.FunctionDef) and n.name=='execute')
-        ns={'design':lambda:self.design,'scopes':scope,'_execute':implementation,'json':json}
+        from FusionPromptBridge import maintainability, reporting
+        import uuid
+        ns={'design':lambda:self.design,'design_id':lambda:'doc','scopes':scope,'_execute':implementation,'json':json,
+            'maintainability':maintainability,'reporting':reporting,'uuid':uuid,'_store':None,'_app':self.app}
         exec(compile(ast.Module(body=[node],type_ignores=[]),str(path),'exec'),ns)
         return ns['execute']
     def test_narrow_scope_without_task_still_rejects_wrong_target(self):
