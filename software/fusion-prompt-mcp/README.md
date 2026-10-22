@@ -1,3 +1,7 @@
+# 0.8.0 development candidate — not deployed
+
+Caller 2.0, rules 1.3.0, 32 tools. See [migration](../../docs/k1-caller-migration.md), [validation](../../docs/k1-validation.md) and [review/install/rollback](../../docs/upgrade-v0.8-review.md). Older installation authorization does not authorize this candidate.
+
 # Fusion Prompt MCP — 0.7.0 development
 
 Local STDIO server plus main-thread Autodesk Fusion add-in. 32 tools, caller contract 1.1,

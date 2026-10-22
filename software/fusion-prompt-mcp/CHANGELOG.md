@@ -1,3 +1,13 @@
+## 0.8.0 development — 2026-10-22 UTC
+
+Post-native-smoke follow-up: reject mismatched server/bridge implementation fingerprints on
+both sides before mutations; expose document-free identity and clear caller-precondition errors.
+Add restricted ledger-only reconciliation and read-only observation, preserving consumed
+budgets/original status and requiring changed strategy. Add native negative-control runner;
+see repository validation for actual executed versus pending coverage. Tool count stays 32.
+
+K1 patch reconciliation; compact immutable report delivery; durable native activity and cooperative issue budgets; separate outcomes/optional validated presentation; bounded ownership/revision attribution; conservative first-save metadata completion. Caller 2.0 / rules 1.3.0 / 32 tools. No installation/push; native/STDIO qualification pending. See docs/k1-gap-analysis.md and docs/k1-fix-disposition.json.
+
 ## 0.7.0 development — 2026-10-19
 
 Declared interface evidence and bounded geometry/access checks; compact/hash-verified detailed results and dependency reuse; semantic signature fallback with ambiguity rejection; durable staged-edit reconciliation without replay; revision-bound manufacturing declarations and optional engineering export gate. No new tools or dependencies. Native Fusion, cloud and STDIO qualification remains unrun. See docs/engineering-contract.md.

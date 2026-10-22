@@ -1,6 +1,6 @@
 # Fusion modeling rules — AI Make
 
-Rules version: 1.2.0. Caller contract: 1.1. Runtime: 0.7.0 development.
+Rules version: 1.3.0. Caller contract: 2.0. Runtime: 0.8.0 development.
 
 These are operational CAD rules. The caller's approved task supplies intended use, dimensions,
 manufacturing context, phase/milestone, active configuration and permitted changes. The MCP
@@ -165,3 +165,37 @@ Use one scoped verification batch for the affected interface dependency closure.
 Checkpoint major edits using named stages and actual postconditions. After failure report observed change or unknown; reconcile the original job, preserve completed stages and verify protected metrics. Never retry the same failed hypothesis with a fresh operation ID. Ask for the specific missing datum/reference/intent when it cannot be determined.
 
 Handoff exports with generation-time geometry identity, declared print orientation/bed face, protected mates, allowed support regions/exceptions and overhang/bridge/access review. Verify source revisions and hashes. Actual bed contact, supports, printer profile, plate placement and per-object settings require slicer inspection. Geometry signatures are bounded guards, not full shape equivalence or manufacturing certification. See engineering-contract.md.
+
+## Bounded authoring and outcome discipline (1.3)
+
+Before a small edit, name the controlling source features, affected scope, protected members,
+planned operations and justified feature/sketch additions. Adopt explicit per-change and
+cumulative issue budgets through `task.authoring`; never invent universal thresholds.
+Keep the same project-qualified issue ID across agent/job changes. Prefer correcting source
+profiles and using patterns to chains of compensating patches. Preserve a checkpoint before
+uncertain construction. A blocked attempt requires a changed, scoped strategy; exhausted or
+uncertain ledgers are blockers, not permission to rename the issue or replay an operation.
+
+The optional budget gate measures additions and source retention on scoped batches/narrow
+calls. Trusted Python remains unrestricted and growth is checked afterward. Without a policy,
+authoring is `procedural_unbounded`. Count compliance is not proof of parametric behavior,
+simple topology, aesthetics or manufacturing readiness. Deleted/flattened history cannot
+produce a maintainability pass; isolated replacement/promotion remains a separate review.
+
+Wrap potentially long native calls with `ctx.native_call` (or `ctx.operation`) and meaningful
+entity identity. Worker heartbeat means the worker is alive, never that Fusion completed a
+Boolean. Cancellation is cooperative. Preserve completed stages and reconcile uncertain work;
+never resubmit completed mutations because a wrapper failed. Flush engineering values with
+`ctx.record` before optional presentation. Use `ctx.capture(required=False)` or read-only
+`ctx.present` for nonessential images. Separate execution, regeneration, integrity, boundary,
+exports, engineering evidence, authoring, readiness and caller approval.
+
+Use compact replies and immutable report pages. Missing or omitted details never mean pass.
+Do not weaken writer fingerprints or protected checks to save response bytes. Generated new
+model dimensions need native creator/component attribution. Revision propagation can only be
+cleared by the implemented bounded history-free B-rep control; authored history or unavailable
+ownership stays unproven. Volume equality alone never establishes shape equivalence.
+
+Manufacturing readiness still requires actual exported representation and slicer evidence.
+Boolean kept-tool attribution, finite roots/ligaments, actual support paths, effective presets
+and physical start enforcement are not newly implemented capabilities in 0.8.

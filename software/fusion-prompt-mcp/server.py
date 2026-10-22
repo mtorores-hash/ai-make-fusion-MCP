@@ -1,6 +1,6 @@
 from typing import Literal
 from mcp.server.fastmcp import FastMCP
-from bridge_client import call
+from bridge_client import call, require_compatible_bridge
 
 mcp = FastMCP('Fusion Prompt MCP', instructions='Inspect the active document and target component before mutations. '
     'Observe with inspect_document_state; acquire_edit_token with the designated writer before mutations. '
@@ -13,6 +13,9 @@ mcp = FastMCP('Fusion Prompt MCP', instructions='Inspect the active document and
     'Before modeling, call get_modeling_rules and follow the returned authoring standard. '
     'Use named components and parameters, fully constrain native sketches, and audit_modeling_hygiene '
     'before declaring completion. Use ctx.export_checked for checked deliverables; checkpoints stay available. '
+    'Contract 2.0: state/token/job/reconcile replies default compact; use report_id for immutable detail. '
+    'Declare task.authoring budgets for bounded tree growth. Missing policy is procedural/unbounded; native health is not maintainability. '
+    'Wrap slow native calls in ctx.native_call; record measurements before optional capture. '
     'Inspect/validate results. Do not equate sampled motion clearance with continuous collision freedom.')
 
 @mcp.tool()
@@ -88,9 +91,15 @@ def export_model(design_id: str, filename: str, format: Literal['step','stl'],
     return call('export', locals())
 
 @mcp.tool()
-def fusion_capabilities(design_id: str) -> dict:
-    """Report loaded add-in version and supported advanced operations."""
-    return call('capabilities', locals())
+def fusion_capabilities(design_id: str = '') -> dict:
+    """Compare server/native runtime, contract, rules and build identities. Empty design_id returns identity without selecting a document.
+    compatible=False blocks mutations; reconnect/restart matching builds. A supplied inspected design_id also returns modeling capabilities."""
+    from FusionPromptBridge.compatibility import identity
+    bridge=call('runtime_identity',{})
+    server=identity()
+    result=call('capabilities',{'design_id':design_id}) if design_id else {'version':bridge['runtime'],'caller_contract_version':bridge['caller_contract']}
+    return dict(result,server_identity=server,bridge_identity=bridge,
+                compatible=all(bridge.get(k)==v for k,v in server.items()))
 
 @mcp.tool()
 def inspect_assembly(design_id: str) -> dict:
@@ -145,23 +154,29 @@ def job_store():
 def run_model_script(operation_id: str, document_id: str, component_token: str,
                      units: Literal['mm','cm','m','in'], script: str,
                      checkpoint_before: bool = True, validate_after: bool = True,
-                     mode: Literal['modeling','read_only'] = 'modeling', edit_token: str = '', scope: dict | None = None, task: dict | None = None,
+                       mode: Literal['modeling','read_only','reconcile'] = 'modeling', edit_token: str = '', scope: dict | None = None, task: dict | None = None,
                  accepted_reference_versions: dict | None = None) -> dict:
     """Enqueue a complete trusted Fusion Python script defining run(ctx); returns immediately.
     Arbitrary Python executes with the user's permissions INSIDE Fusion, on its main thread.
     document_id is inspect_design.design_id; component_token is an explicit Component token or @root.
     mode=read_only accepts ONLY def run(ctx): return queries with literal arguments to
-    ctx.inspect/validate/minimum_distance/interference/capture/audit_hygiene/evidence_fingerprint. Set checkpoint_before=False.
+    ctx.inspect/validate/minimum_distance/interference/capture/present/audit_hygiene/evidence_fingerprint. Set checkpoint_before=False.
     Read-only queries do not regenerate. Full Python modeling always regenerates at completion.
+    Use ctx.native_call for durable operation identity; ctx.record flushes measurements; ctx.capture(required=False) is optional.
+    task.authoring adopts issue budgets; arbitrary Python is measured posthoc, not pre-dispatch bounded.
     Use ctx.target, ctx.point/value, ctx.progress, ctx.stage, ctx.record, ctx.export and return JSON.
     The same operation_id + exact request returns the same job; changed content is rejected.
     Poll job_status/job_result; NEVER auto-retry an interrupted job with a fresh ID.
     Modeling requires acquire_edit_token (matching task.writer_id), or the explicit legacy writer path.
-    Caller contract 1.1 retains scope/task version 1.0; scope revisions are checked before execution, and allowed edits afterward. Checkpoints use local F3D or
+    Caller contract 2.0 retains scope/task version 1.0; scope revisions are checked before execution, and allowed edits afterward. Checkpoints use local F3D or
     a completed clean cloud version manifest for linked assemblies. Failure aborts before modeling.
+    mode='reconcile' accepts only return ctx.acknowledge_authoring(...) with literal arguments;
+    use current scope/task/writer token and checkpoint_before=False, validate_after=False. Ledger-only, never regeneration/replay.
     Cancellation is cooperative; a kernel call or tight Python loop cannot be forcibly interrupted.
     Units declare helper inputs; raw adsk floats STILL use Fusion native cm/radians."""
-    return job_store().submit(locals())
+    request=locals()
+    if mode!='read_only':require_compatible_bridge()
+    return job_store().submit(request)
 
 @mcp.tool()
 def job_status(job_id: str) -> dict:
@@ -169,14 +184,20 @@ def job_status(job_id: str) -> dict:
     return job_store().status(job_id)
 
 @mcp.tool()
-def job_result(job_id: str, section: Literal['full','engineering'] = 'full') -> dict:
-    """Read structured results, created refs, measurements, warnings, files and full traceback.
-    section='engineering' loads the latest hash-verified detailed engineering artifact.
-    While running, returns the latest flushed partial result. Local file paths refer to Fusion's PC."""
+def job_result(job_id: str = '', section: str = 'summary', report_id: str = '',
+               offset: int = 0, limit: int = 50, after_revision: str = '', baseline_report_id: str = '') -> dict:
+    """Compact by default; full is explicit. Immutable detail: report_id plus raw or JSON-pointer section,
+    offset/limit (structured <=100). raw cursors count characters. delta compares document parameters.
+    events returns durable activity after offset cursor. engineering retains detailed engineering retrieval.
+    Full evidence remains stored; omissions never imply pass. Poll job_status while Fusion is busy."""
+    from FusionPromptBridge import reporting
+    store=job_store()
+    if report_id:return reporting.page(store,report_id,section,offset,limit,baseline_report_id)
+    if section=='events':return store.events(job_id,offset,min(limit,100))
     if section=='engineering':
-        from FusionPromptBridge.job_store import load_engineering_report as load_report
-        return load_report(job_store(),job_id)
-    return job_store().result(job_id)
+        from FusionPromptBridge.job_store import load_engineering_report
+        return load_engineering_report(store,job_id)
+    return reporting.response(store,store.result(job_id),section,after_revision,offset,limit)
 
 @mcp.tool()
 def list_jobs(limit: int = 30) -> list[dict]:
@@ -233,7 +254,7 @@ def browse_cloud(hub_id: str = '', project_id: str = '', folder_id: str = '') ->
     return call('browse_cloud', locals())
 
 @mcp.tool()
-def inspect_document_state(document_id: str, acquire_token: bool = False) -> dict:
+def inspect_document_state(document_id: str, acquire_token: bool = False, section: Literal['summary','full'] = 'summary', after_revision: str = '') -> dict:
     """Read-only observation by default: cloud identity, dirty state, revisions and references.
     Does not invalidate a writer token. acquire_token=True is the v0.5 legacy writer path.
     New writers use acquire_edit_token, with writer identity and explicit accepted reference pins.
@@ -260,11 +281,13 @@ def cloud_operation(operation_id: str,
     Dirty/stale preservation: save with accepted pins; update one reference; repin current versions and save; repeat.
     Uncertain terminal saves block further mutations until reconcile_cloud_job records an observed version and caller note.
     No deletes, share links, contributor changes or automatic replacement of existing components."""
-    return job_store().submit_cloud(locals())
+    request=locals()
+    require_compatible_bridge()
+    return job_store().submit_cloud(request)
 
 @mcp.tool()
 def acquire_edit_token(document_id: str, writer_id: str,
-                       accepted_reference_versions: dict | None = None) -> dict:
+                       accepted_reference_versions: dict | None = None, section: Literal['summary','full'] = 'summary') -> dict:
     """Acquire/reuse one unchanged writer baseline. Pins map cloud file_id to exact accepted version.
     A different writer cannot replace the lease; release it explicitly. Single-use token, optimistic
     checks only. Writer IDs and approval text are caller assertions, not authenticated authorization."""
@@ -276,7 +299,7 @@ def release_edit_token(document_id: str, writer_id: str, edit_token: str) -> dic
     return call('release_edit_token',locals())
 
 @mcp.tool()
-def reconcile_cloud_job(job_id: str, version_id: str = '', confirmation_note: str = '') -> dict:
+def reconcile_cloud_job(job_id: str, version_id: str = '', confirmation_note: str = '', section: Literal['summary','full'] = 'summary') -> dict:
     """Observe a failed/cancelled/interrupted save's expected cloud version without replay.
     Provide version_id from Fusion history. A nonempty confirmation_note records the caller's
     verification of its contents and clears the mutation block; it is NOT authenticated approval.
@@ -295,6 +318,7 @@ def retire_occurrences(operation_id: str, document_id: str, occurrence_tokens: l
     facts for caller reconciliation; does not update BOM/graph/site. Projection/derive review is caller-owned."""
     source='def run(ctx): return ctx.retire_occurrences('+','.join(repr(v) for v in
              (occurrence_tokens,reason,replacement_id,dependency_review_note))+')'
+    require_compatible_bridge()
     return job_store().submit(dict(operation_id=operation_id,document_id=document_id,component_token='@root',
         units='mm',script=source,checkpoint_before=True,validate_after=True,edit_token=edit_token,
         scope=scope,task=task,accepted_reference_versions=accepted_reference_versions))

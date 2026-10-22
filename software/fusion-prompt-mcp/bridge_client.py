@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import time
 import uuid
+from FusionPromptBridge.compatibility import identity, require_match, mutates
 
 ROOT = Path.home() / '.fusion-prompt-mcp'
 
@@ -13,11 +14,14 @@ def atomic_json(path, value):
     os.replace(temp, path)
 
 def call(operation, arguments=None, timeout=30, root=ROOT):
+    if mutates(operation,arguments or {}):
+        require_compatible_bridge(timeout,root)
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     ident = uuid.uuid4().hex
     request = root / (ident + '.request')
     response = root / (ident + '.response')
     atomic_json(request, {'id': ident, 'operation': operation,
+                          'caller':identity(),
                           'arguments': arguments or {}, 'expires': time.time() + timeout})
     deadline = time.monotonic() + timeout + 2
     while time.monotonic() < deadline:
@@ -32,3 +36,9 @@ def call(operation, arguments=None, timeout=30, root=ROOT):
     raise TimeoutError('Fusion did not respond. An operation already started may have completed. '
                        'Inspect Fusion before retrying a mutation. Check that the add-in is running '
                        'and no dialog or sketch command is open.')
+
+
+def require_compatible_bridge(timeout=30,root=ROOT):
+    bridge=call('runtime_identity',timeout=timeout,root=root)
+    require_match(bridge)
+    return bridge
