@@ -1,0 +1,8 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "script",
+  "author": "AI Make",
+  "description": {"": "Disposable 0.8 contract fixtures; requires approved candidate activation."},
+  "version": "0.8.0",
+  "supportedOS": "windows|mac"
+}
