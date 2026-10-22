@@ -1,5 +1,17 @@
 # AI Make Fusion MCP
 
+## Process 1.7 alignment source candidate — 22 October 2026
+
+Prepared under Mauricio's instruction to match the K1 proposal with the process/MCP and
+implement supported changes. Rules 1.3.1 adds explicit caller obligations; document-free
+capabilities expose a bounded `process_controls` declaration only for a matching loaded pair.
+Runtime/caller remain 0.8.0/2.0 and the 32-tool surface is unchanged. This source is not installed;
+the observed installed rules 1.3.0 build and prior native receipts remain separate.
+Finite-root/Boolean-attribution and slicer/package/path validators are still deferred.
+See `docs/process-1.7-alignment.md` for implementation, test scope and remaining gaps.
+The following older status sections retain their original dated evidence.
+
+
 A local MCP server and Autodesk Fusion add-in that let an AI client build and inspect native
 Fusion models through typed tools or one complete Python modeling script.
 
