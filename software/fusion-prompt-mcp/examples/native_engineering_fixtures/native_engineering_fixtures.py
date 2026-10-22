@@ -16,6 +16,7 @@ import adsk.fusion
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 from FusionPromptBridge import batch_runner, design_intent, engineering, model_tools, recovery, scope
 from FusionPromptBridge.job_store import Store
+from native_validation import inspect_runtime, require_runtime
 
 
 def make_box(root,name,lo,hi):
@@ -42,6 +43,8 @@ def run(context):
     app=adsk.core.Application.get();out=Path(tempfile.mkdtemp(prefix='fusion-mcp-engineering-'))
     result={'qualification':'native run; explicit finite fixtures only','output_directory':str(out),'cases':[]}
     try:
+        result['runtime']=inspect_runtime(app,Path(__file__).resolve().parents[2])
+        require_runtime(result['runtime'])
         document=app.documents.add(adsk.core.DocumentTypes.FusionDesignDocumentType)
         document.name='MCP_Disposable_Engineering_Fixtures'
         design=adsk.fusion.Design.cast(app.activeProduct);root=design.rootComponent
@@ -115,6 +118,7 @@ def run(context):
         result['all_declared_defect_cases_matched']=all(c['actual']==c['expected'] for c in result['cases'])
         result['not_checked']=['real_process_crash','STDIO_transport','nested_occurrence_transforms','G1_G2_native_evaluators','manufacturing_exports','slicer','physical_assembly']
     except Exception:
+        result['all_declared_defect_cases_matched']=False
         result['error']=traceback.format_exc()
     finally:
         (out/'native-result.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
