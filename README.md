@@ -5,11 +5,27 @@ Fusion models through typed tools or one complete Python modeling script.
 
 ## Current version and release status
 
-**v0.7.0 development source on `workbench`, based on the reviewed package and baseline c0f7857. Windows installation is authorized but remains to be executed locally.** This is an unpublished supporting tool,
+Post-test source update: compatibility fingerprints, clearer caller preflight, explicit ledger
+acknowledgement and a native negative-control runner are implemented; 190 software tests pass.
+The revised build is active: 10 bounded native controls, two identity rejection controls and
+a real STDIO/native spacer run pass, with earlier failed runs retained. Protected revision
+propagation remains conservative; actual crash/cloud and end-to-end native reconcile dispatch
+remain unqualified. See docs/revised-native-validation.json.
+The owner-authorized 0.8 source is uploaded to private workbench through the GitHub web UI;
+connector tools were unavailable in this chat. No main merge or release occurred. The historical fixture results below apply to the preceding local 0.8 build. See CURRENT.md.
+
+Local update, 2026-10-21: the user subsequently authorized installation. A separate 0.8 package
+is installed/active in Fusion; a real STDIO/native parametric spacer and both disposable fixture
+runners passed their declared controls. See [actual validation and limits](docs/k1-validation.md).
+Existing MCP clients need reconnection. This is not a release, exhaustive native qualification,
+physical approval or resolution of the authoring-ledger recovery gap. The original review state
+below is historical.
+
+**v0.8.0 development candidate prepared from workbench 6db17f9; installed locally with owner approval. Uploaded to private workbench; not released.** This is an unpublished supporting tool,
 not a released or physically validated mechanical design. The repository remains private.
 `main` is a landing page; no public release or episode milestone is asserted.
 
-Read the [current-state gap analysis](docs/engineering-gap-analysis.md), [engineering interfaces](docs/engineering-contract.md) and [v0.7 installation/rollback](docs/upgrade-v0.7.md).
+Read the [current gap analysis](docs/k1-gap-analysis.md), [caller migration](docs/k1-caller-migration.md), [validation](docs/k1-validation.md) and [review/install/rollback](docs/upgrade-v0.8-review.md). Release requires project completion and Mauricio approving the printed design.
 
 ## Capabilities
 
@@ -56,8 +72,8 @@ Its original package README, dependency file, Windows setup helper, examples and
 
 ## Known limitations
 
-Live Fusion/Windows loading, CAD-kernel behavior, exports, transforms and joint solving have
-not been verified here. Scripts run as trusted unrestricted Python; component targeting is
+Selected live Fusion/Windows loading, parametric modeling, exports and fixture controls were
+verified locally; broad transforms/joint/kernel/cloud behavior remains unqualified. Scripts run as trusted unrestricted Python; component targeting is
 not a sandbox. Cancellation is cooperative; failures can leave partial changes. Linked-design checkpoints require a clean completed cloud save and produce a version manifest,
 not a self-contained F3D archive. Cloud/version checks are optimistic, not distributed locking. Motion checks
 are discrete samples. Section helpers produce curves, not clipped-solid Section Analysis.
@@ -77,10 +93,11 @@ No MCP-specific published episode is recorded. General channel: [AI Make](https:
 See [CURRENT.md](CURRENT.md). The working [ledger](ledger/LEDGER.md) belongs on `workbench` only.
 Shared operating context is [AI_MAKE](https://github.com/mtorores-hash/AI_MAKE).
 
-Latest: [v0.7 installation/rollback](docs/upgrade-v0.7.md), [caller contract 1.1](docs/caller-contract.md),
+Latest: [v0.8 review/temporary activation/rollback](docs/upgrade-v0.8-review.md), [caller contract 2.0](docs/caller-contract.md),
 and [compatibility handoff](docs/compatibility-handoff-ai-make.md).
 
-Source update pushed to `workbench` with approval. Not installed or native-Fusion tested.
+The earlier 0.7 source update was pushed with approval. This extended 0.8 candidate is local,
+passes source, real STDIO and the stated native disposable tests, and is installed/active.
 
 Modeling standard: [rules](docs/modeling-rules.md) and [audit / checked-export behavior](docs/modeling-hygiene.md).
 

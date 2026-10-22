@@ -1,5 +1,14 @@
 # v0.4.1 — Modeling hygiene (development)
 
+## 0.8.0 development — native-smoke follow-up
+
+Add bidirectional build compatibility checks before mutations, clearer target/scope preflight
+errors, and explicit native-observed interrupted-authoring ledger acknowledgement. Retain
+consumed budgets/history and original job status; require changed strategy, never replay.
+Add software failure controls and a disposable native negative-control runner. Still 32 tools,
+caller 2.0/rules 1.3.0; reconciliation is an additive restricted batch mode. Upload to workbench
+has been requested but is not yet performed; GitHub connector is unavailable in this session.
+
 ## 0.7.0 development — 2026-10-20 source adoption
 
 Adopt the reviewed engineering/interface checks, affected-evidence reuse, staged recovery

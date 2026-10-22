@@ -48,9 +48,29 @@ Use Fusion cloud projects and named native part files for shared editing. Read
 `docs/cloud-workflow.md`; preserve user edits, file IDs and links, use edit tokens before
 mutations, and confirm completed cloud saves before handoff. Never silently migrate assemblies.
 
-Use caller contract 1.1 in docs/caller-contract.md. MCP executes scoped operations; the caller owns
+Use caller contract 2.0 in docs/caller-contract.md. MCP executes scoped operations; the caller owns
 workflow approvals and external records. Review packages do not authorize push, installation or live CAD tests.
 
 For the 2026-10-20 update, Mauricio explicitly authorized implementation and installation.
 See CURRENT.md for the actual source/test/runtime states. Do not repeat a resolved approval
 request, infer installation from a source push, or change AI Make model routing.
+
+## 2026-10-21 K1 candidate restriction (current)
+
+The newer K1 brief permits local implementation/testing only. No push or installation of 0.8 until project completion AND Mauricio approves the printed design, followed by deployment authorization. Preserve active production models/print/recording. See docs/upgrade-v0.8-review.md. This supersedes the earlier installation paragraph for this candidate.
+
+Subsequent direct user instruction authorized local installation and disposable modeling tests.
+0.8 is now installed and active; see CURRENT.md and docs/k1-validation.md for actual evidence.
+This narrow newer authorization supersedes the no-install clause above. It does not authorize
+push, merge, release, production-model edits or infer printed-design approval. Existing MCP
+client sessions need reconnection to use the configured 0.8 server. Preserve old installation
+and current runtime history; interrupted authoring-ledger recovery remains incomplete.
+
+The latest user instruction additionally authorizes implementing the test follow-ups and uploading
+0.8 to the canonical repository using the GitHub connector. Target workbench, preserve remote
+changes, and do not merge/release. Reconciliation source now exists; inspect CURRENT.md for actual
+validation/activation and connector status rather than applying earlier historical restrictions.
+
+The user subsequently accepted authenticated GitHub browser access for the authorized upload
+and enabled local file uploads. The transfer uses the GitHub web UI because connector tools
+remain unavailable here. Workbench only; preserve remote edits and keep no-merge/release limits.
