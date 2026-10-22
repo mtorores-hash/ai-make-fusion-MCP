@@ -1,6 +1,36 @@
-# Current state — 0.8.0 local development candidate
+# Current state â€” 0.8.0 local development candidate
 
-## K1 CAD source follow-up — 22 October 2026
+## Installed and natively qualified — 22 October 2026
+
+Mauricio explicitly authorized installation and qualification through computer use. The
+rules 1.3.2 candidate is installed side by side and active after a clean Fusion restart.
+The previous installation, configuration and consistent idle-queue backup are retained.
+Fresh real SDK STDIO matched server/native runtime 0.8.0, caller 2.0, rules and build hashes;
+32 tools. No native identity or handshake was stubbed.
+
+15 bounded controls passed across the retained disposable fixture and continuation jobs,
+including one explicitly injected evaluator outage. Parameter height changed 0.1 to 1 mm
+with one feature/one sketch retained and zero history growth. Thin/finite box occupancy,
+cache/contradiction handling, stale declarations, real view hashes and checked-export
+evidence were exercised. STEP/F3D/STL and PNG artifact hashes were verified.
+
+Four failed qualification jobs remain retained: a test-package import assumption, a
+BRepBody passed to Fusion's component-only STEP API, stale scope after regeneration,
+and a test-report relative path. Corrected harness/sequence resumed the original fixture;
+the parameter edit was not replayed. Explicit allocation amendments retained all five
+attempts, cumulative elapsed time and growth; no issue reset or production edit occurred.
+The installed product source did not change during these corrections.
+
+Use a native leaf component for STEP, and synchronize before fresh revision-bound
+captures/review/export. Appearance content/decision remains caller-reported. Full root
+connectivity, strength, nested-occurrence probes, physical, real crash and cloud acceptance
+remain unqualified. See docs/k1-cad-native-validation.json for exact identity and controls.
+Configuration points to the new server; this existing chat's MCP process still reports
+the old build and needs reconnection. The fresh matching SDK session is the qualification
+evidence. Startup remains disabled as before; only the candidate bridge is running.
+
+
+## K1 CAD source follow-up â€” 22 October 2026
 
 Implemented parameter-only editing under explicit zero-history-growth budgets; revision-
 bound appearance records with required view/capture hashes; required-evidence blocking in
@@ -11,7 +41,7 @@ native-qualified. Full finite-root connectivity, kept-tool attribution and all f
 execution controls remain outside this implementation. Prior receipts qualify prior builds.
 
 
-## Process 1.7 alignment source candidate — 22 October 2026
+## Process 1.7 alignment source candidate â€” 22 October 2026
 
 Prepared under Mauricio's instruction to match the K1 proposal with the process/MCP and
 implement supported changes. Rules 1.3.1 adds explicit caller obligations; document-free
@@ -23,7 +53,7 @@ See `docs/process-1.7-alignment.md` for implementation, test scope and remaining
 The following older status sections retain their original dated evidence.
 
 
-## Authorized workbench transfer — 2026-10-22
+## Authorized workbench transfer â€” 2026-10-22
 
 The 0.8 implementation, regression tests and disposable fixture runners were uploaded
 through the authenticated GitHub web UI after the user accepted browser access and enabled
@@ -45,7 +75,7 @@ Only repository source/docs/examples/tests are transferred. Private host configu
 databases, runtime artifacts, evidence ZIPs and native CAD/PNG fixtures are excluded. The
 workbench ledger stays private; no main promotion, merge, release or visibility change.
 
-## GitHub browser transfer preparation — 2026-10-22
+## GitHub browser transfer preparation â€” 2026-10-22
 
 Authenticated GitHub browser access verified the private repository and workbench HEAD
 `6db17f97543ab88857f185343df5b02484f9e421`, matching the candidate's recorded baseline.
@@ -56,7 +86,7 @@ local file access and requires "Allow access to file URLs." User action was requ
 Private runtime receipts, databases and CAD fixtures remain outside the upload manifest.
 Do not claim an uploaded version or full remote file reconciliation from browsing alone.
 
-## Revised 0.8 native validation — 2026-10-22
+## Revised 0.8 native validation â€” 2026-10-22
 
 User cleared the blocked Fusion dialogs. A fresh Fusion process loaded the separate
 `fusion-mcp-0.8.0-validation-r2` bridge. Real SDK STDIO reported matching server/native
@@ -86,7 +116,7 @@ was supplied, but connector tools are still unavailable; no remote HEAD verifica
 upload, merge or release has occurred. See `docs/revised-native-validation.json` (or
 `revised-native-validation.json` from this docs directory) for actual results and limits.
 
-## Post-test improvements / requested workbench upload — 2026-10-21
+## Post-test improvements / requested workbench upload â€” 2026-10-21
 
 User authorized implementing the test follow-ups and uploading 0.8 using the GitHub connector.
 Implemented matching runtime/contract/rules/build checks on both sides of mutations; document-free
@@ -109,7 +139,7 @@ to enable the connector. No remote workbench HEAD/reconciliation or upload has o
 remote changes when the connector returns. No push by another route, merge, release or production
 CAD/AI_MAKE/printer change. See `docs/improvement-validation.json` and updated caller migration.
 
-## Owner-authorized local installation and native tests — 2026-10-21
+## Owner-authorized local installation and native tests â€” 2026-10-21
 
 The user subsequently instructed: "Install it in Fusion (Open it with the computer use skill)
 and choose something to model so you can test the MCP." This supersedes the prior no-install
@@ -143,7 +173,7 @@ Cloud/long-Boolean/crash/manufacturing/physical coverage and authoring-ledger re
 unqualified/incomplete. No K1/Reward Rocket production document was opened or modified. Historical
 pre-install notes below remain dated context, not current installation status.
 
-## Local continuation — 2026-10-21 America/Chicago
+## Local continuation â€” 2026-10-21 America/Chicago
 
 The supplied workspace was an empty Git repository (unborn master), not a workbench checkout.
 The review ZIP was extracted under `candidate-review/ai-make-fusion-MCP`; no patch was applied
