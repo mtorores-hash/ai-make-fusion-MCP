@@ -117,3 +117,13 @@ Retirement requires explicit task/scope, root plus source definitions permitted,
 ## Process 1.7 source alignment
 
 Rules 1.3.1 adds the K1 caller responsibilities without new geometry validators or tool names. `fusion_capabilities()` adds `process_controls`, including schema versions, opt-in budget and reconciliation boundaries, and explicit external/unsupported checks. It applies to the loaded pair only when `applies_to_loaded_pair` is true. The runtime/caller versions remain 0.8.0/2.0; existing required identity hashes still change with this source. Both processes must match on any later authorized activation; this source change does not update a running installation. The prior native receipts qualify only their recorded build, not this alignment.
+
+## K1 CAD follow-up contract
+
+The later rules 1.3.2 source adds `ctx.edit_parameters(changes)`, optional appearance
+required evidence, engineering `solid_probe`, evaluator provenance and contradiction
+blocking. Checked exports enforce required scope evidence before writing. See
+[K1 CAD improvements](k1-cad-improvements.md) for exact fields, bounds and examples.
+These additive helpers require a matching supported build; prior source/native receipts
+do not qualify them. Native solver/Boolean acceptance remains pending; no farm controls
+or installed runtime are changed.

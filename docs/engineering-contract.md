@@ -134,3 +134,13 @@ Orientation axes must be nonzero/orthogonal. Bed/support IDs must resolve to fac
 ## API evidence and native limits
 
 Implementation uses Autodesk's documented [temporary BRep operations](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_TemporaryBRepManager.htm), [normal evaluation](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_SurfaceEvaluator_getNormalAtPoint.htm), [curvature evaluation](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_SurfaceEvaluator_getCurvature.htm) and [oriented boxes](https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/core_OrientedBoundingBox3D_create.htm). Native evaluator behavior, empty Boolean intersections and nested occurrence transform semantics still require Fusion qualification. All helpers run inside the existing main-thread custom-event path. API documentation is not execution evidence.
+
+## K1 CAD follow-up contract
+
+The later rules 1.3.2 source adds `ctx.edit_parameters(changes)`, optional appearance
+required evidence, engineering `solid_probe`, evaluator provenance and contradiction
+blocking. Checked exports enforce required scope evidence before writing. See
+[K1 CAD improvements](k1-cad-improvements.md) for exact fields, bounds and examples.
+These additive helpers require a matching supported build; prior source/native receipts
+do not qualify them. Native solver/Boolean acceptance remains pending; no farm controls
+or installed runtime are changed.

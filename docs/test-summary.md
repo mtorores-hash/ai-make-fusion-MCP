@@ -184,3 +184,10 @@ installation/status documentation was adjusted for adoption. An isolated SDK ins
 attempt failed because the execution environment could not resolve the package server;
 real STDIO and Windows/Fusion/native/cloud checks remain unrun here. Do not mistake source
 publication or these tests for installation. See CURRENT.md and upgrade-v0.7.md.
+
+## K1 CAD source follow-up, 22 October 2026
+
+200 unittest/source/API-double tests pass, including seven new CAD review scenarios.
+Isolated real SDK STDIO test passes with native identity/preflight explicitly stubbed.
+Rules 1.3.2; unchanged runtime 0.8.0/caller 2.0/32 tools. No native solver/Boolean,
+real Orca or printer qualification. See k1-cad-improvements.md for exact limits.

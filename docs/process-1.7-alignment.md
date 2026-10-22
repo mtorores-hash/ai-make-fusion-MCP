@@ -46,3 +46,13 @@ Fusion API or shared runtime queue is used. The paired process suite passes 26 t
 An exact-v1.6-source to v1.7 temporary project migration changed 14 managed files, preserved
 synthetic PDS/CURRENT/3MF fixture bytes, and made zero changes on a second application.
 These fixtures do not qualify a real CAD/3MF artifact, client role loading or physical behavior.
+
+## K1 CAD follow-up contract
+
+The later rules 1.3.2 source adds `ctx.edit_parameters(changes)`, optional appearance
+required evidence, engineering `solid_probe`, evaluator provenance and contradiction
+blocking. Checked exports enforce required scope evidence before writing. See
+[K1 CAD improvements](k1-cad-improvements.md) for exact fields, bounds and examples.
+These additive helpers require a matching supported build; prior source/native receipts
+do not qualify them. Native solver/Boolean acceptance remains pending; no farm controls
+or installed runtime are changed.

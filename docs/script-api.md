@@ -157,3 +157,12 @@ and does not run arbitrary Python. It accounts an interrupted attempt without re
 budgets/history, and requires a new strategy for any subsequent corrective work. See
 `k1-caller-migration.md` for the exact sequence and conservative blockers/legacy limits.
 
+## K1 CAD follow-up contract
+
+The later rules 1.3.2 source adds `ctx.edit_parameters(changes)`, optional appearance
+required evidence, engineering `solid_probe`, evaluator provenance and contradiction
+blocking. Checked exports enforce required scope evidence before writing. See
+[K1 CAD improvements](k1-cad-improvements.md) for exact fields, bounds and examples.
+These additive helpers require a matching supported build; prior source/native receipts
+do not qualify them. Native solver/Boolean acceptance remains pending; no farm controls
+or installed runtime are changed.
