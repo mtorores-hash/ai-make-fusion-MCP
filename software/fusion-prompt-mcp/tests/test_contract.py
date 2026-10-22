@@ -24,7 +24,7 @@ class Registration:
 
 class ContractTests(unittest.TestCase):
     def test_versions_rules_mirror_and_hash_reuse(self):
-        result=get_rules();self.assertEqual(result['rules_version'],'1.3.1')
+        result=get_rules();self.assertEqual(result['rules_version'],'1.3.2')
         self.assertEqual((ROOT/'modeling-rules.md').read_bytes(),(ROOT.parents[1]/'docs/modeling-rules.md').read_bytes())
         self.assertTrue(get_rules(result['sha256'])['unchanged']);self.assertNotIn('text',get_rules(result['sha256']))
         self.assertIn('text',get_rules('old'))

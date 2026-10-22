@@ -37,7 +37,7 @@ async def main():
                           'get_modeling_rules','audit_modeling_hygiene','browse_cloud','inspect_document_state','cloud_operation','acquire_edit_token','release_edit_token','reconcile_cloud_job','retire_occurrences'}
                 assert {t.name for t in result.tools}==expected
                 rules=value(await session.call_tool('get_modeling_rules',{}))
-                assert rules['rules_version']=='1.3.1' and 'Component first' in rules['text']
+                assert rules['rules_version']=='1.3.2' and 'Component first' in rules['text']
                 capabilities=value(await session.call_tool('fusion_capabilities',{}))
                 assert capabilities['compatible'] and capabilities['process_controls']['applies_to_loaded_pair']
                 assert capabilities['process_controls']['rules_version']==rules['rules_version']
