@@ -1,5 +1,98 @@
 # Fusion MCP working ledger — unpublished workbench only
 
+## Authorized workbench transfer — 2026-10-22
+
+The 0.8 implementation, regression tests and disposable fixture runners were uploaded
+through the authenticated GitHub web UI after the user accepted browser access and enabled
+local file uploads. Connector tools remained unavailable in this chat. Remote workbench HEAD
+was rechecked as `6db17f97543ab88857f185343df5b02484f9e421`, matching the candidate baseline;
+each subsequent commit checked the expected remote head. Implementation transfer is recorded
+through `9d09c8ae4032f3aa746181502f9a6d07e2e3be26`. Documentation and ledger accompany this
+transfer; earlier pending-connector/upload paragraphs below are historical observations.
+
+This remains a private 0.8 development candidate, caller 2.0/rules 1.3.0/32 tools. 190 source
+tests passed. Revised native evidence covers the real STDIO spacer, 10 bounded fixture
+controls and two mismatched caller rejections, with all five spacer artifacts hash-verified.
+Actual crash/cloud/physical acceptance and end-to-end native STDIO reconcile dispatch remain
+unqualified. Protected child revision propagation can block ledger acknowledgement; positive
+accounting was qualified only in a separate root-only fixture with injected journal restart.
+All failed jobs/receipts remain retained locally; no ledger reset or replay was used.
+
+Only repository source/docs/examples/tests are transferred. Private host configuration, queue
+databases, runtime artifacts, evidence ZIPs and native CAD/PNG fixtures are excluded. The
+workbench ledger stays private; no main promotion, merge, release or visibility change.
+
+## GitHub browser transfer preparation — 2026-10-22
+
+Authenticated GitHub browser access verified the private repository and workbench HEAD
+`6db17f97543ab88857f185343df5b02484f9e421`, matching the candidate's recorded baseline.
+The user accepted continuing after browser repository access was established. Connector
+tools remain unavailable in this chat. Source upload through the GitHub web form is
+prepared, but no files or commits have been uploaded: Chrome's ChatGPT extension rejected
+local file access and requires "Allow access to file URLs." User action was requested.
+Private runtime receipts, databases and CAD fixtures remain outside the upload manifest.
+Do not claim an uploaded version or full remote file reconciliation from browsing alone.
+
+## 2026-10-22 — revised 0.8 native follow-up
+
+Fresh Fusion 2705.1.25 / embedded Python 3.14.0 loaded validation-r2 with one shared queue
+owner. Real SDK STDIO reported matching implementation SHA and passed a fresh disposable
+parametric spacer. Ten native controls and two incompatible caller identity controls pass.
+All five spacer output hashes verified; native fixture F3Ds backed up outside upload tree.
+Protected child revision propagation remains blocked; positive ledger accounting qualified
+in a separate root-only fixture with injected journal restart. Direct helper controls do not
+qualify native STDIO reconcile dispatch or real crash/cloud behavior. Three failed runs
+retained (protected revision, reused fixture document ID, old spacer expected path); no
+original failed job replay, ledger reset, production edit or release. Product files unchanged
+from 190-test software pass; native test harness corrected and actually rerun.
+Bridge active, startup disabled; matching server configured; clients need reconnection.
+GitHub tools unavailable, upload pending and remote HEAD unverified. See CURRENT.md and
+docs/revised-native-validation.json for results and limitations.
+
+## 2026-10-21 — requested improvements and GitHub connector upload
+
+Implemented both-side runtime/build matching before mutations, document/scope caller guidance,
+durable interrupted-attempt baseline and hash-bound explicit ledger acknowledgement. Preserve
+attempts/growth/conservative time/history and original status; reject stale/protected/lost-source
+observations; require changed strategy/remaining budget, no replay/promotion. Added source controls
+and disposable native negatives. 190 software tests and offline real STDIO pass; native handshake
+stub is explicit in offline harness. Revised native test remains pending, distinct from prior
+0.8 native passes. Backed up all disposable documents as F3D and staged a new r2 package/config;
+stopped prior bridge/startup. Computer helper twice could not activate Fusion save dialog; stopped
+input and requested user-assisted close/reopen. GitHub tools/plugin discovery not exposed; asked
+for connector enablement, no remote inspection/upload. No production CAD/AI_MAKE/printer/hardware,
+merge/release or publication. No cost/BOM/clock claim. Local host backups/records stay outside source.
+
+## 2026-10-21 — owner-authorized installation and native disposable tests
+
+User explicitly requested installation and computer-use launch/modeling. Staged a separate 0.8
+package, backed up config/0.7 source/registrations and consistent queue SQLite; 14.8 GB existing
+artifacts retained in place with inventory. Changed only fusion server args. Observed actual
+running 0.7 registration, stopped/disabled it, restarted Fusion, activated 0.8 and enabled startup.
+Native paths/one bridge verified; Fusion 2705.1.25/Python 3.14.0, client Python 3.14.7/MCP 1.30.0.
+Real fresh 0.8 STDIO built/exported a constrained parametric spacer with analytical volume and
+parameter restoration controls. Both native fixture runners passed stated cases; recovery left
+stage two unresolved without replay as expected. Native raw-report SHA/pages/events checks passed.
+Preserved initial caller validation failures and fresh-document correction, all receipts and
+artifacts. Existing chat connection still serves 0.7 rules; reconnect needed. Installation left
+active per request; rollback retained, not executed. No production K1/Reward Rocket, AI_MAKE,
+hardware/printer, push/merge/release, physical qualification or printed-design approval. Opt-in
+authoring-ledger recovery remains incomplete; no cost/BOM/challenge-time claim.
+
+## 2026-10-21 America/Chicago — existing-environment continuation
+
+User authorized source tests, isolated real STDIO and disposable native preparation while retaining
+no installation/push. Workspace was empty/unborn; extracted the supplied ZIP into a new folder.
+Separate LocalAppData checkout has invalid HEAD/no source; preserved without repair. Config and
+running MCP commands target 0.7 review; default add-in junction targets retained 0.6; no Fusion
+process observed and capability request timed out. Loaded native identity remains unknown.
+Read-only queue inspection found no pending jobs; historical interrupted/failed jobs preserved.
+88 evidence hashes matched. Original 177 tests passed, then 179 tests after native provenance
+guards/controls; isolated real STDIO passed on Python 3.14.7 / MCP 1.30.0. Synthetic benchmark
+retained separately. No native/kernel/cloud/physical validation claimed. Prepared exact temporary
+activation/rollback for approval; no activation, dependency installation, production edits,
+AI_MAKE, printer/hardware, push/merge/release, or external message. No cost/time/BOM claim.
+
 ## 2026-09-22 — documentation and source import
 
 Request: review AI_MAKE guidelines and upload this MCP's documentation to the designated repo.
@@ -176,3 +269,7 @@ real STDIO remains unrun here. No remote Windows/Fusion execution connection is 
 in this chat: local application/reload and native/kernel/cloud checks remain pending,
 not refused or awaiting repeated approval. Follow docs/upgrade-v0.7.md locally.
 No CAD, hardware, main-branch release, permission or billing change; no savings claimed.
+
+## 2026-10-22 UTC — K1 feedback candidate (local only)
+
+Implemented from current workbench 6db17f9; reconciled source and retained patches from the user-supplied Oct 21 text-only evidence bundle. Candidate runtime 0.8.0 / caller 2.0 / rules 1.3.0 / 32 tools. See docs/k1-gap-analysis.md and docs/k1-fix-disposition.json for implemented bounds versus deferred diagnostics/adapters. Current software validation is in docs/k1-validation.md. Historical native receipts are provenance only; new STDIO/native/cloud runs are unverified. No push, install, production CAD, hardware, print, preset or recording change. Release requires project completion and Mauricio's printed-design approval. Original best-practices reference retained. No physical BOM use, cost, clock or footage claim; usageEventId none. Idempotency key: fusion-mcp-k1-review-20261022.
