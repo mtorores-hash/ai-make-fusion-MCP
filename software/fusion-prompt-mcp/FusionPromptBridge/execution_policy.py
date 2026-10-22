@@ -1,10 +1,10 @@
 """Strict read-only batch grammar. This is a small query language, not a Python sandbox."""
 import ast
 
-READ_METHODS = {'inspect', 'validate', 'minimum_distance', 'interference', 'capture', 'audit_hygiene','evidence_fingerprint','verify_engineering','reconcile_edit'}
+READ_METHODS = {'inspect', 'validate', 'minimum_distance', 'interference', 'capture', 'present', 'audit_hygiene','evidence_fingerprint','verify_engineering','reconcile_edit','reconcile_authoring'}
 
 
-def validate_read_only(tree):
+def validate_read_only(tree,methods=None):
     if len(tree.body)!=1 or not isinstance(tree.body[0],ast.FunctionDef):
         raise ValueError('read_only requires only def run(ctx): return <queries>')
     fn=tree.body[0]; args=fn.args
@@ -20,7 +20,7 @@ def validate_read_only(tree):
         if isinstance(node,ast.Call):
             f=node.func
             if not (isinstance(f,ast.Attribute) and isinstance(f.value,ast.Name) and
-                    f.value.id=='ctx' and f.attr in READ_METHODS):
+                    f.value.id=='ctx' and f.attr in (READ_METHODS if methods is None else methods)):
                 raise ValueError('Only approved read-only ctx queries are allowed')
             for arg in node.args: literal(arg)
             for kw in node.keywords:
@@ -34,3 +34,10 @@ def validate_read_only(tree):
                 literal(key); query(value)
         else: literal(node)
     query(fn.body[0].value)
+
+
+def validate_reconciliation(tree):
+    validate_read_only(tree,{'acknowledge_authoring'})
+    result=tree.body[0].body[0].value
+    if not isinstance(result,ast.Call):
+        raise ValueError('reconcile requires exactly one literal ctx.acknowledge_authoring(...) call')

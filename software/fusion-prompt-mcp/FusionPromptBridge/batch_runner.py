@@ -10,9 +10,9 @@ import time
 import traceback
 import adsk.core
 import adsk.fusion
-from . import advanced, model_tools, verification, cloud
+from . import advanced, model_tools, verification, cloud, maintainability
 from . import scope as scopes
-from .execution_policy import validate_read_only
+from .execution_policy import validate_read_only, validate_reconciliation
 from .design_intent import ReferenceFailure
 import ast
 
@@ -40,19 +40,48 @@ class Context:
         self.store=store; self.job_id=job['job_id']; self.operation_id=job['operation_id']
         self.request=job['request']; self.app=app; self.design=design; self.target=target
         self.document=app.activeDocument; self.units=self.request['units']; self.guard=guard
-        self.selection=None;self.boundary=None;self.health_baseline=None;self.started=time.monotonic()
-        self.read_only=self.request.get('mode','modeling')=='read_only'
+        self.selection=None;self.boundary=None;self.health_baseline=None;self.authoring=None;self.started=time.monotonic()
+        self.reconciliation=self.request.get('mode')=='reconcile'
+        self.read_only=self.request.get('mode','modeling') in ('read_only','reconcile')
         self.timings={k:0.0 for k in ('solve','measurement','export','checkpoint','script')}
         self.output_dir=store.root/'artifacts'/self.job_id
         self.output_dir.mkdir(parents=True,exist_ok=True)
         self.result={'created':[],'measurements':{},'warnings':[],'files':[],'checkpoints':[],
-                     'traceback':None,'return_value':None,'validation':None,'timings_seconds':self.timings}
+                     'traceback':None,'return_value':None,'validation':None,'timings_seconds':self.timings,
+                     'outcomes':{'execution':'not_started','export':'not_requested','presentation':'not_requested',
+                                 'engineering':'not_checked','readiness':'not_evaluated','approval':'not_evaluated'}}
+
+    @contextlib.contextmanager
+    def operation(self, name, target=None, tools=None):
+        """Persist before entering a blocking native call. No heartbeat implies progress."""
+        import uuid
+        ident=uuid.uuid4().hex;started=time.perf_counter()
+        data={'operation':str(name),'activity_id':ident,'target':target,'tools':tools,
+              'last_completed_stage':self.result.get('last_completed_stage'),
+              'checkpoint':(self.result.get('checkpoints') or [None])[-1]}
+        self.flush();self.store.event(self.job_id,'operation_started',data)
+        outcome='failed'
+        try:
+            yield
+            outcome='completed'
+        finally:
+            self.store.event(self.job_id,'operation_finished',dict(data,status=outcome,elapsed_seconds=time.perf_counter()-started))
+
+    def native_call(self,name,action,target=None,tools=None):
+        self.check_cancel()
+        with self.operation(name,target,tools):return action()
 
     @contextlib.contextmanager
     def timed(self, category):
         start=time.perf_counter()
-        try: yield
+        try:
+            with self.operation(category):yield
         finally: self.timings[category]+=time.perf_counter()-start
+
+    def _synchronized_revision_state(self):
+        # Optimistic revision guard only, not geometry equivalence or evidence refresh.
+        return (scopes.revisions(self.design),
+                [(p.name,p.expression) for p in model_tools.each(self.design.allParameters)])
 
     def synchronize(self, predicate=None, max_events=20, timeout_seconds=2.0, recompute=True):
         if type(max_events) is not int or not 1<=max_events<=1000:
@@ -66,13 +95,17 @@ class Context:
             if recompute and not self.design.computeAll(): raise RuntimeError('Fusion computeAll failed')
             for _ in range(max_events):
                 self.check_cancel()
-                if predicate is None or predicate(): return True
+                if predicate is None or predicate():
+                    if recompute:self._last_synchronized_revision_state=self._synchronized_revision_state()
+                    return True
                 if time.perf_counter()-start>=timeout_seconds: break
                 adsk.doEvents()
         raise RuntimeError('Solver synchronization exhausted its event/time bound; pose unverified')
 
     def check_cancel(self):
         self.guard()
+        if self.authoring and self.authoring.remaining_seconds() is not None and self.authoring.remaining_seconds()<=0:
+            raise Cancelled('Adopted cumulative issue time exhausted at cooperative boundary; native calls cannot be interrupted')
         bound=self.request.get('task',{}).get('max_seconds')
         if bound is not None and time.monotonic()-self.started>bound:
             raise Cancelled('Caller per-operation time bound reached at cooperative checkpoint; kernel calls cannot be interrupted')
@@ -80,7 +113,9 @@ class Context:
 
     def flush(self): self.store.partial(self.job_id,self.result)
     def progress(self,fraction,message):
-        self.check_cancel(); self.store.progress(self.job_id,fraction,message); self.flush()
+        self.check_cancel(); self.store.progress(self.job_id,fraction,message)
+        self.store.event(self.job_id,'progress',{'operation':str(message)[:512],'fraction':fraction,
+            'last_completed_stage':self.result.get('last_completed_stage')});self.flush()
     def warn(self,message): self.result['warnings'].append(str(message)); self.flush()
     def record(self,name,value):
         json.dumps(value,allow_nan=False); self.result['measurements'][name]=value; self.flush(); return value
@@ -118,7 +153,9 @@ class Context:
         entity=entity or self.target
         chosen=scope if scope is not None else (self.selection.current_spec() if self.selection and not self.selection.legacy else scopes.selected(self.design,advanced.native(entity) if adsk.fusion.Component.cast(advanced.native(entity)) else advanced.native(entity).parentComponent))
         selection=scopes.Selection(self.design,chosen);selection.check_export(entity)
-        self.synchronize()
+        if getattr(self,'_last_synchronized_revision_state',None)==self._synchronized_revision_state():
+            self.synchronize(recompute=False)
+        else:self.synchronize()
         # Recompute must not silently make a supplied revision scope current.
         selection=scopes.Selection(self.design,chosen);selection.check_export(entity)
         integrity=scopes.health_report(self.design,selection,getattr(self,'health_baseline',None))
@@ -158,10 +195,19 @@ class Context:
             return result
     def verify_engineering(self,plan,previous_job_id='',detail=False):
         from .engineering import verify
-        return verify(self,plan,previous_job_id,detail)
+        value=verify(self,plan,previous_job_id,detail)
+        self.result['outcomes']['engineering']='evaluated_see_conclusions';self.flush();return value
     def reconcile_edit(self,job_id):
         from .recovery import reconcile
         return reconcile(self,job_id)
+
+    def reconcile_authoring(self,issue_id,original_job_id=''):
+        from .authoring_recovery import inspect
+        return inspect(self,issue_id,original_job_id)
+
+    def acknowledge_authoring(self,issue_id,observation_id,note,original_job_id=''):
+        from .authoring_recovery import acknowledge
+        return acknowledge(self,issue_id,observation_id,note,original_job_id)
     def run_stage(self,stage_id,action,postcondition,protected_plan=None):
         from .recovery import run_stage
         return run_stage(self,stage_id,action,postcondition,protected_plan)
@@ -225,13 +271,21 @@ class Context:
         elif suffix=='.stl':
             opts=manager.createSTLExportOptions(entity,str(path)); opts.sendToPrintUtility=False
         else: raise ValueError('Supported exports: f3d, step, stp, stl.')
-        with self.timed('export'):
-            if not manager.execute(opts) or not path.exists(): raise RuntimeError('Fusion export failed: '+filename)
+        try:
+            with self.timed('export'):
+                if not manager.execute(opts) or not path.exists():raise RuntimeError('Fusion export failed: '+filename)
+        except Exception:
+            self.result['outcomes']['export']='partial_failure' if self.result['outcomes']['export']=='completed' else 'failed'
+            self.flush();raise
         artifact=self.artifact(path)
         if source is not None:
-            if identity(self,entity)!=source:raise RuntimeError('Geometry changed during export; artifact is not revision-matched')
+            if identity(self,entity)!=source:
+                self.result['outcomes']['export']='identity_unproven';self.flush()
+                raise RuntimeError('Geometry changed during export; artifact is not revision-matched')
             artifact['geometry_identity']=source
             self.flush()
+        if self.result['outcomes']['export'] in ('not_requested','completed'):self.result['outcomes']['export']='completed'
+        self.flush()
         return artifact
     def checkpoint(self,label):
         self.check_cancel()
@@ -289,20 +343,50 @@ class Context:
         opts=manager.createSTEPImportOptions(str(path))
         if not manager.importToTarget(opts,self.target): raise RuntimeError('STEP import failed.')
         return self.inspect(False)
-    def capture(self,filename='view.png',width=1920,height=1080):
+    def capture(self,filename='view.png',width=1920,height=1080,required=True):
         self.check_cancel()
         if not 1<=width<=8192 or not 1<=height<=8192: raise ValueError('Invalid image dimensions.')
         path=self.path(filename)
         if path.suffix.lower()!='.png': raise ValueError('Use a PNG filename.')
-        if not self.app.activeViewport.saveAsImageFile(str(path),width,height): raise RuntimeError('Capture failed.')
-        size=model_tools.png_dimensions(path)
-        if size!=(width,height): raise RuntimeError('Fusion returned unexpected image dimensions: '+str(size))
-        return self.artifact(path)
+        try:
+            with self.operation('capture',{'filename':filename,'width':width,'height':height}):
+                if not self.app.activeViewport.saveAsImageFile(str(path),width,height):raise RuntimeError('Capture failed.')
+                from .png_check import dimensions
+                size=dimensions(path)
+                if size!=(width,height):raise RuntimeError('Fusion returned unexpected image dimensions: '+str(size))
+                artifact=self.artifact(path)
+            self.result['outcomes']['presentation']='partial_failure' if self.result.get('presentation_failures') else 'completed'
+            self.flush();return artifact
+        except Exception as exc:
+            self.result['outcomes']['presentation']='failed'
+            failure={'status':'failed','filename':filename,'message':str(exc),'required':required,'regeneration_performed':False}
+            self.result.setdefault('presentation_failures',[]).append(failure);self.flush()
+            if required:raise
+            return failure
     def camera(self,eye,target,up=(0,0,1),fit=False):
         self.check_cancel(); viewport=self.app.activeViewport; camera=viewport.camera
         camera.eye=self.point(*eye); camera.target=self.point(*target)
         camera.upVector=adsk.core.Vector3D.create(*up); camera.isFitView=fit
         camera.isSmoothTransition=False; viewport.camera=camera; viewport.refresh()
+    def present(self,filename='view.png',eye=None,target=None,up=(0,0,1),width=1920,height=1080):
+        """Bounded capture with optional temporary camera, no computeAll or appearances."""
+        from .recovery import observe,changes
+        self.check_cancel();before=observe(self);viewport=self.app.activeViewport;original=viewport.camera
+        if (eye is None)!=(target is None):raise ValueError('Supply both eye and target, or neither')
+        result={};restore_error=None
+        try:
+            if eye is not None:self.camera(eye,target,up)
+            result['capture']=self.capture(filename,width,height,required=False)
+        finally:
+            if eye is not None:
+                try:viewport.camera=original;viewport.refresh()
+                except Exception as exc:restore_error=str(exc)
+            after=observe(self);comparison=changes(before,after)
+            result.update(observation=comparison,camera_restore_error=restore_error,regeneration_performed=False,
+                          claim='Revision/placement/parameter observations only; not exhaustive geometry equality or a model save.')
+            result['status']='pass' if not comparison['model_changed'] and not restore_error and result.get('capture',{}).get('status')!='failed' else 'unproven'
+            self.record('presentation',result)
+        return result
     def apply_appearance(self,entity,appearance):
         # Accept an actual library/document Appearance object, not a guessed localized name.
         local=self.design.appearances.itemByName(appearance.name)
@@ -433,6 +517,8 @@ def execute_job(store,job,app,design_getter,document_id_getter):
             'traceback':None,'return_value':None,'validation':None}
     status='failed'
     try:
+        from .compatibility import require_match
+        if request.get('mode','modeling')!='read_only':require_match(request.get('_caller'))
         def guard():
             if document_id_getter()!=request['document_id']: raise ReferenceFailure('wrong_document','Active document ID changed; job target rejected.')
         guard(); d=design_getter()
@@ -442,13 +528,21 @@ def execute_job(store,job,app,design_getter,document_id_getter):
         ctx=Context(store,job,app,d,target,guard); result=ctx.result
         ctx.selection=scopes.Selection(d,request['scope'] if request.get('scope') is not None else (None if ctx.read_only else scopes.selected(d,target)))
         ctx.boundary=scopes.EditBoundary(d,ctx.selection,request.get('task'),target)
+        if ctx.reconciliation:
+            validate_reconciliation(ast.parse(request['script']))
+            cloud.require_edit(app,d,request['document_id'],request.get('edit_token',''),
+                               accepted_reference_versions=request.get('accepted_reference_versions'),
+                               writer_id=request['task']['writer_id'])
         if not ctx.read_only:
             cloud.require_edit(app,d,request['document_id'],request.get('edit_token',''),
                                accepted_reference_versions=request.get('accepted_reference_versions'),
                                writer_id=request.get('task',{}).get('writer_id','legacy'))
             health_before=scopes.health_snapshot(d);ctx.health_baseline=health_before
+            ctx.authoring=maintainability.Guard(store,d,ctx.selection,request.get('task'),
+                getattr(getattr(app.activeDocument,'dataFile',None),'id',None) or request['document_id'],job['operation_id'])
+            result['authoring']=ctx.authoring.status;ctx.flush()
         ctx.check_cancel()
-        if ctx.read_only: validate_read_only(ast.parse(request['script']))
+        if ctx.read_only and not ctx.reconciliation: validate_read_only(ast.parse(request['script']))
         else: before=inventory(d,ctx.selection.components())
         if not ctx.read_only:
             from .recovery import observe
@@ -464,6 +558,7 @@ def execute_job(store,job,app,design_getter,document_id_getter):
             value=namespace['run'](ctx)
         json.dumps(value,allow_nan=False)
         result['return_value']=value;script_completed=True
+        result['outcomes']['execution']='completed';ctx.flush()
         ctx.check_cancel()
         if not ctx.read_only:
             ctx.synchronize();regenerated=True
@@ -502,6 +597,12 @@ def execute_job(store,job,app,design_getter,document_id_getter):
                     result['validation']['inspection_gaps'].append({'check':'final_regeneration','message':'Script failed/cancelled before final regeneration'})
             except Exception as exc:result['warnings'].append('Post-failure inspection unavailable: '+str(exc))
         if ctx:
+            if ctx.authoring:
+                try:
+                    result['authoring']=ctx.authoring.finish(script_completed)
+                    if result['authoring'].get('blocked'):status='failed'
+                except Exception as exc:
+                    result['authoring']={'status':'unproven','message':str(exc),'reconciliation_required':True};status='failed'
             result['recompute_policy']='read_only_no_regeneration' if ctx.read_only else 'modeling_final_regeneration'
             try:
                 # Compare live API objects, not entityToken strings: Fusion may change token text.
@@ -510,5 +611,14 @@ def execute_job(store,job,app,design_getter,document_id_getter):
             except Exception as exc: result['warnings'].append('Post-job inventory unavailable: '+str(exc))
             result['output_dir']=str(ctx.output_dir)
         result.setdefault('message',status)
+        validation=result.get('validation') or {};boundary=result.get('edit_boundary') or {}
+        result.setdefault('outcomes',{}).update(execution=result['execution_status'],
+            mutation=result.get('change_observation',{}).get('model_changed','unobserved'),
+            regeneration='completed' if regenerated else 'not_performed',
+            integrity=validation.get('validation_status','not_checked'),
+            edit_boundary='fail' if boundary.get('violations') else 'pass' if boundary.get('enforcement')=='narrow_preconditions_and_posthoc_detection' else 'unbounded',
+            evidence=validation.get('evidence_status','not_checked'),
+            authoring=result.get('authoring',{}).get('status','not_evaluated'))
+        result['replay_permitted']=False
         result['partial_changes_possible']=status!='succeeded'
         store.finish(job['job_id'],status,result)

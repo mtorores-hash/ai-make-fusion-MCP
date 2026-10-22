@@ -9,7 +9,8 @@ import re
 import sqlite3
 import time
 import uuid
-from .execution_policy import validate_read_only
+from .execution_policy import validate_read_only, validate_reconciliation
+from .compatibility import identity
 
 ROOT = Path.home() / '.fusion-prompt-mcp'
 TERMINAL = {'succeeded', 'failed', 'cancelled', 'interrupted'}
@@ -30,6 +31,9 @@ class Store:
                 created REAL NOT NULL, updated REAL NOT NULL, progress REAL NOT NULL DEFAULT 0,
                 message TEXT NOT NULL DEFAULT '', cancel_requested INTEGER NOT NULL DEFAULT 0,
                 result TEXT, owner TEXT)''')
+            c.execute('CREATE TABLE IF NOT EXISTS activity (cursor INTEGER PRIMARY KEY AUTOINCREMENT, job_id TEXT, at REAL, kind TEXT, data TEXT)')
+            c.execute('CREATE INDEX IF NOT EXISTS activity_job ON activity(job_id,cursor)')
+            c.execute('CREATE TABLE IF NOT EXISTS heartbeat (owner TEXT PRIMARY KEY, at REAL, busy INTEGER)')
 
     @contextmanager
     def connect(self):
@@ -49,7 +53,7 @@ class Store:
         for key in ('checkpoint_before','validate_after'):
             if type(request.get(key)) is not bool: raise ValueError(key+' must be boolean')
         mode=request.get('mode','modeling')
-        if mode not in ('modeling','read_only'): raise ValueError('mode must be modeling or read_only')
+        if mode not in ('modeling','read_only','reconcile'): raise ValueError('mode must be modeling, read_only or reconcile')
         operation_id = request['operation_id']
         if not re.fullmatch(r'[A-Za-z0-9_.:-]{1,128}', operation_id):
             raise ValueError('operation_id must be 1–128 letters, digits, _, ., :, or -')
@@ -67,6 +71,12 @@ class Store:
             validate_read_only(tree)
             if request['checkpoint_before']:
                 raise ValueError('read_only does not create checkpoints; set checkpoint_before=False')
+        if mode=='reconcile':
+            validate_reconciliation(tree)
+            if request['checkpoint_before'] or request['validate_after']:
+                raise ValueError('reconcile changes only ledger records; set checkpoint_before=False and validate_after=False')
+            if not request.get('scope') or not request.get('task') or not request.get('edit_token'):
+                raise ValueError('reconcile requires current scope, task.writer_id and a writer edit_token')
         task=request.get('task') or {}
         for key in ('scope','task'):
             if request.get(key) is not None and (not isinstance(request[key],dict) or not request[key]):
@@ -76,6 +86,7 @@ class Store:
             if type(bound) not in (int,float) or (not math.isfinite(bound) or bound<=0):raise ValueError('task.max_seconds must be finite and >0; cooperative only')
         # Preserve v0.3 idempotency digests for the unchanged default modeling behavior.
         request=dict(request)
+        request['_caller']=identity()
         if request.get('mode')=='modeling': request.pop('mode')
         if not request.get('edit_token'): request.pop('edit_token',None)
         for optional in ('scope','task','accepted_reference_versions'):
@@ -91,12 +102,13 @@ class Store:
             raise ValueError('Unsupported cloud action')
         if not isinstance(request.get('arguments'),dict): raise ValueError('arguments must be an object')
         if len(canonical(request))>100_000: raise ValueError('Cloud request too large')
-        return self._enqueue(dict(request,kind='cloud'))
+        return self._enqueue(dict(request,kind='cloud',_caller=identity()))
 
     def _enqueue(self, request):
         operation_id=request['operation_id']
         encoded = canonical(request)
-        digest = hashlib.sha256(encoded.encode()).hexdigest()
+        # Runtime metadata must not turn an uncertain retry into a different operation.
+        digest = hashlib.sha256(canonical({k:v for k,v in request.items() if k!='_caller'}).encode()).hexdigest()
         with self.connect() as c:
             c.execute('BEGIN IMMEDIATE')
             old = c.execute('SELECT * FROM jobs WHERE operation_id=?', (operation_id,)).fetchone()
@@ -134,7 +146,39 @@ class Store:
                                    'progress','message','cancel_requested')}
 
     def status(self, job_id):
-        return self.summary(self.row(job_id))
+        row=self.row(job_id);result=self.summary(row)
+        with self.connect() as c:
+            event=c.execute('SELECT * FROM activity WHERE job_id=? ORDER BY cursor DESC LIMIT 1',(job_id,)).fetchone()
+            beat=c.execute('SELECT * FROM heartbeat ORDER BY at DESC LIMIT 1').fetchone()
+        data=json.loads(event['data']) if event else None
+        if data:
+            target=data.get('target')
+            data={k:data[k] for k in ('operation','activity_id','status','elapsed_seconds','last_completed_stage') if k in data}
+            if target is not None:data['target_preview']=str(target)[:512]
+            for k in ('operation','last_completed_stage'):
+                if k in data and data[k] is not None:data[k]=str(data[k])[:256]
+            data['identities_and_checkpoint']='Retrieve job_result(section="events", offset=<cursor>) for full activity'
+        result['activity']=dict(event,data=data) if event else None
+        result['bridge_liveness']=dict(beat) if beat else None
+        if beat:result['bridge_liveness'].update(age_seconds=max(0,time.time()-beat['at']),observed_fresh=time.time()-beat['at']<5)
+        result['main_thread_last_activity_age_seconds']=max(0,time.time()-event['at']) if event else None
+        result['liveness_note']='Heartbeat is worker liveness, not main-thread progress or completed geometry'
+        result['cancellation']='acknowledged' if row['status']=='cancelled' else 'pending_cooperative_boundary' if row['cancel_requested'] else 'not_requested'
+        return result
+
+    def event(self,job_id,kind,data):
+        with self.connect() as c:
+            c.execute('INSERT INTO activity(job_id,at,kind,data) VALUES(?,?,?,?)',(job_id,time.time(),kind,canonical(data)))
+
+    def events(self,job_id,after=0,limit=50):
+        if type(after) is not int or after<0 or type(limit) is not int or not 1<=limit<=100:raise ValueError('Invalid activity cursor/page')
+        with self.connect() as c:
+            rows=c.execute('SELECT * FROM activity WHERE job_id=? AND cursor>? ORDER BY cursor LIMIT ?',(job_id,after,limit)).fetchall()
+        return {'events':[dict(r,data=json.loads(r['data'])) for r in rows],
+                'cursor':rows[-1]['cursor'] if rows else after,'unchanged':not rows,'limit':limit}
+
+    def beat(self,owner,busy):
+        with self.connect() as c:c.execute('INSERT OR REPLACE INTO heartbeat VALUES(?,?,?)',(owner,time.time(),int(busy)))
 
     def result(self, job_id):
         r = self.row(job_id)
@@ -199,6 +243,19 @@ class Store:
     def recover(self):
         # Called only after exclusive bridge lock acquired. Never auto-replay a running job.
         with self.connect() as c:
+            if c.execute("SELECT 1 FROM sqlite_master WHERE name='authoring_issues'").fetchone():
+                for issue in c.execute('SELECT issue_id,record FROM authoring_issues').fetchall():
+                    record=json.loads(issue['record'])
+                    if record.get('active_operation') and not record.get('interrupted_at'):
+                        record['interrupted_at']=time.time()
+                        c.execute('UPDATE authoring_issues SET record=? WHERE issue_id=?',(canonical(record),issue['issue_id']))
+            for row in c.execute("SELECT job_id,result FROM jobs WHERE status='running'").fetchall():
+                result=json.loads(row['result']) if row['result'] else {}
+                result.setdefault('outcomes',{})['mutation']='uncertain_after_restart'
+                result['replay_permitted']=False
+                c.execute('UPDATE jobs SET result=? WHERE job_id=?',(canonical(result),row['job_id']))
+                c.execute('INSERT INTO activity(job_id,at,kind,data) VALUES(?,?,?,?)',
+                          (row['job_id'],time.time(),'interrupted',canonical({'effects':'uncertain','replayed':False})))
             c.execute("UPDATE jobs SET status='interrupted',message=?,updated=? WHERE status='running'",
                       ('Fusion bridge restarted during execution. Inspect/checkpoint recovery required; not replayed.',time.time()))
 

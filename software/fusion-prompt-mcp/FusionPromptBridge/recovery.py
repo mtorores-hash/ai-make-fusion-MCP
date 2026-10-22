@@ -52,6 +52,7 @@ def run_stage(ctx,stage_id,action,postcondition,protected_plan=None):
             row['protected_comparison']=engineering.compare_protected(protected,row['protected_after'])
             if row['protected_comparison']['status']!='pass':raise RuntimeError('Protected interface metrics changed or unavailable')
         row.update(status='completed',return_value=value)
+        ctx.result['last_completed_stage']=stage_id
         return value
     except BaseException as exc:
         row.update(status='failed',error=str(exc),error_code=getattr(exc,'code','stage_failure'),traceback=traceback.format_exc())

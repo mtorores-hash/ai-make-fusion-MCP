@@ -167,6 +167,8 @@ def start(store, job, app, design_getter, document_id_getter):
     request = job['request']; action = request['action']; args = request['arguments']; ident=job['job_id']
     result = {'action': action, 'cloud_complete': False, 'partial_changes_possible': False, 'uncertain':False, 'approval_status':'not_evaluated'}
     try:
+        from .compatibility import require_match
+        require_match(request.get('_caller'))
         store.assert_no_uncertain_cloud(exclude_job_id=ident)
         if _pending: raise ValueError('A cloud upload is pending. Poll it before another cloud operation.')
         store.partial(ident,result)
@@ -218,12 +220,14 @@ def start(store, job, app, design_getter, document_id_getter):
                         ok = doc.save(args.get('description','MCP shared-edit checkpoint'))
                     else:
                         target=destination(app,args)
+                        result['save_intent'].update(folder_id=target.id,project_id=args.get('project_id'))
                         result['uncertain']=True;store.partial(ident,result)
                         ok=doc.saveAs(args['name'],target,args.get('description',''),'')
                     if not ok: raise RuntimeError('Fusion rejected save')
                     future=None
                 else:
                     target=destination(app,args)
+                    result['save_intent'].update(folder_id=target.id,project_id=args.get('project_id'))
                     component=advanced.resolve(design,args['component_token'],adsk.fusion.Component)
                     advanced.editable(design,component)
                     result['uncertain']=True;store.partial(ident,result)
@@ -232,7 +236,7 @@ def start(store, job, app, design_getter, document_id_getter):
                     result['note']='Independent native copy; existing occurrences and joints are NOT replaced. Open/edit this new file by ID.'
                 result['partial_changes_possible']=True
                 result['status_note']='Save started; cloud completion not yet confirmed'
-                _pending[ident]={'doc':doc,'future':future,'baseline':baseline,'result':result,'started':time.monotonic()}
+                _pending[ident]={'app':app,'doc':doc,'future':future,'baseline':baseline,'result':result,'started':time.monotonic()}
                 store.partial(ident,result); store.progress(ident,0.5,'Waiting for Fusion cloud processing'); return
             elif action == 'insert':
                 f=get_file(app,args)
@@ -296,7 +300,24 @@ def tick(store):
                 if file.versionNumber!=pending['baseline']+1:
                     raise RuntimeError('Document version advanced unexpectedly during save. Inspect the version history.')
             if not file: continue
-            info=file_info(file)
+            # First save may temporarily expose local lineage / incomplete metadata.
+            # Observe remote version resolution; never call save again from a poll.
+            intent=result.get('save_intent',{})
+            first_save=result.get('action')=='save' and not intent.get('before_file')
+            try:
+                info=file_info(file)
+                if first_save:
+                    remote=pending['app'].data.findFileById(info['version_id'])
+                    if not remote:raise RuntimeError('Cloud version not yet resolvable')
+                    confirmed=file_info(remote)
+                    if (confirmed['id'],confirmed['version_id'])!=(info['id'],info['version_id']):
+                        raise RuntimeError('Local and cloud identities not yet consistent')
+                    info=confirmed
+            except Exception as exc:
+                if not first_save:raise
+                result['metadata_wait']={'reason':str(exc),'elapsed_seconds':time.monotonic()-pending['started']}
+                store.partial(ident,result);continue
+            check_saved_identity(info,intent,result.get('action'))
             result['file']=info; store.partial(ident,result)
             if not info['complete']: continue
             result.update(cloud_complete=True,uncertain=False,status_note='Cloud version fully processed')
@@ -309,6 +330,15 @@ def reset():
     _pending.clear(); _tokens.clear()
 
 
+def check_saved_identity(info,intent,action):
+    before=intent.get('before_file')
+    if info['version']!=intent.get('expected_version'):raise ValueError('Observed version differs from expected save outcome')
+    if action=='save' and before and info['id']!=before['id']:raise ValueError('Observed file identity differs from original save target')
+    if not before or action=='save_component':
+        for field in ('name','folder_id','project_id'):
+            if intent.get(field) and info.get(field)!=intent[field]:raise ValueError('Observed first-save destination differs: '+field)
+
+
 def reconcile(store,app,job_id,version_id='',confirmation_note=''):
     """Observe a late save; acknowledgement is explicit caller evidence, never automatic replay."""
     row=store.result(job_id);result=row.get('result') or {}
@@ -319,13 +349,12 @@ def reconcile(store,app,job_id,version_id='',confirmation_note=''):
     file=required(app.data.findFileById(version_id),'Observed cloud version')
     info=file_info(file);intent=result.get('save_intent',{});before=intent.get('before_file')
     if not info['complete']:raise ValueError('Observed cloud version still processing')
-    if result.get('action')=='save' and before and info['id']!=before['id']:
-        raise ValueError('Observed file identity differs from original save target')
-    if info['version']!=intent.get('expected_version'):raise ValueError('Observed version differs from expected save outcome')
+    check_saved_identity(info,intent,result.get('action'))
     report={'observed_file':info,'association':'caller must confirm this version contains the intended edits',
             'original_status':row['status'],'replayed':False}
     if confirmation_note.strip():
         report.update(confirmation_note=confirmation_note,confirmation_status='caller_reported_not_authenticated')
         result.update(uncertain=False,reconciliation=report)
         store.annotate_result(job_id,result)
+        row=store.result(job_id)
     return dict(row,reconciliation=report,reconciliation_required=not bool(confirmation_note.strip()))

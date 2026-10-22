@@ -31,7 +31,7 @@ def revisions(d):
 def selected(d, target):
     """Migration default: only target, no claim of complete functional dependencies."""
     return {'version':VERSION,'mode':'selected','targets':['target'],'dependencies':[],
-            'members':[{'id':'target','component_token':target.entityToken,'revision':target.revisionId,
+            'members':[{'id':'target','component_token':'@root' if same(target,d.rootComponent) else target.entityToken,'revision':target.revisionId,
                         'membership':'active','maturity':'working','role':'authored'}],
             'parameter_names':[], 'required_checks':[], 'dependency_review':'not_supplied'}
 
@@ -55,7 +55,7 @@ class Selection:
         if not isinstance(spec.get('targets'),list) or not isinstance(spec.get('dependencies',[]),list):raise ValueError('targets/dependencies must be lists')
         parameter_names=spec.get('parameter_names',[])
         if not isinstance(parameter_names,list) or not set(parameter_names)<={p.name for p in each(d.allParameters)}:
-            raise ValueError('Unresolved parameter_names in scope')
+            raise ValueError('SCOPE_PARAMETERS_NOT_FOUND: scope.parameter_names must name existing inspected parameters. Put approved new names in task.allowed_parameter_names, then add them to the current scope after creation.')
         for m in members:
             if not isinstance(m,dict) or not isinstance(m.get('id'),str) or not m['id'] or m['id'] in ids:
                 raise ValueError('Unique nonempty member id required')
@@ -193,12 +193,17 @@ def health_snapshot(d):
     for c in live_components(d):
         for name in ('features','joints','asBuiltJoints'):
             try:
-                for f in each(getattr(c,name)):
+                entities=each(getattr(c,name))
+            except Exception as exc:
+                unknown.append({'component_token':c.entityToken,'collection':name,'message':str(exc)});continue
+            for f in entities:
+                try:
                     state=f.healthState;message=f.errorOrWarningMessage
                     if state in (adsk.fusion.FeatureHealthStates.ErrorFeatureHealthState,adsk.fusion.FeatureHealthStates.WarningFeatureHealthState):
                         rows.append({'entity':f,'component':c,'state':state,'message':message,
                                      'severity':'error' if state==adsk.fusion.FeatureHealthStates.ErrorFeatureHealthState else 'warning'})
-            except Exception as exc:unknown.append({'component_token':c.entityToken,'collection':name,'message':str(exc)})
+                except Exception as exc:unknown.append({'component_token':c.entityToken,'collection':name,
+                    'entity_token':getattr(f,'entityToken',None),'message':str(exc)})
     return rows,unknown
 
 def health_report(d,selection,baseline=None):
@@ -242,6 +247,8 @@ class EditBoundary:
             if m['maturity']=='frozen' and m['id'] in self.allowed:raise ValueError('Frozen part cannot be mutated; caller must resolve reopening authority first')
         self.require_component(target)
         self.before=[(c,c.revisionId,selection.member(c)) for c in live_components(d)]
+        from . import preservation
+        self.protected_states=[(c,preservation.component_state(c)) for c,_,m in self.before if not m or m['id'] not in self.allowed]
         self.parameters={p.name:p.expression for p in each(d.allParameters)}
         self.occurrences=[(o,o.component,tuple(o.transform2.asArray()),o.entityToken) for o in each(d.rootComponent.allOccurrences)]
     def require_component(self,c):
@@ -252,21 +259,31 @@ class EditBoundary:
         if self.enabled and name not in self.task.get('allowed_parameter_names',[]):raise ValueError('Parameter outside permitted edit set')
     def post(self):
         if not self.enabled:return {'enforcement':'legacy_unbounded','approval_status':'not_evaluated'}
-        changed=[];violations=[];current=live_components(self.design)
+        from . import preservation
+        changed=[];violations=[];attribution=[];current=live_components(self.design)
         for c,rev,m in self.before:
             valid=getattr(c,'isValid',False) and any(c==x for x in current)
             if not valid or c.revisionId!=rev:
                 ident=m['id'] if m else None;changed.append(ident or c.entityToken)
-                if not m or ident not in self.allowed:violations.append({'kind':'component','id':ident,'reason':'outside permitted set or frozen'})
+                if not m or ident not in self.allowed:
+                    old=next(s for obj,s in self.protected_states if obj==c)
+                    comparison=preservation.compare(old,preservation.component_state(c)) if valid else {'status':'fail','changed':['deleted_component']}
+                    attribution.append({'component_token':c.entityToken,'comparison':comparison,
+                                        'classification':'revision_propagation' if comparison['status']=='pass' else 'changed_or_unproven'})
+                    if comparison['status']!='pass':violations.append({'kind':'component','id':ident,'reason':'outside permitted set or frozen; '+comparison['status']})
         for c in current:
             if not any(c==old for old,_,_ in self.before):violations.append({'kind':'new_component','token':c.entityToken,'reason':'new definitions not permitted by contract 1.0; create components before acquiring task scope'})
-        params={p.name:p.expression for p in each(self.design.allParameters)}
+        parameters={p.name:p for p in each(self.design.allParameters)}
+        params={name:p.expression for name,p in parameters.items()};generated=[]
         for name in self.parameters.keys()|params.keys():
             if self.parameters.get(name)!=params.get(name) and name not in self.task.get('allowed_parameter_names',[]):
-                violations.append({'kind':'parameter','name':name})
+                owner=preservation.generated_owner(parameters[name]) if name not in self.parameters and name in parameters else None
+                member=self.selection.member(owner) if owner else None
+                if member and member['id'] in self.allowed:generated.append({'name':name,'owner_member_id':member['id']})
+                else:violations.append({'kind':'parameter','name':name})
         now=each(self.design.rootComponent.allOccurrences)
         for o,c,matrix,token in self.occurrences:
-            if not any(o==x for x in now) or tuple(o.transform2.asArray())!=matrix:
+            if not any(o==x for x in now) or preservation.placement_changed(matrix,o.transform2.asArray()):
                 member=self.selection.member(c)
                 if not member or member['id'] not in self.allowed:violations.append({'kind':'occurrence','token':token})
         for o in now:
@@ -274,7 +291,8 @@ class EditBoundary:
                 member=self.selection.member(o.component)
                 if not member or member['id'] not in self.allowed:
                     violations.append({'kind':'new_occurrence','token':o.entityToken,'reason':'outside permitted set or frozen'})
-        return {'changed_member_ids':changed,'violations':violations,'enforcement':'narrow_preconditions_and_posthoc_detection',
+        return {'changed_member_ids':changed,'violations':violations,'revision_attribution':attribution,'owned_generated_parameters':generated,
+                'enforcement':'narrow_preconditions_and_posthoc_detection',
                 'task_id':self.task['task_id'],'writer_id':self.task['writer_id'],'baseline_id':self.task['baseline_id'],
                 'issue_id':self.task.get('issue_id'),'attempt':self.task.get('attempt'),
                 'approval_reference':self.task.get('approval_reference'),'approval_status':'not_authenticated',

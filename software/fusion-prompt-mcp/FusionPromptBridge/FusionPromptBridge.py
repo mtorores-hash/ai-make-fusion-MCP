@@ -8,9 +8,10 @@ import time
 import uuid
 import adsk.core
 import adsk.fusion
-from . import advanced, model_tools, batch_runner, cloud
+from . import advanced, model_tools, batch_runner, cloud, reporting, maintainability
 from . import scope as scopes
 from .job_store import Store, BridgeLock
+from . import compatibility
 
 ROOT = Path.home() / '.fusion-prompt-mcp'
 EVENT_ID = 'ai.make.fusion.prompt.v01'
@@ -59,7 +60,7 @@ def inspect():
         bodies.append(dict(ref(body), size_mm=[10 * (getattr(box.maxPoint, a) -
                            getattr(box.minPoint, a)) for a in ('x','y','z')]))
     return {'design_id': design_id(), 'document': _app.activeDocument.name,
-            'version': '0.7.0', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
+            'version': '0.8.0', 'root_component': ref(root), 'scope': 'root summary; use inspect_assembly for components', 'bodies': bodies,
             'sketches': [dict(ref(s), profiles=s.profiles.count) for s in items(root.sketches)],
             'parameters': [{'name': p.name, 'expression': p.expression, 'unit': p.unit}
                            for p in items(d.allParameters)],
@@ -82,6 +83,9 @@ def entity(d, token, cls):
     return result
 
 def _execute(op, a):
+    if op=='runtime_identity':
+        return dict(compatibility.identity(),bridge_path=str(Path(__file__).resolve()),
+                    fusion_version=_app.version,queue=str(ROOT))
     if op not in ALLOWED:
         raise ValueError('Unknown operation.')
     if _app.userInterface.activeCommand != 'SelectCommand':
@@ -92,19 +96,19 @@ def _execute(op, a):
         design().designType = adsk.fusion.DesignTypes.ParametricDesignType
         return inspect()
     if op == 'browse_cloud': return cloud.browse(_app,a)
-    if op == 'reconcile_cloud_job':return cloud.reconcile(_store,_app,a['job_id'],a['version_id'],a['confirmation_note'])
+    if op == 'reconcile_cloud_job':return reporting.response(_store,cloud.reconcile(_store,_app,a['job_id'],a['version_id'],a['confirmation_note']),a.get('section','summary'))
     if op == 'release_edit_token':return cloud.release_token(a['document_id'],a['edit_token'],a['writer_id'])
     d = design()
     if op == 'acquire_edit_token':
         if a['document_id']!=design_id():raise ValueError('Active document changed')
-        return cloud.inspect_state(_app,d,design_id(),True,a['writer_id'],a.get('accepted_reference_versions'))
+        return reporting.response(_store,cloud.inspect_state(_app,d,design_id(),True,a['writer_id'],a.get('accepted_reference_versions')),a.get('section','summary'))
     if op == 'document_state':
         if a['document_id'] != design_id(): raise ValueError('Active document changed')
-        return cloud.inspect_state(_app,d,design_id(),a.get('acquire_token',False))
+        return reporting.response(_store,cloud.inspect_state(_app,d,design_id(),a.get('acquire_token',False)),a.get('section','summary'),a.get('after_revision',''))
     if op == 'inspect':
         return inspect()
     if a.get('design_id') != design_id():
-        raise ValueError('Active document changed. Inspect and confirm the target design again.')
+        raise ValueError('TARGET_DOCUMENT_REQUIRED: Active document changed or no design_id supplied. Use inspect_design() and pass its current design_id; an empty or stale ID cannot target the active document.')
     if op == 'inspect_full':
         return model_tools.inspect_full(d, a['include_topology'], a['offset'], a['limit'],a.get('scope'),a.get('include_context',False))
     if op == 'select_geometry':
@@ -239,23 +243,39 @@ def execute(op,a):
         boundary.require_component(owner)
     if op=='parameter':boundary.require_parameter(a['name'])
     before=scopes.health_snapshot(d)
+    budget=None;result={};completed=False;regenerated=False
     try:
+        budget=maintainability.Guard(_store,d,selection,a.get('task'),
+            getattr(getattr(_app.activeDocument,'dataFile',None),'id',None) or design_id(),uuid.uuid4().hex,'narrow')
         result=_execute(op,a)
+        completed=True
         if not d.computeAll():raise RuntimeError('Regeneration failed after narrow operation')
+        regenerated=True
     except Exception as exc:
-        report={'execution_status':'failed','partial_changes_possible':True,'approval_status':'not_evaluated'}
+        report=dict(result,execution_status='completed' if completed else 'failed',partial_changes_possible=True,approval_status='not_evaluated',replay_permitted=False)
+        if budget:
+            try:report['authoring']=budget.finish(completed)
+            except Exception as error:report['authoring']={'status':'unproven','message':str(error)}
         try:
             report['edit_boundary']=boundary.post()
             report['validation']=scopes.health_report(d,selection,before)
             report['validation']['validation_status']='unproven'
             report['validation']['inspection_gaps'].append({'check':'failed_operation','message':'Final regeneration not established'})
         except Exception as inspection_error:report['inspection_error']=str(inspection_error)
-        raise RuntimeError(str(exc)+'; partial-state report: '+json.dumps(report)) from exc
+        report['outcomes']={'execution':report['execution_status'],'regeneration':'completed' if regenerated else 'unproven',
+                            'integrity':report.get('validation',{}).get('validation_status','unproven'),'approval':'not_evaluated'}
+        detail=reporting.response(_store,report) if _store else report
+        raise RuntimeError(str(exc)+'; partial-state report: '+json.dumps(detail)) from exc
     result['execution_status']='completed'
+    result['authoring']=budget.finish(True)
     result['edit_boundary']=boundary.post();result['validation']=scopes.health_report(d,selection,before)
     result['approval_status']='not_evaluated'
-    if result['edit_boundary'].get('violations') or result['validation']['feature_errors'] or result['validation']['inspection_gaps'] or result['validation']['evidence_status']!='pass':
-        raise RuntimeError('Narrow operation applied with failed postconditions: '+json.dumps(result))
+    result['replay_permitted']=False
+    result['outcomes']={'execution':'completed','regeneration':'completed','integrity':result['validation']['validation_status'],
+        'edit_boundary':'fail' if result['edit_boundary'].get('violations') else 'pass',
+        'authoring':result['authoring']['status'],'evidence':result['validation']['evidence_status'],'approval':'not_evaluated'}
+    if result['authoring'].get('blocked') or result['edit_boundary'].get('violations') or result['validation']['feature_errors'] or result['validation']['inspection_gaps'] or result['validation']['evidence_status']!='pass':
+        raise RuntimeError('Narrow operation applied with failed postconditions: '+json.dumps(reporting.response(_store,result) if _store else result))
     return result
 
 class Handler(adsk.core.CustomEventHandler):
@@ -282,6 +302,8 @@ class Handler(adsk.core.CustomEventHandler):
                     raise ValueError('Request ID mismatch.')
                 if time.time() > payload['expires']:
                     raise ValueError('Request expired without execution.')
+                if compatibility.mutates(payload['operation'],payload['arguments']):
+                    compatibility.require_match(payload.get('caller'))
                 result = execute(payload['operation'], payload['arguments'])
                 answer = {'ok': True, 'result': result}
             except Exception as exc:
@@ -302,7 +324,10 @@ class Handler(adsk.core.CustomEventHandler):
                 batch_runner.execute_job(_store, job, _app, design, design_id)
 
 def watch():
+    last_beat=0
     while not _stop.wait(0.2):
+        if time.monotonic()-last_beat>=1:
+            _store.beat(_owner,_busy);last_beat=time.monotonic()
         if any(ROOT.glob('*.request')) or _store.pending():
             _app.fireCustomEvent(EVENT_ID)
 
