@@ -1,6 +1,6 @@
 # Fusion MCP caller contract 2.0
 
-Runtime **0.8.0 development**, rules **1.3.0**, **32 MCP tools**. Both server and add-in must match. This contract adds ordinary JSON dictionaries to existing tools; it introduces no external workflow service or database schema. All Fusion API calls remain on the main thread.
+Runtime **0.8.0 development**, rules **1.3.1**, **32 MCP tools**. Both server and add-in must match. This contract adds ordinary JSON dictionaries to existing tools; it introduces no external workflow service or database schema. All Fusion API calls remain on the main thread.
 
 ## Output migration in 2.0
 
@@ -113,3 +113,17 @@ Retirement requires explicit task/scope, root plus source definitions permitted,
 6. Save completed versions using [cloud workflow](cloud-workflow.md). Reconcile uncertain saves before any new mutation.
 
 [Example request](../software/fusion-prompt-mcp/examples/scoped-validation.request.json) and [actual API-double result](../software/fusion-prompt-mcp/examples/scoped-validation.result.json) exercise this schema. Their document/tokens/revisions are synthetic fixture IDs, not live CAD evidence; replace them with observed Fusion values. Native acceptance is [prepared, not executed](disposable-acceptance-v0.6.md).
+
+## Process 1.7 source alignment
+
+Rules 1.3.1 adds the K1 caller responsibilities without new geometry validators or tool names. `fusion_capabilities()` adds `process_controls`, including schema versions, opt-in budget and reconciliation boundaries, and explicit external/unsupported checks. It applies to the loaded pair only when `applies_to_loaded_pair` is true. The runtime/caller versions remain 0.8.0/2.0; existing required identity hashes still change with this source. Both processes must match on any later authorized activation; this source change does not update a running installation. The prior native receipts qualify only their recorded build, not this alignment.
+
+## K1 CAD follow-up contract
+
+The later rules 1.3.2 source adds `ctx.edit_parameters(changes)`, optional appearance
+required evidence, engineering `solid_probe`, evaluator provenance and contradiction
+blocking. Checked exports enforce required scope evidence before writing. See
+[K1 CAD improvements](k1-cad-improvements.md) for exact fields, bounds and examples.
+These additive helpers require a matching supported build; prior source/native receipts
+do not qualify them. Native solver/Boolean acceptance remains pending; no farm controls
+or installed runtime are changed.

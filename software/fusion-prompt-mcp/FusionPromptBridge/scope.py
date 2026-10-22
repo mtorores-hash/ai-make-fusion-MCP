@@ -178,6 +178,12 @@ def evidence(selection):
             if record.get('geometry_fingerprint'):
                 try:fresh=set(deps)==set(current) and record['geometry_fingerprint']==evidence_fingerprint(selection,need['members'])
                 except Exception:fresh=False
+            if record.get('contradicted_by'):
+                fresh=False
+                row['blocker']='Caller evidence has an unresolved contradiction'
+            if need.get('kind')=='appearance':
+                from .cad_review import appearance
+                fresh=appearance(record,need) and fresh
             if need.get('applicable') is False and need.get('reason') and record.get('status')=='not_applicable' and record.get('reason') and fresh:
                 row.update(status='not_applicable',reason=record['reason'])
             elif record.get('status') in ('pass','fail') and record.get('source') and fresh:

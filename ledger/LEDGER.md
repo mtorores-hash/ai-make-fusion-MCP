@@ -1,6 +1,6 @@
-# Fusion MCP working ledger — unpublished workbench only
+# Fusion MCP working ledger â€” unpublished workbench only
 
-## Authorized workbench transfer — 2026-10-22
+## Authorized workbench transfer â€” 2026-10-22
 
 The 0.8 implementation, regression tests and disposable fixture runners were uploaded
 through the authenticated GitHub web UI after the user accepted browser access and enabled
@@ -22,7 +22,7 @@ Only repository source/docs/examples/tests are transferred. Private host configu
 databases, runtime artifacts, evidence ZIPs and native CAD/PNG fixtures are excluded. The
 workbench ledger stays private; no main promotion, merge, release or visibility change.
 
-## GitHub browser transfer preparation — 2026-10-22
+## GitHub browser transfer preparation â€” 2026-10-22
 
 Authenticated GitHub browser access verified the private repository and workbench HEAD
 `6db17f97543ab88857f185343df5b02484f9e421`, matching the candidate's recorded baseline.
@@ -33,7 +33,7 @@ local file access and requires "Allow access to file URLs." User action was requ
 Private runtime receipts, databases and CAD fixtures remain outside the upload manifest.
 Do not claim an uploaded version or full remote file reconciliation from browsing alone.
 
-## 2026-10-22 — revised 0.8 native follow-up
+## 2026-10-22 â€” revised 0.8 native follow-up
 
 Fresh Fusion 2705.1.25 / embedded Python 3.14.0 loaded validation-r2 with one shared queue
 owner. Real SDK STDIO reported matching implementation SHA and passed a fresh disposable
@@ -49,7 +49,7 @@ Bridge active, startup disabled; matching server configured; clients need reconn
 GitHub tools unavailable, upload pending and remote HEAD unverified. See CURRENT.md and
 docs/revised-native-validation.json for results and limitations.
 
-## 2026-10-21 — requested improvements and GitHub connector upload
+## 2026-10-21 â€” requested improvements and GitHub connector upload
 
 Implemented both-side runtime/build matching before mutations, document/scope caller guidance,
 durable interrupted-attempt baseline and hash-bound explicit ledger acknowledgement. Preserve
@@ -63,7 +63,7 @@ input and requested user-assisted close/reopen. GitHub tools/plugin discovery no
 for connector enablement, no remote inspection/upload. No production CAD/AI_MAKE/printer/hardware,
 merge/release or publication. No cost/BOM/clock claim. Local host backups/records stay outside source.
 
-## 2026-10-21 — owner-authorized installation and native disposable tests
+## 2026-10-21 â€” owner-authorized installation and native disposable tests
 
 User explicitly requested installation and computer-use launch/modeling. Staged a separate 0.8
 package, backed up config/0.7 source/registrations and consistent queue SQLite; 14.8 GB existing
@@ -79,7 +79,7 @@ active per request; rollback retained, not executed. No production K1/Reward Roc
 hardware/printer, push/merge/release, physical qualification or printed-design approval. Opt-in
 authoring-ledger recovery remains incomplete; no cost/BOM/challenge-time claim.
 
-## 2026-10-21 America/Chicago — existing-environment continuation
+## 2026-10-21 America/Chicago â€” existing-environment continuation
 
 User authorized source tests, isolated real STDIO and disposable native preparation while retaining
 no installation/push. Workspace was empty/unborn; extracted the supplied ZIP into a new folder.
@@ -93,7 +93,7 @@ retained separately. No native/kernel/cloud/physical validation claimed. Prepare
 activation/rollback for approval; no activation, dependency installation, production edits,
 AI_MAKE, printer/hardware, push/merge/release, or external message. No cost/time/BOM claim.
 
-## 2026-09-22 — documentation and source import
+## 2026-09-22 â€” documentation and source import
 
 Request: review AI_MAKE guidelines and upload this MCP's documentation to the designated repo.
 Advanced: organized v0.3 technical documentation, retained matching source/examples/tests,
@@ -114,7 +114,7 @@ Next: run documented live Fusion acceptance on a copy of a local native design.
 
 This ledger stays on unpublished workbench; it is not a public release artifact.
 
-## 2026-09-23 — BRANCA execution and verification update
+## 2026-09-23 â€” BRANCA execution and verification update
 
 Request: update the MCP using the attached lessons. Advanced: v0.4 execution/verification slice;
 full requirements and remaining work preserved in docs/modeling-lessons.md and docs/upgrade-v0.4.md.
@@ -127,7 +127,7 @@ Video candidate: rejected destructive experiment beside preserved source, and st
 proposed only, no footage. Shelf: pending; no consumption event. usageEventId: none.
 Idempotency key: fusion-mcp-branca-update-20260923. Public main and active challenge lock unchanged.
 
-## v0.4.1 — supplied parametric modeling standard
+## v0.4.1 â€” supplied parametric modeling standard
 
 Request: incorporate Mauricio's compilation of design hygiene rules following the agreed
 instruction-plus-checks approach. Advanced: original source preserved, operational rules exposed
@@ -141,7 +141,7 @@ proposed only, no footage. Shelf: pending; no consumption event; usageEventId: n
 Idempotency key: fusion-mcp-hygiene-v041. Next: retrieve installed rules and run live audit on a copy.
 No active-challenge lock change, license decision, public release or visibility change.
 
-## 2026-09-27 — generic documentation and example
+## 2026-09-27 â€” generic documentation and example
 
 Request: remove project-specific references from working documentation and use generic example names.
 Advanced: condensed reusable modeling lessons, updated links/provenance and renamed sample parameters.
@@ -151,7 +151,7 @@ Evidence: static Python syntax, parameter-reference and local Markdown link chec
 BOM: no parts consumed. Cost/time: not measured. Video: none. Shelf: no consumption event; usageEventId: none.
 Idempotency key: fusion-mcp-generic-docs-20260927. Next: existing live Fusion acceptance gates.
 
-## 2026-09-27 — commercial hardware sourcing rule
+## 2026-09-27 â€” commercial hardware sourcing rule
 
 Request: use quality commercial CAD before placeholders: search online, ask user, reconstruct
 from online specifications, then placeholder only as last resort.
@@ -164,7 +164,7 @@ BOM: no parts consumed. Cost/time: not measured. Video: none. Shelf: no consumpt
 Idempotency key: fusion-mcp-hardware-rules-20260927. usageEventId: none.
 Next: refresh local software and retrieve rules 1.0.1; existing live acceptance remains pending.
 
-## 2026-10-07 — PCB detail policy
+## 2026-10-07 â€” PCB detail policy
 
 Request: avoid detailed PCB connectors/pins unless specified; model clearance volumes and
 route cables to the correct board area/orientation. Advanced: rules 1.0.2, manual audit item,
@@ -175,7 +175,7 @@ BOM: no parts consumed. Cost/time: not measured. Video: none. Shelf: no consumpt
 Idempotency key: fusion-mcp-pcb-detail-20261007. usageEventId: none.
 Next: refresh local software and retrieve rules 1.0.2.
 
-## 2026-10-08 — junction completeness
+## 2026-10-08 â€” junction completeness
 
 Request: add the agreed rule against unintended incomplete/discontinuous junctions.
 Advanced: rules 1.0.3 and manual audit reminder require intent, complete attachment, local
@@ -187,7 +187,7 @@ BOM: no consumption. Cost/time: not measured. Video: none. Shelf: no consumption
 Idempotency key: fusion-mcp-junction-rules-20261008. usageEventId: none.
 Next: refresh local installation and retrieve rules 1.0.3; live geometry checks remain pending.
 
-## 2026-10-08 — connection selection
+## 2026-10-08 â€” connection selection
 
 Request: add the agreed connection-selection and fastener-review guidance.
 Advanced: rules 1.0.4 cover consolidation, motion/load paths, service, locating/retention roles,
@@ -200,7 +200,7 @@ Idempotency key: fusion-mcp-connection-rules-20261008. usageEventId: none.
 Next: refresh local installation and retrieve rules 1.0.4.
 
 
-## 2026-10-08 — cloud files and shared editing
+## 2026-10-08 â€” cloud files and shared editing
 
 Request: implement Fusion cloud projects and named part files so the user can manually design
 parts and the AI continues from those versions. Advanced: v0.5.0 / rules 1.0.5, 28 tools,
@@ -216,7 +216,7 @@ Idempotency key: fusion-mcp-cloud-editing-20261008.
 Next: upgrade both local processes, run disposable cloud project/part/reference acceptance.
 
 
-## 2026-10-10 — scoped workflow implementation, local review only
+## 2026-10-10 â€” scoped workflow implementation, local review only
 
 Request: execute only the Fusion-MCP implementation prompt in the supplied separate-repo ZIP.
 Base: verified current workbench b15d491fe87fd4b1a1953ea148378f045f621f14, matching all 57 blobs.
@@ -231,7 +231,7 @@ BOM: no parts consumed. Cost/time: not measured. No challenge clock or release i
 Idempotency key: fusion-mcp-workflow-v06-20261010. Next: review package and approve deployment/native tests separately.
 
 
-## 2026-10-10 — approved source push
+## 2026-10-10 â€” approved source push
 
 Mauricio instructed: "Push the update." Rechecked workbench; still b15d491fe87fd4b1a1953ea148378f045f621f14.
 Pushed the prepared 0.6.0 source change set to workbench, preserving its history; no force push
@@ -240,7 +240,7 @@ package. Retained evidence: 150 automated tests, syntax/rule consistency and pat
 Installation, real STDIO and disposable native Fusion acceptance remain unperformed. No AI_MAKE
 changes, hardware action or live model modification. Idempotency key: fusion-mcp-v06-approved-push-20261010.
 
-## 2026-10-19 — Reward Rocket lessons, bounded engineering implementation
+## 2026-10-19 â€” Reward Rocket lessons, bounded engineering implementation
 
 Baseline verified current workbench c0f7857cfcd38ef3e0c834a7ed1bfab323a8749c, preserving v0.6.
 Provided current-state gap analysis first. Implemented interface/revision evidence, declared
@@ -256,7 +256,7 @@ operation or physical claim. Installation/rollback and caller handoff packaged f
 BOM: none consumed. Cost/challenge time: not measured. Idempotency: fusion-mcp-engineering-v07-20261019.
 
 
-## 2026-10-20 — Adopt reviewed v0.7 source; local install authorized
+## 2026-10-20 â€” Adopt reviewed v0.7 source; local install authorized
 
 Mauricio requested implementation and installation of `Fusion-MCP-v0.7.0-review.zip`.
 Baseline workbench: `c0f7857cfcd38ef3e0c834a7ed1bfab323a8749c`. ZIP SHA-256:
@@ -270,6 +270,60 @@ in this chat: local application/reload and native/kernel/cloud checks remain pen
 not refused or awaiting repeated approval. Follow docs/upgrade-v0.7.md locally.
 No CAD, hardware, main-branch release, permission or billing change; no savings claimed.
 
-## 2026-10-22 UTC — K1 feedback candidate (local only)
+## 2026-10-22 UTC â€” K1 feedback candidate (local only)
 
 Implemented from current workbench 6db17f9; reconciled source and retained patches from the user-supplied Oct 21 text-only evidence bundle. Candidate runtime 0.8.0 / caller 2.0 / rules 1.3.0 / 32 tools. See docs/k1-gap-analysis.md and docs/k1-fix-disposition.json for implemented bounds versus deferred diagnostics/adapters. Current software validation is in docs/k1-validation.md. Historical native receipts are provenance only; new STDIO/native/cloud runs are unverified. No push, install, production CAD, hardware, print, preset or recording change. Release requires project completion and Mauricio's printed-design approval. Original best-practices reference retained. No physical BOM use, cost, clock or footage claim; usageEventId none. Idempotency key: fusion-mcp-k1-review-20261022.
+
+## 2026-10-22 â€” process 1.7 source alignment
+
+Mauricio asked to match the K1 proposal with the process/MCP and implement supported changes.
+Rules 1.3.1 and additive document-free process_controls describe supported boundaries, caller-owned
+requirements and missing geometry/slicer validators. Scope/task and engineering stay 1.0; runtime
+0.8.0/caller 2.0/32 tools are unchanged. Same-version foreign builds cannot inherit the metadata.
+193 source/API-double tests and isolated real STDIO pass; native identity/preflight is explicitly
+stubbed in the offline protocol harness. Paired process setup has 26 passes and a temporary
+v1.6-to-1.7 migration with protected fixture bytes preserved and zero second-apply changes.
+Prepared on a separate review branch from verified workbench 15742d5. AI_MAKE draft PR #1 holds
+the matching workflow/role/PDS changes. No running installation, production CAD, active project,
+preset, printer, recording, physical evidence, main merge or release is changed. Prior native
+receipts remain limited to their exact earlier build. See docs/process-1.7-alignment.md.
+
+## K1 CAD source follow-up â€” 22 October 2026
+
+Implemented parameter-only editing under explicit zero-history-growth budgets; revision-
+bound appearance records with required view/capture hashes; required-evidence blocking in
+checked exports; declared native solid-region probes; evaluator provenance/cache revision
+and explicit contradiction blocking. Rules 1.3.2, runtime 0.8.0/caller 2.0/32 tools.
+See docs/k1-cad-improvements.md. Source/API-double qualification only; not installed or
+native-qualified. Full finite-root connectivity, kept-tool attribution and all farm/slicer
+execution controls remain outside this implementation. Prior receipts qualify prior builds.
+
+## Installed and natively qualified — 22 October 2026
+
+Mauricio explicitly authorized installation and qualification through computer use. The
+rules 1.3.2 candidate is installed side by side and active after a clean Fusion restart.
+The previous installation, configuration and consistent idle-queue backup are retained.
+Fresh real SDK STDIO matched server/native runtime 0.8.0, caller 2.0, rules and build hashes;
+32 tools. No native identity or handshake was stubbed.
+
+15 bounded controls passed across the retained disposable fixture and continuation jobs,
+including one explicitly injected evaluator outage. Parameter height changed 0.1 to 1 mm
+with one feature/one sketch retained and zero history growth. Thin/finite box occupancy,
+cache/contradiction handling, stale declarations, real view hashes and checked-export
+evidence were exercised. STEP/F3D/STL and PNG artifact hashes were verified.
+
+Four failed qualification jobs remain retained: a test-package import assumption, a
+BRepBody passed to Fusion's component-only STEP API, stale scope after regeneration,
+and a test-report relative path. Corrected harness/sequence resumed the original fixture;
+the parameter edit was not replayed. Explicit allocation amendments retained all five
+attempts, cumulative elapsed time and growth; no issue reset or production edit occurred.
+The installed product source did not change during these corrections.
+
+Use a native leaf component for STEP, and synchronize before fresh revision-bound
+captures/review/export. Appearance content/decision remains caller-reported. Full root
+connectivity, strength, nested-occurrence probes, physical, real crash and cloud acceptance
+remain unqualified. See docs/k1-cad-native-validation.json for exact identity and controls.
+Configuration points to the new server; this existing chat's MCP process still reports
+the old build and needs reconnection. The fresh matching SDK session is the qualification
+evidence. Startup remains disabled as before; only the candidate bridge is running.
+

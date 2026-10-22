@@ -19,6 +19,9 @@ async def main():
         bootstrap=('import sys; sys.path.insert(0,sys.argv[1]); import server; '
                    'from FusionPromptBridge.job_store import Store; '
                    'server.job_store=lambda:Store(sys.argv[2]); '
+                   'from FusionPromptBridge.compatibility import identity; '
+                   'original_call=server.call; '
+                   'server.call=lambda operation,arguments=None: identity() if operation=="runtime_identity" else original_call(operation,arguments); '
                    'server.require_compatible_bridge=lambda:None; server.mcp.run(transport="stdio")')
         params=StdioServerParameters(command=sys.executable,args=['-c',bootstrap,str(Path(server).parent),home],
                                      env={'PYTHONPATH':os.pathsep.join(sys.path)})
@@ -34,7 +37,11 @@ async def main():
                           'get_modeling_rules','audit_modeling_hygiene','browse_cloud','inspect_document_state','cloud_operation','acquire_edit_token','release_edit_token','reconcile_cloud_job','retire_occurrences'}
                 assert {t.name for t in result.tools}==expected
                 rules=value(await session.call_tool('get_modeling_rules',{}))
-                assert rules['rules_version']=='1.3.0' and 'Component first' in rules['text']
+                assert rules['rules_version']=='1.3.2' and 'Component first' in rules['text']
+                capabilities=value(await session.call_tool('fusion_capabilities',{}))
+                assert capabilities['compatible'] and capabilities['process_controls']['applies_to_loaded_pair']
+                assert capabilities['process_controls']['rules_version']==rules['rules_version']
+                assert capabilities['process_controls']['controls']['finite_root_ligament_proof']=='not_implemented'
                 cached=value(await session.call_tool('get_modeling_rules',{'known_sha256':rules['sha256']}))
                 assert cached['unchanged'] and 'text' not in cached
                 source_tools={t.name:t for t in result.tools}
@@ -76,6 +83,6 @@ async def main():
                 assert cloud['status']=='queued'
                 assert value(await session.call_tool('cloud_operation',cloud_request))['job_id']==cloud['job_id']
                 assert (await session.call_tool('cloud_operation',dict(cloud_request,action='delete'))).isError
-                print('PASS: real STDIO initialize; 32 tools; rules; validation; isolated enqueue/status; duplicate protection; cancellation. Native handshake explicitly stubbed in this offline harness; not native acceptance.')
+                print('PASS: real STDIO initialize; 32 tools; rules and document-free process controls; validation; isolated enqueue/status; duplicate protection; cancellation. Native identity/handshake explicitly stubbed in this offline harness; not native acceptance.')
 
 asyncio.run(main())

@@ -95,11 +95,15 @@ def fusion_capabilities(design_id: str = '') -> dict:
     """Compare server/native runtime, contract, rules and build identities. Empty design_id returns identity without selecting a document.
     compatible=False blocks mutations; reconnect/restart matching builds. A supplied inspected design_id also returns modeling capabilities."""
     from FusionPromptBridge.compatibility import identity
+    from FusionPromptBridge.process_controls import describe
     bridge=call('runtime_identity',{})
     server=identity()
     result=call('capabilities',{'design_id':design_id}) if design_id else {'version':bridge['runtime'],'caller_contract_version':bridge['caller_contract']}
-    return dict(result,server_identity=server,bridge_identity=bridge,
-                compatible=all(bridge.get(k)==v for k,v in server.items()))
+    matched=all(bridge.get(k)==v for k,v in server.items())
+    controls=describe()
+    controls['applies_to_loaded_pair']=matched
+    return dict(result,server_identity=server,bridge_identity=bridge,process_controls=controls,
+                compatible=matched)
 
 @mcp.tool()
 def inspect_assembly(design_id: str) -> dict:

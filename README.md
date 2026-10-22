@@ -1,5 +1,58 @@
 # AI Make Fusion MCP
 
+## Installed and natively qualified — 22 October 2026
+
+Mauricio explicitly authorized installation and qualification through computer use. The
+rules 1.3.2 candidate is installed side by side and active after a clean Fusion restart.
+The previous installation, configuration and consistent idle-queue backup are retained.
+Fresh real SDK STDIO matched server/native runtime 0.8.0, caller 2.0, rules and build hashes;
+32 tools. No native identity or handshake was stubbed.
+
+15 bounded controls passed across the retained disposable fixture and continuation jobs,
+including one explicitly injected evaluator outage. Parameter height changed 0.1 to 1 mm
+with one feature/one sketch retained and zero history growth. Thin/finite box occupancy,
+cache/contradiction handling, stale declarations, real view hashes and checked-export
+evidence were exercised. STEP/F3D/STL and PNG artifact hashes were verified.
+
+Four failed qualification jobs remain retained: a test-package import assumption, a
+BRepBody passed to Fusion's component-only STEP API, stale scope after regeneration,
+and a test-report relative path. Corrected harness/sequence resumed the original fixture;
+the parameter edit was not replayed. Explicit allocation amendments retained all five
+attempts, cumulative elapsed time and growth; no issue reset or production edit occurred.
+The installed product source did not change during these corrections.
+
+Use a native leaf component for STEP, and synchronize before fresh revision-bound
+captures/review/export. Appearance content/decision remains caller-reported. Full root
+connectivity, strength, nested-occurrence probes, physical, real crash and cloud acceptance
+remain unqualified. See docs/k1-cad-native-validation.json for exact identity and controls.
+Configuration points to the new server; this existing chat's MCP process still reports
+the old build and needs reconnection. The fresh matching SDK session is the qualification
+evidence. Startup remains disabled as before; only the candidate bridge is running.
+
+
+## K1 CAD source follow-up â€” 22 October 2026
+
+Implemented parameter-only editing under explicit zero-history-growth budgets; revision-
+bound appearance records with required view/capture hashes; required-evidence blocking in
+checked exports; declared native solid-region probes; evaluator provenance/cache revision
+and explicit contradiction blocking. Rules 1.3.2, runtime 0.8.0/caller 2.0/32 tools.
+See docs/k1-cad-improvements.md. Source/API-double qualification only; not installed or
+native-qualified. Full finite-root connectivity, kept-tool attribution and all farm/slicer
+execution controls remain outside this implementation. Prior receipts qualify prior builds.
+
+
+## Process 1.7 alignment source candidate â€” 22 October 2026
+
+Prepared under Mauricio's instruction to match the K1 proposal with the process/MCP and
+implement supported changes. Rules 1.3.1 adds explicit caller obligations; document-free
+capabilities expose a bounded `process_controls` declaration only for a matching loaded pair.
+Runtime/caller remain 0.8.0/2.0 and the 32-tool surface is unchanged. This source is not installed;
+the observed installed rules 1.3.0 build and prior native receipts remain separate.
+Finite-root/Boolean-attribution and slicer/package/path validators are still deferred.
+See `docs/process-1.7-alignment.md` for implementation, test scope and remaining gaps.
+The following older status sections retain their original dated evidence.
+
+
 A local MCP server and Autodesk Fusion add-in that let an AI client build and inspect native
 Fusion models through typed tools or one complete Python modeling script.
 

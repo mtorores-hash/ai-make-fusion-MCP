@@ -1,6 +1,6 @@
 # Caller migration: 0.8.0 development / contract 2.0
 
-Rules 1.3.0; engineering and scope/task dictionaries remain 1.0; 32 tools. Both local server
+Rules 1.3.1; engineering and scope/task dictionaries remain 1.0; 32 tools. Both local server
 and Fusion add-in must be updated together after release authorization. No new dependency.
 This is a breaking default-output migration, hence caller contract 2.0.
 
@@ -177,3 +177,7 @@ Incorrect identities fail uncertain; missing metadata waits within the existing 
 Reconciliation preserves original terminal status and requires the caller's explicit confirmation.
 There is no duplicate save retry, automatic reload or promotion of an old version. Existing clean
 linked-cloud checkpoints and self-contained unlinked F3D checkpoints remain distinct.
+
+## Process 1.7 source alignment
+
+Rules 1.3.1 adds the K1 caller responsibilities without new geometry validators or tool names. `fusion_capabilities()` adds `process_controls`, including schema versions, opt-in budget and reconciliation boundaries, and explicit external/unsupported checks. It applies to the loaded pair only when `applies_to_loaded_pair` is true. The runtime/caller versions remain 0.8.0/2.0; existing required identity hashes still change with this source. Both processes must match on any later authorized activation; this source change does not update a running installation. The prior native receipts qualify only their recorded build, not this alignment.

@@ -136,6 +136,10 @@ class Context:
         if p: p.expression=expression
         else: p=self.design.userParameters.add(name,adsk.core.ValueInput.createByString(expression),unit or self.units,'Batch MCP')
         return p
+    def edit_parameters(self,changes):
+        """Bounded existing-user-parameter route; no feature/sketch creation or rollback."""
+        from .authoring import edit_parameters
+        return edit_parameters(self,changes)
     def audit_hygiene(self, scope=None):
         from .hygiene import audit
         self.check_cancel()
@@ -162,6 +166,8 @@ class Context:
         self.record('checked_export_integrity',integrity)
         if integrity['feature_errors'] or integrity['inspection_gaps']:
             raise RuntimeError('Checked export blocked by new/relevant integrity errors or unavailable checks')
+        if integrity.get('evidence_status')!='pass':
+            raise RuntimeError('Checked export blocked by failed, stale or missing required evidence')
         boundary=getattr(self,'boundary',None)
         if boundary and boundary.post().get('violations'):raise RuntimeError('Checked export blocked by edit-scope violation')
         report=self.require_hygiene(strict_reviews,chosen)
