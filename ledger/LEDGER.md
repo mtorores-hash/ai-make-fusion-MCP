@@ -273,3 +273,17 @@ No CAD, hardware, main-branch release, permission or billing change; no savings 
 ## 2026-10-22 UTC — K1 feedback candidate (local only)
 
 Implemented from current workbench 6db17f9; reconciled source and retained patches from the user-supplied Oct 21 text-only evidence bundle. Candidate runtime 0.8.0 / caller 2.0 / rules 1.3.0 / 32 tools. See docs/k1-gap-analysis.md and docs/k1-fix-disposition.json for implemented bounds versus deferred diagnostics/adapters. Current software validation is in docs/k1-validation.md. Historical native receipts are provenance only; new STDIO/native/cloud runs are unverified. No push, install, production CAD, hardware, print, preset or recording change. Release requires project completion and Mauricio's printed-design approval. Original best-practices reference retained. No physical BOM use, cost, clock or footage claim; usageEventId none. Idempotency key: fusion-mcp-k1-review-20261022.
+
+## 2026-10-22 — process 1.7 source alignment
+
+Mauricio asked to match the K1 proposal with the process/MCP and implement supported changes.
+Rules 1.3.1 and additive document-free process_controls describe supported boundaries, caller-owned
+requirements and missing geometry/slicer validators. Scope/task and engineering stay 1.0; runtime
+0.8.0/caller 2.0/32 tools are unchanged. Same-version foreign builds cannot inherit the metadata.
+193 source/API-double tests and isolated real STDIO pass; native identity/preflight is explicitly
+stubbed in the offline protocol harness. Paired process setup has 26 passes and a temporary
+v1.6-to-1.7 migration with protected fixture bytes preserved and zero second-apply changes.
+Prepared on a separate review branch from verified workbench 15742d5. AI_MAKE draft PR #1 holds
+the matching workflow/role/PDS changes. No running installation, production CAD, active project,
+preset, printer, recording, physical evidence, main merge or release is changed. Prior native
+receipts remain limited to their exact earlier build. See docs/process-1.7-alignment.md.
