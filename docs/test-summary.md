@@ -1,3 +1,7 @@
+# Current validation: 0.8.0 local development
+
+177 software/API-double tests pass; new real STDIO/native acceptance unrun. See [current validation](k1-validation.md), [metrics](k1-response-metrics.json) and [register](k1-fix-disposition.json). The 0.7 results below are historical.
+
 # Current validation: 0.7.0 development
 
 159 tests pass (150 baseline plus 9 meaningful behavioral scenarios), syntax and diff checks pass. Native Fusion and real STDIO remain unrun. See [engineering-validation.md](engineering-validation.md) and [measured software evidence](engineering-metrics.json). These results do not prove production readiness.

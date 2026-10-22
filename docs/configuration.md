@@ -1,5 +1,11 @@
 # Configuration
 
+Updated 0.8 mutations require matching server/native runtime, caller contract, rules SHA and
+implementation fingerprint. `fusion_capabilities()` reports both identities without needing
+a document. Reconnect existing MCP clients and restart Fusion after switching immutable source
+folders; otherwise mutations fail with `MCP_RUNTIME_MISMATCH` before execution. Keep one bridge
+owner of the shared queue. Do not edit an installed build in place or bypass its fingerprint.
+
 Run the MCP server and Fusion under the same Windows account on the same computer.
 Choose a permanent installation path; the executable and server paths must refer to that
 installation. The repository root is not the executable source folder.

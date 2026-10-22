@@ -1,0 +1,288 @@
+{
+  "baseline": "6db17f97543ab88857f185343df5b02484f9e421",
+  "runtime": "0.8.0 development",
+  "caller_contract": "2.0",
+  "rules": "1.3.0",
+  "tools": 32,
+  "evidence_bundle_sha256": "2da023c0abc0eedc75ff339feccd25b1c4b8e5cbe8e069a161f1cb492acb2fdb",
+  "evidence_packaged_hashes_verified": true,
+  "release_condition": "Project completion AND Mauricio approves printed design; no deployment authorization inferred",
+  "push": false,
+  "installed": true,
+  "original_patches": [
+    {
+      "file": "k1-native-root-scope-fix.patch",
+      "sha256": "f485b9deb916cb1691bc6a4c8d4a2291050268cb046f9ab1cdd1bd3fdd44951a",
+      "status": "Integrated deliberately; regression/syntax validation recorded separately"
+    },
+    {
+      "file": "preserved-export-sync-fix.patch",
+      "sha256": "98de9cdf497ac9dd7f0cae267e325bd49d998f3bd7f0ecbd7df0794a3dc8977d",
+      "status": "Integrated deliberately; regression/syntax validation recorded separately"
+    }
+  ],
+  "items": [
+    {
+      "id": "MCP-K1-01",
+      "disposition": "implemented_and_software_tested",
+      "files": [
+        "scope.py",
+        "test_scoped_workflow.py"
+      ],
+      "summary": "Root @root fallback; original project native pass retained as dated provenance.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "Candidate native engineering fixture matched root-scope defect/seam controls; standalone real MCP root spacer passed",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-02",
+      "disposition": "implemented_and_software_syntax_checked",
+      "files": [
+        "examples/native_engineering_fixtures"
+      ],
+      "summary": "Explicit scope reload preserved; candidate path guard added. New runner unrun.",
+      "software_evidence": "Syntax only",
+      "native_status": "Matching installed 0.8 engineering runner executed successfully; runtime paths recorded",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-PRESERVED-01",
+      "disposition": "implemented_and_software_tested",
+      "files": [
+        "batch_runner.py",
+        "test_k1_regressions.py"
+      ],
+      "summary": "Exact solved-state reuse, changed parameter recompute, stale revision rejection. Native export acceptance pending.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "Candidate native checked-export solved-state observation passed; native compute-call count not independently instrumented",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "PROCESS-NATIVE-KEPT-TOOL-R27",
+      "disposition": "deferred",
+      "files": [
+        "docs/k1-gap-analysis.md"
+      ],
+      "summary": "Authoring-script workaround stays evidence; no general server helper without required native kept-tool/multi-fragment controls.",
+      "software_evidence": "Not implemented; no new test claim",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-OPEN-01",
+      "disposition": "partial_implemented_and_software_tested",
+      "files": [
+        "scope.py",
+        "advanced.py",
+        "batch_runner.py"
+      ],
+      "summary": "Per-entity unavailable health does not hide later damage; completed work retained. AsBuiltJoint full integrity remains unproven.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-OPEN-02",
+      "disposition": "partial_implemented_and_software_tested",
+      "files": [
+        "preservation.py",
+        "scope.py"
+      ],
+      "summary": "Bounded history-free B-rep revision propagation and roundoff. Authored-history GUID propagation remains blocked/unproven.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-01",
+      "disposition": "deferred",
+      "files": [
+        "docs/k1-gap-analysis.md"
+      ],
+      "summary": "Finite-root/neck/ligament evaluator lacks native controls; existing surface checks do not cover it.",
+      "software_evidence": "Not implemented; no new test claim",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-OPEN-03",
+      "disposition": "implemented_and_software_tested",
+      "files": [
+        "preservation.py",
+        "scope.py"
+      ],
+      "summary": "New native-created dimensions attributed to permitted components; existing/foreign changes still rejected. Native acceptance pending.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "Native generated owned dimensions accepted in permitted root; no boundary violations; negative foreign/existing controls remain software-only",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-OPEN-04",
+      "disposition": "partial_implemented_and_software_tested",
+      "files": [
+        "batch_runner.py",
+        "execution_policy.py"
+      ],
+      "summary": "Read-only present/capture without regeneration, bounded observations. Native camera restoration unverified.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "Native presentation observed no model change and camera restoration passed on disposable fixture",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-02",
+      "disposition": "deferred",
+      "files": [
+        "docs/k1-gap-analysis.md"
+      ],
+      "summary": "Retained-feature destructive-impact coverage inference not implemented.",
+      "software_evidence": "Not implemented; no new test claim",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-03",
+      "disposition": "partial_implemented_and_software_tested",
+      "files": [
+        "reporting.py",
+        "batch_runner.py"
+      ],
+      "summary": "Independent outcomes and hash-bound report evidence; actual mesh/package/support qualification deferred to adapters.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-OPEN-05",
+      "disposition": "implemented_and_software_tested",
+      "files": [
+        "batch_runner.py",
+        "png_check.py"
+      ],
+      "summary": "Optional capture failure preserved independently; PNG existence/raster checks, durable measurements/return/files. Actual viewport failure cause unknown.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "Normal native PNG capture and exports passed; forced optional failure behavior remains software-only",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-OPEN-06",
+      "disposition": "partial_implemented_and_software_tested",
+      "files": [
+        "job_store.py",
+        "batch_runner.py",
+        "maintainability.py"
+      ],
+      "summary": "Named durable activity and adopted budgets; no forced native interruption or automatic per-adsk attribution.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "PROCESS-ORCA-R27-01",
+      "disposition": "deferred",
+      "files": [
+        "docs/k1-gap-analysis.md"
+      ],
+      "summary": "Adapter GUI override-marker regression retained as evidence; outside Fusion runtime; no slicer changes.",
+      "software_evidence": "Not implemented; no new test claim",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-04",
+      "disposition": "implemented_and_software_tested",
+      "files": [
+        "job_store.py",
+        "batch_runner.py",
+        "FusionPromptBridge.py"
+      ],
+      "summary": "Operation start/end persisted before blocking callback; heartbeat distinct, cooperative cancellation and restart uncertainty. Native timing unverified.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-05",
+      "disposition": "implemented_and_software_tested",
+      "files": [
+        "batch_runner.py",
+        "reporting.py"
+      ],
+      "summary": "Completed return/artifacts survive missing later health/capture; real failures remain visible and replay prohibited.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-06",
+      "disposition": "deferred",
+      "files": [
+        "docs/k1-gap-analysis.md"
+      ],
+      "summary": "Localized near-coincident native diagnostics/probes require kernel evidence; universal geometry thresholds deliberately not invented.",
+      "software_evidence": "Not implemented; no new test claim",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-07",
+      "disposition": "deferred",
+      "files": [
+        "docs/k1-gap-analysis.md"
+      ],
+      "summary": "Kept tool ownership/export cross-kernel accuracy controls not generalized without native tests.",
+      "software_evidence": "Not implemented; no new test claim",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-08",
+      "disposition": "partial_implemented_and_software_tested",
+      "files": [
+        "maintainability.py",
+        "batch_runner.py",
+        "FusionPromptBridge.py"
+      ],
+      "summary": "Cumulative budget gate plus hash-bound native observation/explicit ledger acknowledgement; retains budgets/history, requires changed strategy, never replay/promotion. Legacy missing baselines remain blocked.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "Root-only helper accounting controls passed with injected journal restart; protected-revision propagation remains blocked; native STDIO reconcile dispatch unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-09",
+      "disposition": "partial_implemented_and_software_tested",
+      "files": [
+        "maintainability.py",
+        "modeling-rules.md"
+      ],
+      "summary": "Source retention, gross additions and history removal gate. Semantic repair-chain inference, isolated replacement and parameter-behavior promotion deferred; unscoped/raw paths remain unbounded.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "New candidate unrun",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    },
+    {
+      "id": "MCP-K1-PROP-10",
+      "disposition": "implemented_and_software_tested",
+      "files": [
+        "reporting.py",
+        "job_store.py",
+        "server.py"
+      ],
+      "summary": "Compact defaults, immutable pages/deltas, unchanged polls, blocker counts, full fingerprints, measured bytes. Other full inspection endpoints/host schema overhead remain.",
+      "software_evidence": "tests/test_k1_regressions.py and retained suite",
+      "native_status": "Real STDIO native-job compact/raw pages/SHA256/unchanged/events passed; large native inventories and host token overhead unmeasured",
+      "compatibility": "Caller 2.0 compact migration; scope/task 1.0 retained; see k1-caller-migration.md"
+    }
+  ],
+  "local_native_validation": {
+    "date_local": "2026-10-21",
+    "runtime": "Fusion 2705.1.25 / Python 3.14.0",
+    "summary_receipt": "candidate-review/native-install-validation.json (private local evidence outside package)",
+    "scope": "Disposable native and real STDIO smoke only; not complete candidate or physical qualification"
+  },
+  "post_smoke_improvements": {
+    "implementation": "compatibility, preflight, explicit ledger observation/acknowledgement, negative runner",
+    "software_tests": 190,
+    "native_revised": "Bounded native controls/spacer pass; actual crash/cloud and end-to-end native STDIO reconcile remain untested",
+    "github_upload": "Implementation uploaded to private workbench via authorized GitHub browser UI; documentation accompanies transfer; no main merge/release"
+  }
+}

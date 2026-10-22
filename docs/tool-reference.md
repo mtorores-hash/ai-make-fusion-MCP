@@ -1,7 +1,6 @@
-# MCP tool reference — 0.7.0
+# MCP tool reference — 0.8.0 development
 
-32 tools. Signatures/descriptions generated from server.py. See [caller contract](caller-contract.md)
-for dictionary fields, migration, enforcement and unverified behavior.
+32 tools; caller contract 2.0. Generated from server.py. See [caller contract](caller-contract.md) and [migration](k1-caller-migration.md).
 
 ### get_modeling_rules
 
@@ -88,7 +87,7 @@ Writes to ~/FusionPromptExports and refuses overwrites. Returns local path.
 ### fusion_capabilities
 
 ```python
-fusion_capabilities(design_id: str)
+fusion_capabilities(design_id: str='')
 ```
 
 Report loaded add-in version and supported advanced operations.
@@ -146,20 +145,22 @@ Preserve existing placements unless the user requested alignment. Inspect return
 ### run_model_script
 
 ```python
-run_model_script(operation_id: str, document_id: str, component_token: str, units: Literal['mm', 'cm', 'm', 'in'], script: str, checkpoint_before: bool=True, validate_after: bool=True, mode: Literal['modeling', 'read_only']='modeling', edit_token: str='', scope: dict | None=None, task: dict | None=None, accepted_reference_versions: dict | None=None)
+run_model_script(operation_id: str, document_id: str, component_token: str, units: Literal['mm', 'cm', 'm', 'in'], script: str, checkpoint_before: bool=True, validate_after: bool=True, mode: Literal['modeling', 'read_only', 'reconcile']='modeling', edit_token: str='', scope: dict | None=None, task: dict | None=None, accepted_reference_versions: dict | None=None)
 ```
 
 Enqueue a complete trusted Fusion Python script defining run(ctx); returns immediately.
 Arbitrary Python executes with the user's permissions INSIDE Fusion, on its main thread.
 document_id is inspect_design.design_id; component_token is an explicit Component token or @root.
 mode=read_only accepts ONLY def run(ctx): return queries with literal arguments to
-ctx.inspect/validate/minimum_distance/interference/capture/audit_hygiene/evidence_fingerprint. Set checkpoint_before=False.
+ctx.inspect/validate/minimum_distance/interference/capture/present/audit_hygiene/evidence_fingerprint. Set checkpoint_before=False.
 Read-only queries do not regenerate. Full Python modeling always regenerates at completion.
+Use ctx.native_call for durable operation identity; ctx.record flushes measurements; ctx.capture(required=False) is optional.
+task.authoring adopts issue budgets; arbitrary Python is measured posthoc, not pre-dispatch bounded.
 Use ctx.target, ctx.point/value, ctx.progress, ctx.stage, ctx.record, ctx.export and return JSON.
 The same operation_id + exact request returns the same job; changed content is rejected.
 Poll job_status/job_result; NEVER auto-retry an interrupted job with a fresh ID.
 Modeling requires acquire_edit_token (matching task.writer_id), or the explicit legacy writer path.
-Caller contract 1.1 retains scope/task schema 1.0; scope revisions are checked before execution, and allowed edits afterward. Checkpoints use local F3D or
+Caller contract 2.0 retains scope/task version 1.0; scope revisions are checked before execution, and allowed edits afterward. Checkpoints use local F3D or
 a completed clean cloud version manifest for linked assemblies. Failure aborts before modeling.
 Cancellation is cooperative; a kernel call or tight Python loop cannot be forcibly interrupted.
 Units declare helper inputs; raw adsk floats STILL use Fusion native cm/radians.
@@ -175,11 +176,13 @@ Read durable status/progress without waiting for Fusion's UI thread.
 ### job_result
 
 ```python
-job_result(job_id: str, section: Literal['full','engineering'] = 'full')
+job_result(job_id: str='', section: str='summary', report_id: str='', offset: int=0, limit: int=50, after_revision: str='', baseline_report_id: str='')
 ```
 
-Read structured results, created refs, measurements, warnings, files and full traceback.
-While running, returns the latest flushed partial result. Local file paths refer to Fusion's PC.
+Compact by default; full is explicit. Immutable detail: report_id plus raw or JSON-pointer section,
+offset/limit (structured <=100). raw cursors count characters. delta compares document parameters.
+events returns durable activity after offset cursor. engineering retains detailed engineering retrieval.
+Full evidence remains stored; omissions never imply pass. Poll job_status while Fusion is busy.
 
 ### list_jobs
 
@@ -259,7 +262,7 @@ File records contain stable id, version_id for opening, version, processing/read
 ### inspect_document_state
 
 ```python
-inspect_document_state(document_id: str, acquire_token: bool=False)
+inspect_document_state(document_id: str, acquire_token: bool=False, section: Literal['summary', 'full']='summary', after_revision: str='')
 ```
 
 Read-only observation by default: cloud identity, dirty state, revisions and references.
@@ -293,7 +296,7 @@ No deletes, share links, contributor changes or automatic replacement of existin
 ### acquire_edit_token
 
 ```python
-acquire_edit_token(document_id: str, writer_id: str, accepted_reference_versions: dict | None=None)
+acquire_edit_token(document_id: str, writer_id: str, accepted_reference_versions: dict | None=None, section: Literal['summary', 'full']='summary')
 ```
 
 Acquire/reuse one unchanged writer baseline. Pins map cloud file_id to exact accepted version.
@@ -311,7 +314,7 @@ Release an unused writer token by exact identity; does not change the model.
 ### reconcile_cloud_job
 
 ```python
-reconcile_cloud_job(job_id: str, version_id: str='', confirmation_note: str='')
+reconcile_cloud_job(job_id: str, version_id: str='', confirmation_note: str='', section: Literal['summary', 'full']='summary')
 ```
 
 Observe a failed/cancelled/interrupted save's expected cloud version without replay.
@@ -330,5 +333,3 @@ Requires explicit scope/task, permitted root and source members, completed check
 dependencies. Refuses live joints/rigid groups, derived occurrences or nested/subtree removal.
 Preserves shared definitions and source/history, verifies surviving placements. Returns lifecycle
 facts for caller reconciliation; does not update BOM/graph/site. Projection/derive review is caller-owned.
-
-Engineering extension (caller 1.1): `job_result(job_id, section="engineering")` returns the latest hash-verified detailed engineering report. Default `full` preserves the prior result envelope. See [engineering-contract.md](engineering-contract.md); no additional MCP tools.

@@ -1,0 +1,35 @@
+{
+  "date_utc": "2026-10-22",
+  "baseline": "6db17f97543ab88857f185343df5b02484f9e421",
+  "runtime": "0.8.0 development",
+  "python": "3.12.14",
+  "software": {
+    "command": "python -m unittest discover -s tests -v",
+    "tests": 177,
+    "passed": 177,
+    "failures": 0,
+    "errors": 0,
+    "reported_seconds": 2.964,
+    "baseline_tests": 159,
+    "retained_project_regressions": 2,
+    "new_behavior_tests": 16
+  },
+  "syntax": "pass",
+  "git_diff_check": "pass",
+  "original_best_practices_unchanged": true,
+  "rules_mirror_equal": true,
+  "rules_sha256": "d01f958cedf8f435c348dbd10185635c75f4e1205985a6dc5d5cf78bc4e3ba79",
+  "real_stdio": {
+    "status": "unrun",
+    "reason": "MCP SDK absent; dependency installation prohibited"
+  },
+  "native_candidate": {
+    "status": "unrun",
+    "reason": "No Fusion runtime connection; production/install changes prohibited"
+  },
+  "historical_native_receipt_sha256": "af3e3b7d3c12646476813d30d57fc39b74253302e32c6eef72325760fdb83388",
+  "historical_native_not_current_acceptance": true,
+  "physical_qualification": "not performed",
+  "pushed": false,
+  "installed": false
+}

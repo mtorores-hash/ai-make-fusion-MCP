@@ -1,3 +1,7 @@
+# Current review candidate: 0.8.0
+
+Do not install this candidate yet. Follow [review/install/rollback](upgrade-v0.8-review.md) and its release condition. The earlier 0.7 authorization below is historical and does not authorize 0.8.
+
 # Installation
 
 Repository source is in [`software/fusion-prompt-mcp`](../software/fusion-prompt-mcp/). Copy that folder to your chosen permanent installation directory; the examples below assume `C:\AI-Make\fusion-prompt-mcp`. Do not point the MCP at the repository root.

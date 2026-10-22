@@ -49,3 +49,7 @@ v0.5 journals lack the new uncertainty marker; the update cannot retrospectively
 Linked checkpoints are **JSON manifests** of clean completed assembly and reference versions, not self-contained local archives or automatic rollback. Dirty linked checkpoints stop; save/poll between batches. Local unlinked checkpoints remain F3D archives. `ctx.try_feature` rejects linked experiments before regeneration, snapshot or mutation. Alternative: work on a separately authorized unlinked local part copy with a self-contained archive, review it, and deliberately integrate it later; no automatic detach, assembly rebuild or joint migration.
 
 See [disposable acceptance](disposable-acceptance-v0.6.md) and [installation/rollback](upgrade-v0.6.md). Native cloud behavior remains unverified in this development session.
+
+## 0.8 migration
+
+State/token/reconcile replies default compact; use `section="full"` or immutable detail pages. First-save completion now requires remote identity/destination confirmation; unresolved metadata never triggers another save. See [migration](k1-caller-migration.md). Native cloud acceptance remains pending.

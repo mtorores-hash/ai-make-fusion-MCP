@@ -1,0 +1,123 @@
+{
+  "date_local": "2026-10-22",
+  "status": "bounded_native_pass_with_retained_failures",
+  "activation": "Revised validation-r2 bridge active; startup disabled; old bridges stopped. Config points to matching revised server. Existing clients need reconnection.",
+  "identity": {
+    "runtime": "0.8.0",
+    "caller_contract": "2.0",
+    "protocol": 1,
+    "rules_sha256": "d01f958cedf8f435c348dbd10185635c75f4e1205985a6dc5d5cf78bc4e3ba79",
+    "build_sha256": "4a6a172660bb677432bcc0ac5e7a15df2641bb2ff687f3037723c012cedc0157"
+  },
+  "fusion_version": "2705.1.25",
+  "fusion_python": "3.14.0 (tags/v3.14.0:ebf955d, Oct  7 2025, 10:15:03) [MSC v.1944 64 bit (AMD64)]",
+  "one_shared_queue_bridge": true,
+  "native_controls": [
+    {
+      "id": "stale_token_rejects_actual_parameter_edit",
+      "passed": true
+    },
+    {
+      "id": "foreign_parameter_change_detected",
+      "passed": true
+    },
+    {
+      "id": "frozen_component_edit_detected",
+      "passed": true
+    },
+    {
+      "id": "protected_revision_ambiguity_stays_blocked",
+      "passed": true
+    },
+    {
+      "id": "interrupted_native_attempt_observable",
+      "passed": true
+    },
+    {
+      "id": "stale_ledger_observation_rejected",
+      "passed": true
+    },
+    {
+      "id": "ledger_ack_preserves_original_and_budget",
+      "passed": true
+    },
+    {
+      "id": "unchanged_strategy_stays_blocked",
+      "passed": true
+    },
+    {
+      "id": "remaining_budget_continuation",
+      "passed": true
+    },
+    {
+      "id": "optional_capture_failure_preserves_native_state",
+      "passed": true
+    }
+  ],
+  "identity_controls": [
+    {
+      "id": "legacy_missing_identity",
+      "passed": true
+    },
+    {
+      "id": "same_version_wrong_build",
+      "passed": true
+    }
+  ],
+  "real_stdio_native": {
+    "status": "pass",
+    "job_id": "db30c21c65a6440cb47db1d03c2a240e",
+    "native_preflight_stubbed": false,
+    "outcomes": {
+      "approval": "not_evaluated",
+      "authoring": "procedural_unbounded",
+      "edit_boundary": "pass",
+      "engineering": "not_checked",
+      "evidence": "pass",
+      "execution": "completed",
+      "export": "completed",
+      "integrity": "pass",
+      "mutation": true,
+      "presentation": "completed",
+      "readiness": "not_evaluated",
+      "regeneration": "completed"
+    },
+    "geometric_controls": {
+      "bore_10mm_volume_mm3": 6283.185307179855,
+      "bounds_mm": [
+        30.0,
+        30.0,
+        10.0
+      ],
+      "expected_volume_mm3": 6565.928646002668,
+      "initial_volume_mm3": 6565.928646002949,
+      "restored_bore": "8 mm",
+      "restored_volume_mm3": 6565.928646002949,
+      "sketch_fully_constrained": true,
+      "solid_count": 1
+    },
+    "file_hashes_verified": 5,
+    "raw_result_hash_verified": true
+  },
+  "failures_retained": [
+    "First native ledger run blocked on protected child revision propagation; safety guard retained",
+    "Second native harness reused synthetic document ID across distinct documents; unresolved issue claim correctly blocked continuation; harness corrected",
+    "First revised spacer script retained old expected source folder; rejected before geometry, original job failed and was not replayed; new blank fixture/operation passed"
+  ],
+  "limits": [
+    "Native ledger helpers called directly on private fixture journals; reconcile-mode end-to-end STDIO dispatch remains software-tested only",
+    "Restart journal and capture I/O failures injected; no real process crash, cloud save/reload, or physical qualification",
+    "Protected component revision propagation can conservatively block valid continuation; no guard weakening or ledger reset",
+    "Ledger acknowledgement does not repair/promote geometry, reset budgets/history, or replay original jobs",
+    "Previous K1/engineering fixture passes apply only to pre-improvement build; revised runs here cover spacer and named negative controls",
+    "Connector tools unavailable; source uploaded through authorized GitHub browser UI; no main merge, release or production changes"
+  ],
+  "github": {
+    "transport": "Authenticated GitHub web UI; owner accepted browser continuation",
+    "connector_available": false,
+    "baseline_verified": "6db17f97543ab88857f185343df5b02484f9e421",
+    "implementation_uploaded": true,
+    "implementation_head": "9d09c8ae4032f3aa746181502f9a6d07e2e3be26",
+    "main_merge_release": false
+  }
+}

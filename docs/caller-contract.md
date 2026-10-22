@@ -1,10 +1,14 @@
-# Fusion MCP caller contract 1.1
+# Fusion MCP caller contract 2.0
 
-Runtime **0.7.0 development**, rules **1.2.0**, **32 MCP tools**. Both server and add-in must match. This contract adds ordinary JSON dictionaries to existing tools; it introduces no external workflow service or database schema. All Fusion API calls remain on the main thread.
+Runtime **0.8.0 development**, rules **1.3.0**, **32 MCP tools**. Both server and add-in must match. This contract adds ordinary JSON dictionaries to existing tools; it introduces no external workflow service or database schema. All Fusion API calls remain on the main thread.
 
-## Additive engineering extension in 1.1
+## Output migration in 2.0
 
-See [engineering-contract.md](engineering-contract.md). Tool count stays 32. Scope/task JSON remains version 1.0. New batch helpers, optional export/manifest fields and `job_result(job_id, section="engineering")` are additive. Existing 1.0 callers retain behavior; new engineering gates require explicit caller plans. No silent global engineering certification is introduced.
+Read [k1-caller-migration.md](k1-caller-migration.md) for exact compact-output signatures, optional authoring budgets, activity, presentation and limits. `section="full"` restores the prior full state/job payload. This breaking default is why the caller contract is 2.0.
+
+## Retained engineering extension from 1.1
+
+See [engineering-contract.md](engineering-contract.md). Tool count stays 32. Scope/task JSON remains version 1.0. New batch helpers, optional export/manifest fields and `job_result(job_id, section="engineering")` are additive. Existing scope/task shapes are retained; compact output defaults require migration; new engineering gates require explicit caller plans. No silent global engineering certification is introduced.
 
 ## Tools and migration
 

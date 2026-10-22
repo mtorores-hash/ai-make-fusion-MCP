@@ -143,3 +143,17 @@ Native solver behavior is still unverified: [prepared acceptance](disposable-acc
 ## Engineering extension (0.7 development)
 
 Exact helper signatures, plans, examples and limits: [engineering-contract.md](engineering-contract.md). Existing helpers are retained. `surface_audit(..., intent_plan=plan)` adds declared checks; its original small-feature heuristics remain review candidates.
+
+## 0.8 activity, presentation and issue budgets
+
+See [caller migration](k1-caller-migration.md) for `ctx.native_call`, `ctx.operation`, `ctx.present`, optional `capture(required=False)`, adopted `task.authoring`, outcome handling and remaining limits.
+## 0.8 post-smoke-test additions
+
+`ctx.reconcile_authoring(issue_id, original_job_id='')` is a permitted read-only query returning
+a native-observed, hash-bound ledger proposal. `ctx.acknowledge_authoring(issue_id, observation_id,
+note, original_job_id='')` is accepted only as one literal return call in `mode='reconcile'`.
+This mode requires current scope/task/writer token, forbids checkpoints/validation regeneration,
+and does not run arbitrary Python. It accounts an interrupted attempt without replay, retains
+budgets/history, and requires a new strategy for any subsequent corrective work. See
+`k1-caller-migration.md` for the exact sequence and conservative blockers/legacy limits.
+

@@ -1,0 +1,31 @@
+{
+  "qualification": "Synthetic direct Python calls; not transport latency, native timing or token/billing measurement",
+  "rows": [
+    {
+      "parameter_count": 10,
+      "full_bytes": 378,
+      "summary_bytes": 949,
+      "unchanged_bytes": 267,
+      "summary_generation_median_ms": 0.07078549992911576,
+      "logical_summary_calls": 1,
+      "logical_unchanged_poll_calls": 1,
+      "raw_detail_calls_32768_chars": 1
+    },
+    {
+      "parameter_count": 10000,
+      "full_bytes": 287928,
+      "summary_bytes": 958,
+      "unchanged_bytes": 273,
+      "summary_generation_median_ms": 2.6113289998193068,
+      "logical_summary_calls": 1,
+      "logical_unchanged_poll_calls": 1,
+      "raw_detail_calls_32768_chars": 9
+    }
+  ],
+  "tool_count": 32,
+  "tool_description_characters": 9934,
+  "iterations_per_case": 10,
+  "validation_or_fingerprint_work_removed": false,
+  "limits": "Canonical UTF-8 response sizes exclude MCP envelope; full detail is still hashed/stored. Native latency and large real design costs unmeasured.",
+  "python": "3.12.14"
+}
