@@ -1,6 +1,6 @@
 # Fusion modeling rules — AI Make
 
-Rules version: 1.3.0. Caller contract: 2.0. Runtime: 0.8.0 development.
+Rules version: 1.3.1. Caller contract: 2.0. Runtime: 0.8.0 development.
 
 These are operational CAD rules. The caller's approved task supplies intended use, dimensions,
 manufacturing context, phase/milestone, active configuration and permitted changes. The MCP
@@ -199,3 +199,38 @@ ownership stays unproven. Volume equality alone never establishes shape equivale
 Manufacturing readiness still requires actual exported representation and slicer evidence.
 Boolean kept-tool attribution, finite roots/ligaments, actual support paths, effective presets
 and physical start enforcement are not newly implemented capabilities in 0.8.
+
+## Process 1.7 caller handoff
+
+Use the project's one living PDS and current requirement IDs from its context pointer.
+Record owner corrections/supersession before dependent work. An objection stops the
+affected action across tools/agents; independent authorized work may continue. Accept
+clear owner-reported PASS/FAIL for its stated specimen/test, labeled reported; do not
+require photos or overrule an observed failure with nominal CAD clearance.
+
+For consequential repairs, compare before/after feature/sketch counts in the same scope,
+preserve protected interfaces and try a risky repeated operation on one representative
+region. Grouping, suppression or history flattening is not a maintainable remodel. Check
+the complete relevant attachment and operating/assembly load path through ends, cuts,
+tabs, slots and ligaments, including retained geometry affected outside the edit band.
+Native health and declared planar/sampled checks do not prove adequate finite roots.
+Use task-specific engineering evidence; no universal thickness or fatigue threshold.
+
+Declare assembly order and insertion direction before mechanism selection; verify the
+actual reference interfaces, necessary insertion/tool paths and full relevant movement.
+Distinguish installed geometry from removable manufacturing aids. Preserve intentional
+seams and accepted fits. Correct a false pass explicitly and, where practical, show the
+checker rejects the old defect while accepting a valid intended case.
+
+Owner presets, package transforms/layout and emitted paths are external controlled inputs.
+Equipment access is not permission to reset them. A strength-setting permission does not
+authorize speed, flow, temperature or macros. A future slicer/submission adapter must bind
+the actual source/export, saved project, effective settings, emitted paths and submitted
+output, checking support occupancy AND exclusions and chronological bridge/root anchors.
+These are caller/adapter obligations, not newly implemented Fusion validators. An unresolved
+consequential route gap blocks only its affected new submission, not an existing print.
+Recording has separate permission; never restart it merely because printing is authorized.
+
+`fusion_capabilities().process_controls` is additive document-free implementation metadata.
+It describes the matching loaded pair only when `applies_to_loaded_pair` is true; mismatched
+builds never inherit the new server's capability claims. Metadata is not an acceptance receipt.
