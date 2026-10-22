@@ -287,3 +287,13 @@ Prepared on a separate review branch from verified workbench 15742d5. AI_MAKE dr
 the matching workflow/role/PDS changes. No running installation, production CAD, active project,
 preset, printer, recording, physical evidence, main merge or release is changed. Prior native
 receipts remain limited to their exact earlier build. See docs/process-1.7-alignment.md.
+
+## K1 CAD source follow-up — 22 October 2026
+
+Implemented parameter-only editing under explicit zero-history-growth budgets; revision-
+bound appearance records with required view/capture hashes; required-evidence blocking in
+checked exports; declared native solid-region probes; evaluator provenance/cache revision
+and explicit contradiction blocking. Rules 1.3.2, runtime 0.8.0/caller 2.0/32 tools.
+See docs/k1-cad-improvements.md. Source/API-double qualification only; not installed or
+native-qualified. Full finite-root connectivity, kept-tool attribution and all farm/slicer
+execution controls remain outside this implementation. Prior receipts qualify prior builds.
