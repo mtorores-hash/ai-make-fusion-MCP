@@ -234,3 +234,27 @@ Recording has separate permission; never restart it merely because printing is a
 `fusion_capabilities().process_controls` is additive document-free implementation metadata.
 It describes the matching loaded pair only when `applies_to_loaded_pair` is true; mismatched
 builds never inherit the new server's capability claims. Metadata is not an acceptance receipt.
+
+## K1 CAD evidence and tool ownership
+
+For a small controlling-parameter correction, prefer the supported `ctx.edit_parameters`
+route with an explicit task boundary and adopted zero-new-feature/sketch budget. Validate
+the representative consequence before repetition; do not grow a repair into hundreds of
+features merely because native health remains clean. Other edits remain trusted scripts
+under their declared boundaries; no helper sandboxes arbitrary Python or rolls back failure.
+
+For appearance-sensitive work, declare required views and current requirement IDs, retain
+hash-bound captures and a revision-bound reviewer decision using the optional appearance
+required-check contract. Capture availability is not aesthetic acceptance. Checked export
+blocks missing/failed required evidence. An unresolved contradiction blocks evidence reuse;
+preserve the earlier receipt and explicit withdrawal rather than overwriting history.
+
+Use declared `solid_probe` checks for local finite-region occupancy where appropriate.
+Choose the region and acceptance threshold from actual engineering intent, never a generic
+thickness rule. A probe pass does not establish connectivity, strength, global root
+completeness or support paths. Inspect retained affected geometry outside the edit band.
+
+Printfarm owns exact manufacturing meshes/package roundtrips, effective Orca settings,
+chronological path/support checks and the covered submission/start route. Fusion exports
+native identity and declarations; it does not manage printer profiles, queues or readiness.
+See docs/k1-cad-improvements.md for the source contract and qualification limits.
