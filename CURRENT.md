@@ -1,5 +1,16 @@
 # Current state — 0.8.0 local development candidate
 
+## K1 CAD source follow-up — 22 October 2026
+
+Implemented parameter-only editing under explicit zero-history-growth budgets; revision-
+bound appearance records with required view/capture hashes; required-evidence blocking in
+checked exports; declared native solid-region probes; evaluator provenance/cache revision
+and explicit contradiction blocking. Rules 1.3.2, runtime 0.8.0/caller 2.0/32 tools.
+See docs/k1-cad-improvements.md. Source/API-double qualification only; not installed or
+native-qualified. Full finite-root connectivity, kept-tool attribution and all farm/slicer
+execution controls remain outside this implementation. Prior receipts qualify prior builds.
+
+
 ## Process 1.7 alignment source candidate — 22 October 2026
 
 Prepared under Mauricio's instruction to match the K1 proposal with the process/MCP and
@@ -183,3 +194,7 @@ Next: review source changes and remaining gaps. Release remains conditional on p
 AND Mauricio approving the printed design. Only after explicit deployment authorization follow
 `docs/upgrade-v0.8-review.md`; preserve actual pending/partial work and verify loaded paths/versions.
 No AI_MAKE edits or messaging. No new physical, financial, public release or manufacturing claim.
+
+Qualification for the later K1 CAD source: 200 source/API-double tests and isolated
+real STDIO pass; native identity/preflight is explicitly stubbed in that protocol test.
+No new native/kernel/cloud/physical acceptance or runtime activation is claimed.
