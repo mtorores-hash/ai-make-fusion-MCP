@@ -1,3 +1,11 @@
+# Current local installation: 0.8.0 and rules 1.3.2
+
+Mauricio authorized installation and native qualification on 22 October 2026. The matching
+candidate is active; see CURRENT.md and k1-cad-native-validation.json for actual bounds.
+Old installations/configuration/queue backup are retained. Reconnect existing MCP clients
+to use the configured new server. Startup remains disabled as before. The earlier review
+restriction below is historical and superseded for this explicitly authorized installation.
+
 # Current review candidate: 0.8.0
 
 Do not install this candidate yet. Follow [review/install/rollback](upgrade-v0.8-review.md) and its release condition. The earlier 0.7 authorization below is historical and does not authorize 0.8.

@@ -1,0 +1,178 @@
+{
+  "date": "2026-10-22",
+  "runtime": "0.8.0",
+  "caller_contract": "2.0",
+  "rules_version": "1.3.2",
+  "fusion_version": "2705.1.25",
+  "identity": {
+    "runtime": "0.8.0",
+    "caller_contract": "2.0",
+    "protocol": 1,
+    "rules_sha256": "6911ead1cd5950fef61f3965bad650eef1f19420939d43f68fe96345917d6ba9",
+    "build_sha256": "7129e7dca5db44d2bbd8474a194ace2eed15d69fbe47e2d43e8b65c0fb221f49"
+  },
+  "tool_count": 32,
+  "status": "bounded_native_controls_passed",
+  "native_preflight_stubbed": false,
+  "controls": [
+    {
+      "id": "native_thin_region_rejected",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776",
+      "fill_fraction": 0.10000000000000003
+    },
+    {
+      "id": "all_parameter_edits_preflight_before_write",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "native_parameter_edit_drives_shape_without_history_growth",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776",
+      "measured_height_mm": 1.0
+    },
+    {
+      "id": "native_finite_region_accepted",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776",
+      "fill_fraction": 1.0000000000000002
+    },
+    {
+      "id": "native_unchanged_check_reuses_evidence",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "contradiction_blocks_cached_native_pass",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "native_probe_stale_revision_unproven",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "injected_evaluator_outage_stays_unproven",
+      "passed": true,
+      "injected": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "native_checked_export_rejects_missing_review",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "real_captures_bound_to_current_review",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "missing_required_view_stays_unproven",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "native_stale_appearance_review_unproven",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "capture_hash_mismatch_unproven",
+      "passed": true,
+      "reused_from_job": "18b791c417704b93b8f669ab19818776"
+    },
+    {
+      "id": "native_checked_component_step_export_accepts_current_evidence",
+      "passed": true,
+      "target_kind": "leaf_component"
+    },
+    {
+      "id": "native_probe_provenance_recorded",
+      "passed": true
+    }
+  ],
+  "authoring": {
+    "arbitrary_python_pre_dispatch_enforced": false,
+    "attempt": 5,
+    "blocked": false,
+    "cumulative_growth": {
+      "features": 0,
+      "sketches": 0
+    },
+    "elapsed_seconds": 6.55528719999711,
+    "enforcement": "preflight_budget_and_posthoc_growth",
+    "growth": {
+      "features": 0,
+      "sketches": 0
+    },
+    "issue_id": "disposable:k1-cad:20261022T143852Z",
+    "limitation": "Counts and source retention only. Native parametric behavior, aesthetic simplicity and isolated replacement promotion need separate evidence.",
+    "removed": {
+      "features": 0,
+      "sketches": 0
+    },
+    "status": "pass",
+    "violations": []
+  },
+  "artifacts": [
+    {
+      "sha256": "68ef5c635f43e9cce94f79034a58a840993722cfc941669b4a317bf9d197f39b",
+      "bytes": 70512,
+      "name": "checkpoint_000_before_batch.f3d"
+    },
+    {
+      "sha256": "739c9cdda4205793647075f80c4e8837bf468c1ed338ef058517cd8ad9de28dd",
+      "bytes": 23076,
+      "name": "qualification_isometric.png"
+    },
+    {
+      "sha256": "a22246ddc4a0df612100e4d484369b24232b9472771e7fd7492e2fc84f2728ce",
+      "bytes": 12926,
+      "name": "qualification_top.png"
+    },
+    {
+      "sha256": "2670443d5f1585fe5d244b2a8d437be435c7d5e0a054220eb928b97857d11e0b",
+      "bytes": 5595,
+      "name": "qualified_fixture.step"
+    },
+    {
+      "sha256": "064148a237ce3e01d8fef38639bdb7355e1ed618769cb19ac99321d84bc4b30a",
+      "bytes": 70855,
+      "name": "qualified_fixture.f3d"
+    },
+    {
+      "sha256": "39b071f5630e332577a5d623a45ccbbb8628f0f2f8348df9ca83ad779890dd21",
+      "bytes": 20884,
+      "name": "qualified_fixture.stl"
+    }
+  ],
+  "limits": [
+    "One evaluator outage is injected, not a real kernel failure.",
+    "STEP qualified for a leaf component; a BRepBody STEP target was rejected by Fusion.",
+    "Synchronize before fresh revision-bound capture/review/export.",
+    "No root-connectivity, strength, physical printer, native crash/cloud or nested occurrence qualification.",
+    "Appearance reviewer/content remains caller-reported; fixture review is not owner approval."
+  ],
+  "retained_failed_runs": [
+    {
+      "job_id": "dc81d0f5f75743fb98e395540e67cdee",
+      "message": "No module named 'FusionPromptBridge'"
+    },
+    {
+      "job_id": "18b791c417704b93b8f669ab19818776",
+      "message": "Qualification control failed: native_checked_export_accepts_current_declared_evidence"
+    },
+    {
+      "job_id": "025b8b6a3d9141e591a47a566ae09714",
+      "message": "Stale scope revision: fixture"
+    },
+    {
+      "job_id": "f837a2b186d04c3387308d400deb2695",
+      "message": "[Errno 2] No such file or directory: 'deliverables\\\\native-qualification\\\\20261022T144051Z\\\\qualification.json'"
+    }
+  ],
+  "client_state": "Configured server updated; existing chat session remains on old server and must reconnect. Fresh matching SDK session qualified."
+}

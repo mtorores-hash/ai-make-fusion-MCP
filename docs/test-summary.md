@@ -8,7 +8,7 @@
 
 ## Historical v0.6 record
 
-# Test summary — v0.6.0 development (2026-10-10)
+# Test summary â€” v0.6.0 development (2026-10-10)
 
 **150 automated tests pass** on Python 3.12.14: 106 baseline tests first passed unchanged;
 44 additional targeted regressions/source-contract checks now pass with the retained suite.
@@ -91,7 +91,7 @@ Run [live hygiene acceptance](disposable-acceptance-v0.6.md) after updating.
 
 ## Historical v0.4 evidence
 
-# Test summary — v0.4.0
+# Test summary â€” v0.4.0
 
 2026-09-23: **63 tests pass**, plus the real STDIO MCP protocol check (23 tools).
 New coverage: repeated read-only batches perform no regeneration; modeling still regenerates;
@@ -119,7 +119,7 @@ not available here, and those results are not evidence for the new wrappers. See
 
 ## Historical v0.3 evidence (unchanged below)
 
-# Test summary — v0.3.0
+# Test summary â€” v0.3.0
 
 ## Objective
 
@@ -191,3 +191,33 @@ publication or these tests for installation. See CURRENT.md and upgrade-v0.7.md.
 Isolated real SDK STDIO test passes with native identity/preflight explicitly stubbed.
 Rules 1.3.2; unchanged runtime 0.8.0/caller 2.0/32 tools. No native solver/Boolean,
 real Orca or printer qualification. See k1-cad-improvements.md for exact limits.
+
+## Installed and natively qualified — 22 October 2026
+
+Mauricio explicitly authorized installation and qualification through computer use. The
+rules 1.3.2 candidate is installed side by side and active after a clean Fusion restart.
+The previous installation, configuration and consistent idle-queue backup are retained.
+Fresh real SDK STDIO matched server/native runtime 0.8.0, caller 2.0, rules and build hashes;
+32 tools. No native identity or handshake was stubbed.
+
+15 bounded controls passed across the retained disposable fixture and continuation jobs,
+including one explicitly injected evaluator outage. Parameter height changed 0.1 to 1 mm
+with one feature/one sketch retained and zero history growth. Thin/finite box occupancy,
+cache/contradiction handling, stale declarations, real view hashes and checked-export
+evidence were exercised. STEP/F3D/STL and PNG artifact hashes were verified.
+
+Four failed qualification jobs remain retained: a test-package import assumption, a
+BRepBody passed to Fusion's component-only STEP API, stale scope after regeneration,
+and a test-report relative path. Corrected harness/sequence resumed the original fixture;
+the parameter edit was not replayed. Explicit allocation amendments retained all five
+attempts, cumulative elapsed time and growth; no issue reset or production edit occurred.
+The installed product source did not change during these corrections.
+
+Use a native leaf component for STEP, and synchronize before fresh revision-bound
+captures/review/export. Appearance content/decision remains caller-reported. Full root
+connectivity, strength, nested-occurrence probes, physical, real crash and cloud acceptance
+remain unqualified. See docs/k1-cad-native-validation.json for exact identity and controls.
+Configuration points to the new server; this existing chat's MCP process still reports
+the old build and needs reconnection. The fresh matching SDK session is the qualification
+evidence. Startup remains disabled as before; only the candidate bridge is running.
+
