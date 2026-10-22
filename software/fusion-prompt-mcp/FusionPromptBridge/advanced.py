@@ -117,7 +117,7 @@ def execute(op, a, d, app):
                 'engineering_plan_version':'1.0','declared_engineering_checks':['continuous_wall','gap','intersection','G1','G2','access'],
                 'engineering_detail_results':True,'stage_reconciliation':True,'manufacturing_declarations':True,
                 'continuous_collision_proof':False,'automatic_aesthetic_acceptance':False,
-                'checked_export_gate': True, 'modeling_rules_version': '1.3.0'}
+                'checked_export_gate': True, 'modeling_rules_version': '1.3.1'}
     if op == 'inspect_assembly':
         return assembly(d)
     if op == 'read_selection':
