@@ -1,0 +1,36 @@
+# Scope and capability map
+
+This is a supporting tool for prompt-driven CAD. It does not include a finished mechanism, a motor model, a validated physical fit, or production readiness.
+
+| Requested capability | Implementation | Evidence / boundary |
+| --- | --- | --- |
+| Batch script execution | Full trusted adsk script via durable jobs | Persistence/protocol tested; Fusion execution needs live acceptance |
+| Full assembly inspection | Component definitions, nested occurrences, bodies, optional topology, dimensions, transforms, feature health | Implemented; real nested geometry validation pending |
+| Constrained parametric sketches | Full API access and diameter-driven spring-cup example | Example is not a live-tested finished part |
+| Broader modeling | Full adsk available for revolve, sweep, loft, patterns, split and other features | Not separate tested wrappers for every operation |
+| Components and joints | Typed basic joints; script helpers for STEP import, joint limits and position sampling | Existing native design context required; solving pending |
+| Geometry checks | Distance, interference, section-curve sketch and discrete motion samples | No automatic access-envelope or continuous-collision proof |
+| Save/export/presentation | F3D/STEP/STL, temporary print-copy orientation, appearances, camera and PNG capture | Native Fusion output validation pending; no encoded video; cloud management added in v0.5.0 below |
+
+The script runner was explicitly requested after the earlier typed-tool-only versions. It
+executes unrestricted local Python with user permissions. Target checks are guardrails, not
+security isolation. Scripts must identify stage checkpoints and cooperative cancellation points.
+
+Live Fusion checks are still required before you rely on a result. See the [README](../README.md) for the current limits of this prototype.
+
+## v0.4 update
+
+See [Execution and verification contracts and remaining work](upgrade-v0.4.md) for earlier verification helpers.
+
+## v0.5.0 update
+
+[Cloud workflow](cloud-workflow.md) adds named project/part files, external links, selected reference
+updates and optimistic shared-edit checks. Cloud/kernel acceptance is pending.
+
+## v0.6.0 workflow compatibility
+
+Selected validation/hygiene/export, separate lifecycle/maturity/roles, caller evidence, bounded
+edit postconditions, top-level leaf retirement, accepted cloud pins, observer/writer separation
+and uncertain-save reconciliation are implemented. No universal projection/derive dependency
+graph, nested retirement, automatic rollback, or finished native acceptance is claimed. Read
+the [caller contract](caller-contract.md) and [troubleshooting](troubleshooting.md).

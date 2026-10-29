@@ -1,0 +1,8 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "script",
+  "author": "AI Make",
+  "description": {"": "Disposable 0.8 contract fixtures for a local Fusion session."},
+  "version": "0.8.0",
+  "supportedOS": "windows|mac"
+}

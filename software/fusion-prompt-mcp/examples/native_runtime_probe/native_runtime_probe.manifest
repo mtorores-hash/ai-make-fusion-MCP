@@ -1,0 +1,8 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "script",
+  "author": "AI Make",
+  "description": {"": "Read-only loaded runtime provenance; never opens or edits a design."},
+  "version": "0.8.0",
+  "supportedOS": "windows|mac"
+}
